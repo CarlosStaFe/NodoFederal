@@ -37,5 +37,9 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('sangreysudor'),
         ]);
 
+        $this->call([
+            LocalidadesSeeder::class
+        ]);
+
     }
 }

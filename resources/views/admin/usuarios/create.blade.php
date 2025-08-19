@@ -43,7 +43,7 @@
                     <label for="password_confirmation">Verificar Contraseña</label><b>*</b>
                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required>
                 </div>
-                    @error('password_verify')
+                    @error('password_confirmation')
                             <small style="color: red">{{$message}}</small>
                     @enderror
                 <br>

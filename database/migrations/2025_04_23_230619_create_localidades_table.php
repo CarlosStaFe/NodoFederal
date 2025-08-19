@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('localidades', function (Blueprint $table) {
+            $table->id();
+            $table->string('id_prov',2);
+            $table->string('provincia',100);
+            $table->string('id_local',11);
+            $table->string('localidad',100);
+            $table->string('cod_postal',10);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('localidades');
+    }
+};

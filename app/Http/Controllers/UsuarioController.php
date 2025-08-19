@@ -10,10 +10,11 @@ class UsuarioController extends Controller
     public function index()
     {
         $usuarios = User::all();
+        //return response()->json($usuarios);
         return view('admin.usuarios.index', compact('usuarios'));
     }
 
-        public function create()
+    public function create()
     {
         return view('admin.usuarios.create');
     }

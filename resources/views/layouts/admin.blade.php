@@ -9,13 +9,21 @@
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="{{ url('plugins/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ url('dist/css/adminlte.min.css?v=3.2.0') }}">
     <!-- Iconos Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- jQuery -->
+    <script src="{{url('plugins/jquery/jquery.min.js')}}"></script>
+    <!-- Sweetalert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- DataTables Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
 
 </head>
 
@@ -75,6 +83,8 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
+        
+                        <!-- Usuarios -->
                         <li class="nav-item">
                             <a href="#" class="nav-link active">
                                 <i class="nav-icon fas bi bi-person-badge"></i>
@@ -91,14 +101,87 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ url('admin/usuarios/index') }}" class="nav-link active">
+                                    <a href="{{ url('admin/usuarios') }}" class="nav-link active">
                                         <i class="bi bi-person-lines-fill nav-icon"></i>
                                         <p>Listado de Usuarios</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
+                        <!-- Nodos -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas bi bi-building-fill"></i>
+                                <p>
+                                    Nodos
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/nodos/create') }}" class="nav-link active">
+                                        <i class="bi bi-building-add nav-icon"></i>
+                                        <p>Crear Nodos</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/nodos') }}" class="nav-link active">
+                                        <i class="bi bi-building-down nav-icon"></i>
+                                        <p>Listado de Nodos</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Socios -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas fa-solid fa-building-columns"></i>
+                                <p>
+                                    Socios
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/socioss/create') }}" class="nav-link active">
+                                        <i class="fa-solid fa-building nav-icon"></i>
+                                        <p>Crear Socios</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/socios') }}" class="nav-link active">
+                                        <i class="fa-solid fa-file-contract nav-icon"></i>
+                                        <p>Listado de Socios</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Clientes -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas bi bi-people-fill"></i>
+                                <p>
+                                    Clientes
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/clientes/create') }}" class="nav-link active">
+                                        <i class="bi bi-person-plus nav-icon"></i>
+                                        <p>Crear Clientes</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/clientes') }}" class="nav-link active">
+                                        <i class="bi bi-people nav-icon"></i>
+                                        <p>Listado de Clientes</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
+                        <!-- Cerrar Sesión -->
                         <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link" style="background-color: #a9200e;"
                                 onclick="event.preventDefault();
@@ -114,9 +197,7 @@
                         </li>
                     </ul>
                 </nav>
-                <!-- /.sidebar-menu -->
             </div>
-            <!-- /.sidebar -->
         </aside>
 
         <div class="content-wrapper">
@@ -129,11 +210,23 @@
         <aside class="control-sidebar control-sidebar-dark">
             <!-- Control sidebar content goes here -->
             <div class="p-3">
-                <h5>Title</h5>
-                <p>Sidebar content</p>
+                <h5>Título</h5>
+                <p>Contenido Barra Lateral</p>
             </div>
         </aside>
-        <!-- /.control-sidebar -->
+
+        <!-- SweetAlert -->
+        @if((($message = Session::get('mensaje')) && ($icono = Session::get('icono'))))
+            <script>
+                Swal.fire({
+                    //position: "top-end",
+                    icon: "{{$icono}}",
+                    title: "{{$message}}",
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            </script>
+        @endif
 
         <!-- Main Footer -->
         <footer class="main-footer">
@@ -146,20 +239,26 @@
             reserved.
         </footer>
     </div>
-    <!-- ./wrapper -->
 
     <!-- REQUIRED SCRIPTS -->
 
-    <!-- jQuery -->
-    <script src="{{ url('plugins/jquery/jquery.min.js') }}"></script>
     <!-- Bootstrap 4 -->
     <script src="{{ url('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- DataTables Bootstrap 5 & Plugins -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="{{url('plugins/jszip/jszip.min.js')}}"></script>
+    <script src="{{url('plugins/pdfmake/pdfmake.min.js')}}"></script>
+    <script src="{{url('plugins/pdfmake/vfs_fonts.js')}}"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
     <!-- AdminLTE App -->
     <script src="{{ url('dist/js/adminlte.min.js?v=3.2.0') }}"></script>
-    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
-        integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
-        data-cf-beacon='{"rayId":"9713e4573e23ed2c","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.8.0","token":"2437d112162f4ec4b63c3ca0eb38fb20"}'
-        crossorigin="anonymous"></script>
 </body>
 
 </html>
