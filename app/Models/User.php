@@ -21,7 +21,19 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'nodo_id',
+        'socio_id',
     ];
+
+    public function nodo()
+    {
+        return $this->belongsTo(Nodo::class);
+    }
+
+    public function socio()
+    {
+        return $this->belongsTo(Socio::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

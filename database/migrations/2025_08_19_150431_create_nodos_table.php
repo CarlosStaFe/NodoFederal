@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('nodos', function (Blueprint $table) {
             $table->id();
-            $table->integer('numero')->unique();
-            $table->integer('factura');
+            $table->string('numero', 10)->unique();
+            $table->string('factura', 10);
             $table->string('nombre', 100);
             $table->string('domicilio', 100);
 

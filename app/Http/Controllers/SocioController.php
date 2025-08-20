@@ -7,20 +7,16 @@ use Illuminate\Http\Request;
 
 class SocioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $socios = Socio::with(['nodo'])->get();
+        return view('admin.socios.index', compact('socios'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $nodos = \App\Models\Nodo::all();
+        return view('admin.socios.create', compact('nodos'));
     }
 
     /**

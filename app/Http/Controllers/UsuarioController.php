@@ -9,14 +9,16 @@ class UsuarioController extends Controller
 {
     public function index()
     {
-        $usuarios = User::all();
+        $usuarios = User::with(['nodo', 'socio'])->get();
         //return response()->json($usuarios);
         return view('admin.usuarios.index', compact('usuarios'));
     }
 
     public function create()
     {
-        return view('admin.usuarios.create');
+        $nodos = \App\Models\Nodo::all();
+        $socios = \App\Models\Socio::all();
+        return view('admin.usuarios.create', compact('nodos', 'socios'));
     }
 
     public function store(Request $request)
@@ -43,14 +45,16 @@ class UsuarioController extends Controller
 
     public function show($id)
     {
-        $usuario = User::findOrFail($id);
-        return view('admin.usuarios.show', compact('usuario'));
+    $usuario = User::with(['nodo', 'socio'])->findOrFail($id);
+    return view('admin.usuarios.show', compact('usuario'));
     }
 
     public function edit($id)
     {
-        $usuario = User::findOrFail($id);
-        return view('admin.usuarios.edit', compact('usuario'));
+    $nodos = \App\Models\Nodo::all();
+    $socios = \App\Models\Socio::all();
+    $usuario = User::with(['nodo', 'socio'])->findOrFail($id);
+    return view('admin.usuarios.edit', compact('usuario', 'nodos', 'socios'));
     }
     
     public function update(Request $request, $id)

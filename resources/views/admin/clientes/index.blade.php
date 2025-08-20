@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-    <h1>Listado de Nodos</h1>
+    <h1>Listado de Clientes</h1>
 
     <div class="col-md-12">
         <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title">Nodos Registrados</h3>
+                <h3 class="card-title">Clientes Registrados</h3>
             
                 <div class="card-tools">
-                    <a href="{{url('/admin/nodos/create')}}" class="btn btn-primary">
-                        Registrar Nodo
+                    <a href="{{url('/admin/clientes/create')}}" class="btn btn-primary">
+                        Registrar Cliente
                     </a>
                 </div>
             </div>
@@ -30,18 +30,18 @@
                     </thead>
                     <tbody>
                         <?php $linea = 1; ?>
-                        @foreach($nodos as $nodo)
+                        @foreach($clientes as $cliente)
                         <tr>
                             <td style="text-align: right;">{{ $linea++ }}</td>
-                            <td style="text-align: right;">{{ $nodo->numero }}</td>
-                            <td style="text-align: right;">{{ $nodo->factura }}</td>
-                            <td>{{ $nodo->nombre }}</td>
-                            <td>{{ $nodo->telefono }}</td>
-                            <td>{{ $nodo->estado }}</td>
+                            <td>{{ $cliente->numero }}</td>
+                            <td>{{ $cliente->factura }}</td>
+                            <td>{{ $cliente->nombre }}</td>
+                            <td>{{ $cliente->telefono }}</td>
+                            <td>{{ $cliente->estado }}</td>
                             <td>
-                                <a href="{{url('admin/nodos/'.$nodo->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
-                                <a href="{{url('admin/nodos/'.$nodo->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
-                                <a href="{{url('admin/nodos/'.$nodo->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
+                                <a href="{{url('admin/clientes/'.$cliente->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                                <a href="{{url('admin/clientes/'.$cliente->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
+                                <a href="{{url('admin/clientes/'.$cliente->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         @endforeach

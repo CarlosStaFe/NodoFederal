@@ -7,21 +7,17 @@ use Illuminate\Http\Request;
 
 class ClienteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $clientes = Cliente::all();
+        return view('admin.clientes.index', compact('clientes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('admin.clientes.create');
     }
+
 
     /**
      * Store a newly created resource in storage.

@@ -3,49 +3,59 @@
 @section('content')
 
 <div class="row">
-    <h1>Modificar nodo: {{$nodo->nombre}}</h1>
+    <h1>Registrar Socios</h1>
 </div>
 
 <div class="col-md-12">
-    <div class="card card-outline card-info">
+    <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">Actualizar los datos</h3>
+            <h3 class="card-title">Completar los datos</h3>
         </div>
 
         <div class="card-body">
-            <form action="{{url('/admin/nodos',$nodo->id)}}" method="POST">
+            <form action="{{url('/admin/socios/create')}}" method="POST">
                 @csrf
-                @method('PUT')
                 <div class="row">
                     <div>
                         <input id="nombrelocal" name="nombrelocal" type="hidden">
                         <input id="nombreprov" name="nombreprov" type="hidden">
-                        <input id="codigopostal" name="codigopostal" type="hidden" value="{{$nodo->localidad->id}}">
                     </div>
-
-                    <div class="col-md-1">
+                    <div class="col-md-2">
                         <div class="form-group">
-                            <label for="numero">Número</label><b>*</b>
-                            <input type="number" class="form-control" value="{{$nodo->numero}}" id="numero" name="numero" placeholder="Nodo" required readonly>
+                            <label for="numero">Número Socio</label><b>*</b>
+                            <input type="text" class="form-control" value="{{old('numero')}}" id="numero" name="numero" placeholder="Número del Socio" required>
                             @error('numero')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="nodo">Nombre del Nodo</label><b>*</b>
+                            <input type="text" class="form-control" value="{{old('nodo')}}" id="nodo" name="nodo" placeholder="Nombre del Nodo" required>
+                            @error('nodo')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="factura">Factura</label><b>*</b>
-                            <input type="number" class="form-control" value="{{$nodo->factura}}" id="factura" name="factura" placeholder="Número de Facturación" required>
-                            @error('factura')
+                            <label for="clase" class="form-label">Clase</label><b>*</b>
+                            <select id="clase" name="clase" class="form-select" required>
+                                <option selected disabled>Elige una clase...</option>
+                                <option value="SIMPLE">SIMPLE</option>
+                                <option value="CORPORATIVO">CORPORATIVO</option>
+                            </select>
+                            @error('clase')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-2">
                         <div class="form-group">
-                            <label for="nombre">Nombre del Nodo</label><b>*</b>
-                            <input type="text" class="form-control" value="{{$nodo->nombre}}" id="nombre" name="nombre" placeholder="Nombre del Nodo" required>
-                            @error('nombre')
+                            <label for="razon_social">Razón Social</label><b>*</b>
+                            <input type="text" class="form-control" value="{{old('razon_social')}}" id="razon_social" name="razon_social" placeholder="Razón Social" required>
+                            @error('razon_social')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
@@ -53,7 +63,7 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="cuit">C.U.I.T.</label><b>*</b>
-                            <input type="text" class="form-control" value="{{$nodo->cuit}}" id="cuit" name="cuit" placeholder="C.U.I.T." required>
+                            <input type="text" class="form-control" value="{{old('cuit')}}" id="cuit" name="cuit" placeholder="C.U.I.T." required>
                             @error('cuit')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -62,8 +72,9 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="tipo">Tipo I.V.A.</label>
-                            <select type="text" class="form-control" id="tipo" name="tipo" placeholder="Tipo I.V.A." required>
-                                <option value="{{$nodo->tipo}}">{{$nodo->tipo ?? 'N/A'}}</option>
+                            <select type="text" class="form-control" value="{{old('tipo')}}" id="tipo" name="tipo" placeholder="Tipo I.V.A." required>
+                                <option selected disabled>Elige una tipo de I.V.A...</option>
+                                <option value="Consumidor Final">Consumidor Final</option>
                                 <option value="Exento">Exento</option>
                                 <option value="Monotributo">Monotributo</option>
                                 <option value="No Responsable">No Responsable</option>
@@ -79,7 +90,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="domicilio">Domicilio</label><b>*</b>
-                            <input type="text" class="form-control" value="{{$nodo->domicilio}}" id="domicilio" name="domicilio" placeholder="Domicilio" required>
+                            <input type="text" class="form-control" value="{{old('domicilio')}}" id="domicilio" name="domicilio" placeholder="Domicilio" required>
                             @error('domicilio')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -87,9 +98,9 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
-                            <label for="provincia">Provincia</label><b>*</b>
-                            <select type="text" class="form-control" value="{{strtoupper($nodo->localidad->provincia ?? 'N/A')}}" id="provincia" name="provincia" placeholder="Provincia">
-                                <option value="{{$nodo->localidad->id_prov}}">{{strtoupper($nodo->localidad->provincia ?? 'N/A')}}</option>
+                            <label for="provincia">Provincia</label>
+                            <select type="text" class="form-control" value="{{old('provincia')}}" id="provincia" name="provincia" placeholder="Provincia">
+                                <option selected disabled>Elige provincia...</option>
                                 <option value="6">BUENOS AIRES</option>
                                 <option value="2">CABA</option>
                                 <option value="10">CATAMARCA</option>
@@ -122,9 +133,8 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
-                            <label for="localidad">Localidad</label><b>*</b>
-                            <select type="text" class="form-control" value="{{strtoupper($nodo->localidad->localidad ?? 'N/A')}}" id="localidad" name="localidad" placeholder="Localidad">
-                                <option value="{{$nodo->localidad->id_local}}">{{strtoupper($nodo->localidad->localidad ?? 'N/A')}}</option>
+                            <label for="localidad">Localidad</label>
+                            <select type="text" class="form-control" value="{{old('localidad')}}" id="localidad" name="localidad" placeholder="Localidad">
                             </select>
                             @error('localidad')
                                 <small style="color: red">{{$message}}</small>
@@ -133,9 +143,8 @@
                     </div>
                     <div class="col-md-2 col-sm-12">
                         <div class="form-group">
-                            <label for="cod_postal">Cod.Postal</label><b>*</b>
-                            <select type="text" class="form-control" value="{{$nodo->localidad->cod_postal ?? 'N/A' }}" id="cod_postal" name="cod_postal" placeholder="Código">
-                                <option value="{{$nodo->localidad->id}}">{{strtoupper($nodo->localidad->cod_postal ?? 'N/A')}}</option>
+                            <label for="cod_postal">Cod.Postal</label>
+                            <select type="text" class="form-control" value="{{old('cod_postal')}}" id="cod_postal" name="cod_postal" placeholder="Código">
                             </select>
                             @error('cod_postal')
                                 <small style="color: red">{{$message}}</small>
@@ -147,26 +156,26 @@
                     <div class="col-md-4 col-sm-12">
                         <div class="form group">
                             <label for="telefono">Teléfono</label><b>*</b>
-                            <input type="text" class="form-control" value="{{$nodo->telefono}}" id="telefono" name="telefono" placeholder="Teléfono" required>
+                            <input type="text" class="form-control" value="{{old('telefono')}}" id="telefono" name="telefono" placeholder="Teléfono" required>
                             @error('telefono')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-5 col-sm-4">
+                    <div class="col-md-4 col-sm-4">
                         <div class="form group">
                             <label for="email">Email</label><b>*</b>
-                            <input type="email" class="form-control" value="{{$nodo->email}}" id="email" name="email" placeholder="Email" required>
+                            <input type="email" class="form-control" value="{{old('email')}}" id="email" name="email" placeholder="Email" required>
                             @error('email')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-4">
+                    <div class="col-md-3 col-sm-4">
                         <div class="form group">
-                            <label for="estado">Estado</label><b>*</b>
-                            <select type="text" class="form-control" value="{{$nodo->estado}}" id="estado" name="estado" placeholder="Estado">
-                                <option value="{{$nodo->estado}}">{{strtoupper($nodo->estado ?? 'N/A')}}</option>
+                            <label for="estado">Estado</label>
+                            <select type="text" class="form-control" value="{{old('estado')}}" id="estado" name="estado" placeholder="Estado">
+                                <option selected disabled>Elige estado...</option>
                                 <option value="Activo">Activo</option>
                                 <option value="Inactivo">Inactivo</option>
                             </select>
@@ -181,7 +190,7 @@
                     <div class="col-md-12 col-sm-4">
                         <div class="form-group">
                             <label for="observacion">Observación</label>
-                            <textarea class="form-control" id="observacion" name="observacion" placeholder="Ingrese una observación">{{$nodo->observacion}}</textarea>
+                            <textarea class="form-control" value={{old('observacion')}} id="observacion" name="observacion" placeholder="Ingrese una observación"></textarea>
                             @error('observacion')
                                 <small style="color: red">{{ $message }}</small>
                             @enderror
@@ -190,8 +199,8 @@
                 </div>
                 <br>
                 <div class="form group">
-                    <a href="{{url('admin/nodos')}}" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-info">Actualizar</button>
+                    <a href="{{url('admin/socios')}}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Registrar Socio</button>
                 </div>
             </form>
         </div>
@@ -200,7 +209,7 @@
 
 <!-- // Script para seleccionar la provincia y la localidad -->
 <script>
-    document.getElementById('provincia').addEventListener('change', function () {
+    document.getElementById('provincia').addEventListener('change', function() {
         const idProv = this.value;
         const nombreProv = this.options[this.selectedIndex].text;
         const localidadSelect = document.getElementById('localidad');
@@ -247,7 +256,6 @@
             })
             .catch(error => console.error('Error al obtener los códigos postales:', error));
     });
-
 </script>
 
 @endsection
