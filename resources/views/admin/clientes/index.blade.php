@@ -20,11 +20,13 @@
                     <thead style="background-color:rgb(14, 107, 169); color: white;">
                         <tr>
                             <th style="text-align: center; width: 5%;">#</th>
-                            <th style="text-align: center; width: 6%;">NRO.</th>
-                            <th style="text-align: center; width: 6%;">FACT.</th>
-                            <th style="text-align: center; width: 30%;">NOMBRE</th>
-                            <th style="text-align: center; width: 20%;">TELÉFONO</th>
-                            <th style="text-align: center; width: 10%;">ESTADO</th>
+                            <th style="text-align: center; width: 6%;">TIPO</th>
+                            <th style="text-align: center; width: 8%;">DOCUM.</th>
+                            <th style="text-align: center; width: 4%;">S.</th>
+                            <th style="text-align: center; width: 28%;">APELLIDO Y NOMBRES</th>
+                            <th style="text-align: center; width: 10%;">C.U.I.T.</th>
+                            <th style="text-align: center; width: 18%;">ESTADO</th>
+                            <th style="text-align: center; width: 10%;">FECHA EST.</th>
                             <th style="text-align: center; width: 11%;">ACCIONES</th>
                         </tr>
                     </thead>
@@ -33,11 +35,13 @@
                         @foreach($clientes as $cliente)
                         <tr>
                             <td style="text-align: right;">{{ $linea++ }}</td>
-                            <td>{{ $cliente->numero }}</td>
-                            <td>{{ $cliente->factura }}</td>
-                            <td>{{ $cliente->nombre }}</td>
-                            <td>{{ $cliente->telefono }}</td>
+                            <td>{{ $cliente->tipodoc }}</td>
+                            <td>{{ $cliente->documento }}</td>
+                            <td style="text-align: center;">{{ $cliente->sexo }}</td>
+                            <td>{{ $cliente->apelnombres }}</td>
+                            <td>{{ $cliente->cuit }}</td>
                             <td>{{ $cliente->estado }}</td>
+                            <td>{{ \Carbon\Carbon::parse($cliente->fechaestado)->format('d-m-Y') }}</td>
                             <td>
                                 <a href="{{url('admin/clientes/'.$cliente->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
                                 <a href="{{url('admin/clientes/'.$cliente->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
@@ -75,7 +79,7 @@
                     },
                 },
                 "columnDefs": [
-                    { "orderable": false, "targets": [3] }
+                    { "orderable": false, "targets": [0,8] }
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });

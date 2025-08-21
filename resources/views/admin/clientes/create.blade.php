@@ -20,11 +20,11 @@
                         <input id="nombrelocal" name="nombrelocal" type="hidden">
                         <input id="nombreprov" name="nombreprov" type="hidden">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <div class="form-group">
-                            <label for="tipodoc" class="form-label">Tipo Doc.</label>
+                            <label for="tipodoc" class="form-label">Tipo Doc.</label><b>*</b>
                             <select id="tipodoc" name="tipodoc" class="form-select" required>
-                                <option selected disabled>Elige tipo...</option>
+                                <option selected disabled>Tipo...</option>
                                 <option value="DNI">DNI</option>
                                 <option value="LC">LC</option>
                                 <option value="LE">LE</option>
@@ -36,10 +36,24 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="col-md-1 col-sm-4">
+                        <div class="form group">
+                            <label for="sexo">Sexo</label><b>*</b>
+                            <select type="text" class="form-control" value="{{old('sexo')}}" id="sexo" name="sexo" placeholder="Sexo" required>
+                                <option selected disabled>Elige sexo...</option>
+                                <option value="M">M</option>
+                                <option value="F">F</option>
+                                <option value="S">S</option>
+                            </select>
+                            @error('sexo')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="documento" class="form-label">Documento</label>
-                            <input id="documento" name="documento" type="text" class="form-control" required>
+                            <label for="documento" class="form-label">Documento</label><b>*</b>
+                            <input id="documento" name="documento" type="text" class="form-control" placeholder="Documento..." required>
                             @error('documento')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -48,26 +62,26 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="cuit">C.U.I.T.</label><b>*</b>
-                            <input type="text" class="form-control" value="{{old('cuit')}}" id="cuit" name="cuit" placeholder="C.U.I.T." required>
+                            <input type="text" class="form-control" value="{{ old('cuit', isset($cuit) ? $cuit : '') }}" id="cuit" name="cuit" placeholder="C.U.I.T." required readonly>
                             @error('cuit')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="apelnombre" class="form-label">Apellido y Nombres</label>
-                            <input id="apelnombre" name="apelnombre" type="text" class="form-control" required>
-                            @error('apelnombre')
+                            <label for="apelnombres" class="form-label">Apellido y Nombres</label><b>*</b>
+                            <input id="apelnombres" name="apelnombres" type="text" class="form-control" placeholder="Apellido y Nombres" required>
+                            @error('apelnombres')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         <div class="form-group">
-                            <label for="fechanac" class="form-label">Fecha Nac.</label>
-                            <input id="fechanac" name="fechanac" type="date" class="form-control" required>
-                            @error('fechanac')
+                            <label for="nacimiento" class="form-label">Fecha Nac.</label><b>*</b>
+                            <input id="nacimiento" name="nacimiento" type="date" class="form-control" required>
+                            @error('nacimiento')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
@@ -85,7 +99,7 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
-                            <label for="provincia">Provincia</label>
+                            <label for="provincia">Provincia</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('provincia')}}" id="provincia" name="provincia" placeholder="Provincia">
                                 <option selected disabled>Elige provincia...</option>
                                 <option value="6">BUENOS AIRES</option>
@@ -120,7 +134,7 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
-                            <label for="localidad">Localidad</label>
+                            <label for="localidad">Localidad</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('localidad')}}" id="localidad" name="localidad" placeholder="Localidad">
                             </select>
                             @error('localidad')
@@ -130,7 +144,7 @@
                     </div>
                     <div class="col-md-2 col-sm-12">
                         <div class="form-group">
-                            <label for="cod_postal">Cod.Postal</label>
+                            <label for="cod_postal">Cod.Postal</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('cod_postal')}}" id="cod_postal" name="cod_postal" placeholder="Código">
                             </select>
                             @error('cod_postal')
@@ -140,7 +154,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-md-3 col-sm-12">
                         <div class="form group">
                             <label for="telefono">Teléfono</label><b>*</b>
                             <input type="text" class="form-control" value="{{old('telefono')}}" id="telefono" name="telefono" placeholder="Teléfono" required>
@@ -160,11 +174,16 @@
                     </div>
                     <div class="col-md-3 col-sm-4">
                         <div class="form group">
-                            <label for="estado">Estado</label>
+                            <label for="estado">Estado</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('estado')}}" id="estado" name="estado" placeholder="Estado">
                                 <option selected disabled>Elige estado...</option>
                                 <option value="Activo">Activo</option>
                                 <option value="Inactivo">Inactivo</option>
+                                <option value="Atrasado">Atrasado</option>
+                                <option value="Cancelado">Cancelado</option>
+                                <option value="Cancelado con atraso">Cancelado con atraso</option>
+                                <option value="Afectado">Afectado</option>
+                                <option value="En Convenio">En Convenio</option>
                             </select>
                             @error('estado')
                                 <small style="color: red">{{$message}}</small>
@@ -242,6 +261,43 @@
                 });
             })
             .catch(error => console.error('Error al obtener los códigos postales:', error));
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function actualizarCuit() {
+            const dni = document.getElementById('documento').value;
+            let sexo = '';
+            // Puedes tener un select o radio para sexo/tipo
+            if(document.getElementById('sexo')) {
+                sexo = document.getElementById('sexo').value;
+            } else if(document.getElementById('tipopersona')) {
+                // Si tienes un select para tipo de persona (M/F/S)
+                sexo = document.getElementById('tipopersona').value;
+            }
+            if(dni && sexo) {
+                fetch("{{ route('clientes.calcular-cuit') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                    },
+                    body: JSON.stringify({dni: dni, sexo: sexo})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cuit').value = data.cuit || '';
+                });
+            }
+        }
+        document.getElementById('documento').addEventListener('input', actualizarCuit);
+        if(document.getElementById('sexo')) {
+            document.getElementById('sexo').addEventListener('change', actualizarCuit);
+        }
+        if(document.getElementById('tipopersona')) {
+            document.getElementById('tipopersona').addEventListener('change', actualizarCuit);
+        }
     });
 </script>
 

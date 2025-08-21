@@ -61,7 +61,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="tipo">Tipo I.V.A.</label>
+                            <label for="tipo">Tipo I.V.A.</label><b>*</b>
                             <select type="text" class="form-control" id="tipo" name="tipo" placeholder="Tipo I.V.A." required>
                                 <option value="{{$nodo->tipo}}">{{$nodo->tipo ?? 'N/A'}}</option>
                                 <option value="Exento">Exento</option>

@@ -20,12 +20,12 @@
                     <thead style="background-color:rgb(14, 107, 169); color: white;">
                         <tr>
                             <th style="text-align: center; width: 5%;">#</th>
-                            <th style="text-align: center; width: 6%;">NRO.</th>
-                            <th style="text-align: center; width: 30%;">NOMBRE</th>
-                            <th style="text-align: center; width: 10%;">CLASE</th>
+                            <th style="text-align: center; width: 8%;">NRO.</th>
+                            <th style="text-align: center; width: 25%;">NOMBRE</th>
+                            <th style="text-align: center; width: 11%;">CLASE</th>
                             <th style="text-align: center; width: 20%;">NODO</th>
-                            <th style="text-align: center; width: 10%;">TELÉFONO</th>
-                            <th style="text-align: center; width: 10%;">ESTADO</th>
+                            <th style="text-align: center; width: 11%;">TELÉFONO</th>
+                            <th style="text-align: center; width: 9%;">ESTADO</th>
                             <th style="text-align: center; width: 11%;">ACCIONES</th>
                         </tr>
                     </thead>
@@ -34,10 +34,16 @@
                         @foreach($socios as $socio)
                         <tr>
                             <td style="text-align: right;">{{ $linea++ }}</td>
-                            <td>{{ $socio->numero }}</td>
-                            <td>{{ $socio->nombre }}</td>
+                            <td style="text-align: right;">{{ $socio->numero }}</td>
+                            <td>{{ $socio->razon_social }}</td>
                             <td>{{ $socio->clase }}</td>
-                            <td>{{ $socio->nodo }}</td>
+                            <td>
+                                @if($socio->nodo)
+                                    {{ $socio->nodo->numero }} - {{ $socio->nodo->nombre }}
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>{{ $socio->telefono }}</td>
                             <td>{{ $socio->estado }}</td>
                             <td>
@@ -77,7 +83,7 @@
                     },
                 },
                 "columnDefs": [
-                    { "orderable": false, "targets": [3] }
+                    { "orderable": false, "targets": [0, 7] }
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });

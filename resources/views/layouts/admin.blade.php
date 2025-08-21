@@ -95,13 +95,13 @@
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="{{ url('admin/usuarios/create') }}" class="nav-link active">
-                                        <i class="bi bi-person-plus-fill nav-icon"></i>
+                                        <i class="bi bi-person-bounding-box nav-icon"></i>
                                         <p>Crear Usuarios</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ url('admin/usuarios') }}" class="nav-link active">
-                                        <i class="bi bi-person-lines-fill nav-icon"></i>
+                                        <i class="bi bi-list-check nav-icon"></i>
                                         <p>Listado de Usuarios</p>
                                     </a>
                                 </li>
@@ -110,7 +110,7 @@
                         <!-- Nodos -->
                         <li class="nav-item">
                             <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-building-fill"></i>
+                                <i class="nav-icon fas bi bi-geo-alt-fill"></i>
                                 <p>
                                     Nodos
                                     <i class="right fas fa-angle-left"></i>
@@ -119,13 +119,13 @@
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="{{ url('admin/nodos/create') }}" class="nav-link active">
-                                        <i class="bi bi-building-add nav-icon"></i>
+                                        <i class="bi bi-geo nav-icon"></i>
                                         <p>Crear Nodos</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ url('admin/nodos') }}" class="nav-link active">
-                                        <i class="bi bi-building-down nav-icon"></i>
+                                        <i class="bi bi-list-columns-reverse nav-icon"></i>
                                         <p>Listado de Nodos</p>
                                     </a>
                                 </li>
@@ -143,13 +143,13 @@
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="{{ url('admin/socios/create') }}" class="nav-link active">
-                                        <i class="fa-solid fa-building nav-icon"></i>
+                                        <i class="bi bi-buildings nav-icon"></i>
                                         <p>Crear Socios</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ url('admin/socios') }}" class="nav-link active">
-                                        <i class="fa-solid fa-file-contract nav-icon"></i>
+                                        <i class="bi bi-card-checklist nav-icon"></i>
                                         <p>Listado de Socios</p>
                                     </a>
                                 </li>
@@ -182,7 +182,7 @@
                         <!-- Operaciones -->
                         <li class="nav-item">
                             <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-people-fill"></i>
+                                <i class="nav-icon fas bi bi-briefcase-fill"></i>
                                 <p>
                                     Operaciones
                                     <i class="right fas fa-angle-left"></i>
@@ -191,19 +191,19 @@
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="{{ url('admin/clientes/create') }}" class="nav-link active">
-                                        <i class="bi bi-person-plus nav-icon"></i>
+                                        <i class="bi bi-search nav-icon"></i>
                                         <p>Consultar Antecedentes</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ url('admin/clientes') }}" class="nav-link active">
-                                        <i class="bi bi-people nav-icon"></i>
+                                        <i class="bi bi-bag-plus nav-icon"></i>
                                         <p>Cargar Operaciones</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ url('admin/clientes') }}" class="nav-link active">
-                                        <i class="bi bi-people nav-icon"></i>
+                                        <i class="bi bi-fire nav-icon"></i>
                                         <p>Afectar Cliente</p>
                                     </a>
                                 </li>

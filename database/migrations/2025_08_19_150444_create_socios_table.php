@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('socios', function (Blueprint $table) {
             $table->id();
-            $table->integer('numero')->unique();
+            $table->string('numero', 10)->unique();
 
             $table->unsignedBigInteger('nodo_id');
             $table->foreign('nodo_id')->references('id')->on('nodos')->nullable();
 
             $table->string('clase', 30);
-            $table->string('nombre', 100);
+            $table->string('razon_social', 100);
             $table->string('domicilio', 100);
 
             $table->unsignedBigInteger('cod_postal_id');

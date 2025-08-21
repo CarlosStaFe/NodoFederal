@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="tipo">Tipo I.V.A.</label>
+                            <label for="tipo">Tipo I.V.A.</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('tipo')}}" id="tipo" name="tipo" placeholder="Tipo I.V.A." required>
                                 <option selected disabled>Elige una tipo de I.V.A...</option>
                                 <option value="Consumidor Final">Consumidor Final</option>

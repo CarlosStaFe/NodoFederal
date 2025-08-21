@@ -1,6 +1,9 @@
-<?php
 
+<?php
 use Illuminate\Support\Facades\Route;
+// Endpoint AJAX para calcular CUIT
+Route::post('/admin/clientes/calcular-cuit', [\App\Http\Controllers\ClienteController::class, 'calcularCuit'])->name('clientes.calcular-cuit');
+
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;

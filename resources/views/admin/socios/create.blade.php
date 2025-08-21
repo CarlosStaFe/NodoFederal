@@ -22,23 +22,28 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="numero">Número Socio</label><b>*</b>
-                            <input type="text" class="form-control" value="{{old('numero')}}" id="numero" name="numero" placeholder="Número del Socio" required>
+                            <label for="numero">Número</label><b>*</b>
+                            <input type="number" class="form-control" value="{{ old('numero', isset($numero) ? $numero : '') }}" id="numero" name="numero" placeholder="Número del Socio" required>
                             @error('numero')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <div class="form-group">
-                            <label for="nodo">Nombre del Nodo</label><b>*</b>
-                            <input type="text" class="form-control" value="{{old('nodo')}}" id="nodo" name="nodo" placeholder="Nombre del Nodo" required>
-                            @error('nodo')
+                            <label for="nodo_id">Nombre del Nodo</label><b>*</b>
+                            <select class="form-control" id="nodo_id" name="nodo_id" required>
+                                <option value="" disabled selected>Seleccione un nodo...</option>
+                                @foreach($nodos as $nodo)
+                                    <option value="{{$nodo->id}}" {{ old('nodo_id') == $nodo->id ? 'selected' : '' }}>{{$nodo->numero}} - {{$nodo->nombre}}</option>
+                                @endforeach
+                            </select>
+                            @error('nodo_id')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="clase" class="form-label">Clase</label><b>*</b>
                             <select id="clase" name="clase" class="form-select" required>
@@ -51,7 +56,9 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-2">
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
                         <div class="form-group">
                             <label for="razon_social">Razón Social</label><b>*</b>
                             <input type="text" class="form-control" value="{{old('razon_social')}}" id="razon_social" name="razon_social" placeholder="Razón Social" required>
@@ -69,9 +76,9 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <label for="tipo">Tipo I.V.A.</label>
+                            <label for="tipo">Tipo I.V.A.</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('tipo')}}" id="tipo" name="tipo" placeholder="Tipo I.V.A." required>
                                 <option selected disabled>Elige una tipo de I.V.A...</option>
                                 <option value="Consumidor Final">Consumidor Final</option>
@@ -85,8 +92,6 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="domicilio">Domicilio</label><b>*</b>
@@ -98,7 +103,7 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
-                            <label for="provincia">Provincia</label>
+                            <label for="provincia">Provincia</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('provincia')}}" id="provincia" name="provincia" placeholder="Provincia">
                                 <option selected disabled>Elige provincia...</option>
                                 <option value="6">BUENOS AIRES</option>
@@ -133,7 +138,7 @@
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
-                            <label for="localidad">Localidad</label>
+                            <label for="localidad">Localidad</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('localidad')}}" id="localidad" name="localidad" placeholder="Localidad">
                             </select>
                             @error('localidad')
@@ -143,7 +148,7 @@
                     </div>
                     <div class="col-md-2 col-sm-12">
                         <div class="form-group">
-                            <label for="cod_postal">Cod.Postal</label>
+                            <label for="cod_postal">Cod.Postal</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('cod_postal')}}" id="cod_postal" name="cod_postal" placeholder="Código">
                             </select>
                             @error('cod_postal')
@@ -173,7 +178,7 @@
                     </div>
                     <div class="col-md-3 col-sm-4">
                         <div class="form group">
-                            <label for="estado">Estado</label>
+                            <label for="estado">Estado</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('estado')}}" id="estado" name="estado" placeholder="Estado">
                                 <option selected disabled>Elige estado...</option>
                                 <option value="Activo">Activo</option>
