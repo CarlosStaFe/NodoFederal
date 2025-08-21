@@ -62,7 +62,7 @@ class ClienteController extends Controller
         $cliente->documento = $request->documento;
         $cliente->sexo = $request->sexo;
         $cliente->cuit = $request->cuit;
-        $cliente->apelnombres = $request->apelnombres;
+        $cliente->apelnombres = strtoupper($request->apelnombres);
         $cliente->nacimiento = $request->nacimiento;
         $cliente->domicilio = $request->domicilio;
         $cliente->cod_postal_id = $request->cod_postal;
@@ -113,7 +113,7 @@ class ClienteController extends Controller
         $cliente->documento = $request->documento;
         $cliente->sexo = $request->sexo;
         $cliente->cuit = $request->cuit;
-        $cliente->apelnombres = $request->apelnombres;
+        $cliente->apelnombres = strtoupper($request->apelnombres);
         $cliente->nacimiento = $request->nacimiento ? date('Y-m-d', strtotime($request->nacimiento)) : null;
         $cliente->domicilio = $request->domicilio;
         $cliente->cod_postal_id = $request->cod_postal;

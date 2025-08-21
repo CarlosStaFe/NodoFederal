@@ -74,142 +74,149 @@
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="info">
                         <a href="" class="d-block">Usuario: <b>{{ Auth::user()->name }}</b></a>
-                        {{-- <a href="" class="d-block">Rol: <b>{{ Auth::user()->roles->pluck('name')->first() }}</b></a> --}}
+                        <a href="" class="d-block">Rol: <b>{{ Auth::user()->roles->pluck('name')->first() }}</b></a>
                     </div>
                 </div>
 
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="false">
-        
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Usuarios -->
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-person-badge"></i>
-                                <p>
-                                    Usuarios
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/usuarios/create') }}" class="nav-link active">
-                                        <i class="bi bi-person-bounding-box nav-icon"></i>
-                                        <p>Crear Usuarios</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/usuarios') }}" class="nav-link active">
-                                        <i class="bi bi-list-check nav-icon"></i>
-                                        <p>Listado de Usuarios</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @can('admin.usuarios.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-person-badge"></i>
+                                    <p>
+                                        Usuarios
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/usuarios/create') }}" class="nav-link active">
+                                            <i class="bi bi-person-bounding-box nav-icon"></i>
+                                            <p>Crear Usuarios</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/usuarios') }}" class="nav-link active">
+                                            <i class="bi bi-list-check nav-icon"></i>
+                                            <p>Listado de Usuarios</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
                         <!-- Nodos -->
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-geo-alt-fill"></i>
-                                <p>
-                                    Nodos
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/nodos/create') }}" class="nav-link active">
-                                        <i class="bi bi-geo nav-icon"></i>
-                                        <p>Crear Nodos</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/nodos') }}" class="nav-link active">
-                                        <i class="bi bi-list-columns-reverse nav-icon"></i>
-                                        <p>Listado de Nodos</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @can('admin.nodos.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-geo-alt-fill"></i>
+                                    <p>
+                                        Nodos
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/nodos/create') }}" class="nav-link active">
+                                            <i class="bi bi-geo nav-icon"></i>
+                                            <p>Crear Nodos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/nodos') }}" class="nav-link active">
+                                            <i class="bi bi-list-columns-reverse nav-icon"></i>
+                                            <p>Listado de Nodos</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
                         <!-- Socios -->
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas fa-solid fa-building-columns"></i>
-                                <p>
-                                    Socios
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/socios/create') }}" class="nav-link active">
-                                        <i class="bi bi-buildings nav-icon"></i>
-                                        <p>Crear Socios</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/socios') }}" class="nav-link active">
-                                        <i class="bi bi-card-checklist nav-icon"></i>
-                                        <p>Listado de Socios</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @can('admin.socios.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas fa-solid fa-building-columns"></i>
+                                    <p>
+                                        Socios
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/socios/create') }}" class="nav-link active">
+                                            <i class="bi bi-buildings nav-icon"></i>
+                                            <p>Crear Socios</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/socios') }}" class="nav-link active">
+                                            <i class="bi bi-card-checklist nav-icon"></i>
+                                            <p>Listado de Socios</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
                         <!-- Clientes -->
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-people-fill"></i>
-                                <p>
-                                    Clientes
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/clientes/create') }}" class="nav-link active">
-                                        <i class="bi bi-person-plus nav-icon"></i>
-                                        <p>Crear Clientes</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/clientes') }}" class="nav-link active">
-                                        <i class="bi bi-people nav-icon"></i>
-                                        <p>Listado de Clientes</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @can('admin.clientes.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-people-fill"></i>
+                                    <p>
+                                        Clientes
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/clientes/create') }}" class="nav-link active">
+                                            <i class="bi bi-person-plus nav-icon"></i>
+                                            <p>Crear Clientes</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/clientes') }}" class="nav-link active">
+                                            <i class="bi bi-people nav-icon"></i>
+                                            <p>Listado de Clientes</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
                         <!-- Operaciones -->
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-briefcase-fill"></i>
-                                <p>
-                                    Operaciones
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/clientes/create') }}" class="nav-link active">
-                                        <i class="bi bi-search nav-icon"></i>
-                                        <p>Consultar Antecedentes</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/clientes') }}" class="nav-link active">
-                                        <i class="bi bi-bag-plus nav-icon"></i>
-                                        <p>Cargar Operaciones</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ url('admin/clientes') }}" class="nav-link active">
-                                        <i class="bi bi-fire nav-icon"></i>
-                                        <p>Afectar Cliente</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
+                        {{-- @can('admin.operaciones.index') --}}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-briefcase-fill"></i>
+                                    <p>
+                                        Operaciones
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/clientes/create') }}" class="nav-link active">
+                                            <i class="bi bi-search nav-icon"></i>
+                                            <p>Consultar Antecedentes</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/clientes') }}" class="nav-link active">
+                                            <i class="bi bi-bag-plus nav-icon"></i>
+                                            <p>Cargar Operaciones</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/clientes') }}" class="nav-link active">
+                                            <i class="bi bi-fire nav-icon"></i>
+                                            <p>Afectar Cliente</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {{-- @endcan --}}
                         <!-- Cerrar Sesión -->
                         <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link" style="background-color: #a9200e;"
