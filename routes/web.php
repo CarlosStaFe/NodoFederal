@@ -12,6 +12,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\NodoController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\OperacionController;
 
 Route::get('/', function () {
     return redirect()->route('admin.index');
@@ -65,6 +66,11 @@ Route::get('/admin/clientes/{id}/confirm-delete', [ClienteController::class, 'co
 Route::delete('/admin/clientes/{id}', [ClienteController::class, 'destroy'])->name('admin.clientes.destroy')->middleware(['auth', 'can:admin.clientes.destroy']);
 
 // RUTAS PARA EL ADMIN - OPERACIONES
+Route::get('/admin/operaciones/consulta', [OperacionController::class, 'consultar'])->name('admin.operaciones.consulta')->middleware(['auth', 'can:admin.operaciones.consulta']);
+Route::get('/admin/operaciones/create', [OperacionController::class, 'create'])->name('admin.operaciones.create')->middleware(['auth', 'can:admin.operaciones.create']);
+Route::post('/admin/operaciones/create', [OperacionController::class, 'store'])->name('admin.operaciones.store')->middleware(['auth', 'can:admin.operaciones.store']);
+Route::get('/admin/operaciones/{id}', [OperacionController::class, 'show'])->name('admin.operaciones.show')->middleware(['auth', 'can:admin.operaciones.show']);
+Route::get('/admin/operaciones/afectar', [OperacionController::class, 'afectarCreate'])->name('admin.operaciones.afectar')->middleware(['auth', 'can:admin.operaciones.afectar']);
 
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD

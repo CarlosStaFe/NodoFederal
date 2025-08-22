@@ -86,14 +86,10 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'admin.clientes.destroy'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
 
         //RUTA PARA EL ADMIN - OPERACIONES
-        Permission::create(['name' => 'admin.operaciones.index'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::create(['name' => 'admin.operaciones.consulta'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
         Permission::create(['name' => 'admin.operaciones.create'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.store'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.show'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.edit'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.update'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.confirmDelete'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.destroy'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::create(['name' => 'admin.operaciones'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::create(['name' => 'admin.operaciones.afectar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
 
 
         $this->call([

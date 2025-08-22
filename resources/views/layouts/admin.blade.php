@@ -186,7 +186,7 @@
                             </li>
                         @endcan
                         <!-- Operaciones -->
-                        {{-- @can('admin.operaciones.index') --}}
+                        @can('admin.operaciones.index')
                             <li class="nav-item">
                                 <a href="#" class="nav-link active">
                                     <i class="nav-icon fas bi bi-briefcase-fill"></i>
@@ -197,26 +197,26 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="{{ url('admin/clientes/create') }}" class="nav-link active">
+                                        <a href="{{ url('admin/operaciones/consulta') }}" class="nav-link active">
                                             <i class="bi bi-search nav-icon"></i>
                                             <p>Consultar Antecedentes</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ url('admin/clientes') }}" class="nav-link active">
+                                        <a href="{{ url('admin/operaciones/create') }}" class="nav-link active">
                                             <i class="bi bi-bag-plus nav-icon"></i>
                                             <p>Cargar Operaciones</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ url('admin/clientes') }}" class="nav-link active">
+                                        <a href="{{ url('admin/operaciones/afectar') }}" class="nav-link active">
                                             <i class="bi bi-fire nav-icon"></i>
                                             <p>Afectar Cliente</p>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                        {{-- @endcan --}}
+                        @endcan
                         <!-- Cerrar Sesión -->
                         <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link" style="background-color: #a9200e;"

@@ -35,8 +35,8 @@
                 </div>
                     <br>
                     <div class="form group">
-                        <a href="{{url('admin/usuarios')}}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Registrar Usuario</button>
+                        <a href="{{url('admin/operaciones')}}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Consultar</button>
                     </div>
                 </div>
             </form>
