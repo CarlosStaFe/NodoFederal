@@ -26,20 +26,6 @@ class ClienteController extends Controller
         return view('admin.clientes.create', compact('cuit'));
     }
 
-    /**
-     * Endpoint para calcular el CUIT vía AJAX
-     */
-    public function calcularCuit(Request $request)
-    {
-        $dni = $request->input('dni');
-        $sexo = $request->input('sexo');
-        $cuit = null;
-        if ($dni && $sexo) {
-            $cuit = CuitHelper::calcularCuit($dni, $sexo);
-        }
-        return response()->json(['cuit' => $cuit]);
-    }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -142,4 +128,19 @@ class ClienteController extends Controller
             ->with('mensaje', 'Cliente eliminado con éxito.')
             ->with('icono', 'success');
     }
+
+    /**
+    * Endpoint para calcular el CUIT vía AJAX
+    */
+    public function calcularCuit(Request $request)
+    {
+        $dni = $request->input('dni');
+        $sexo = $request->input('sexo');
+        $cuit = null;
+        if ($dni && $sexo) {
+            $cuit = CuitHelper::calcularCuit($dni, $sexo);
+        }
+        return response()->json(['cuit' => $cuit]);
+    }
+
 }

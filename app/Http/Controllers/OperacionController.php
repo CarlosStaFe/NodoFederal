@@ -4,9 +4,96 @@ namespace App\Http\Controllers;
 
 use App\Models\Operacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OperacionController extends Controller
 {
+    /**
+     * Muestra el formulario de consulta de operaciones.
+     */
+    public function consultar()
+    {
+        return view('admin.operaciones.consultar');
+    }
+    /**
+     * Obtiene un token de autenticación desde la API externa usando datos del .env
+     */
+    public function obtenerTokenApi()
+    {
+        $url = env('API_TOKEN');
+        $user = env('API_USER');
+        $password = env('API_PASSWORD');
+
+        $response = Http::post($url, [
+            'username' => $user,
+            'password' => $password,
+        ]);
+
+        // dd($response->json());
+
+        if ($response && $response->successful()) {
+            return $response->json();
+        } else {
+            Log::error('Error autenticando con la API', [
+                'url' => $url,
+                'status' => $response ? $response->status() : 'sin respuesta',
+                'body' => $response ? $response->body() : 'sin respuesta'
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Consulta la API externa por documento y muestra los datos en la vista.
+     */
+    public function consultarApiPorDocumento(Request $request)
+    {
+        $dni = $request->input('documento');
+        $apiUrl = env('API_DOC');
+        $apiUrl = preg_replace('/=(\?)/', '='.$dni, $apiUrl, 1);
+
+        // Obtener el token
+        $token = $this->obtenerTokenApi();
+        //dd($token);
+        if (!$token) {
+            return back()->with('error', 'No se pudo obtener el token de autenticación.');
+        }
+        $access_token = $token['access_token'] ?? null;
+        //dd($access_token);
+
+        if (!$token) {
+            return back()->with('error', 'No se pudo obtener el token de autenticación.');
+        }
+
+        $response = Http::withToken($access_token)->get($apiUrl);
+        // Mostrar en consola para depuración
+        //dd($response);
+
+        if ($response->successful()) {
+            $datos = $response->json();
+            //dd($datos);
+            return view('admin.operaciones.consultar', compact('datos'));
+        } else {
+            return back()->with('error', 'No se pudo obtener datos de la API.');
+        }
+    }
+
+    public function informe()
+    {
+        return view('admin.operaciones.informe');
+    }
+
+    public function pdf()
+    {
+        // No usar authorize ni policies aquí
+        $pdf = PDF::loadView('admin.operaciones.pdf');
+        return $pdf->stream();
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -1,5 +1,5 @@
-
 <?php
+
 use Illuminate\Support\Facades\Route;
 // Endpoint AJAX para calcular CUIT
 Route::post('/admin/clientes/calcular-cuit', [\App\Http\Controllers\ClienteController::class, 'calcularCuit'])->name('clientes.calcular-cuit');
@@ -72,6 +72,10 @@ Route::post('/admin/operaciones/create', [OperacionController::class, 'store'])-
 Route::get('/admin/operaciones/{id}', [OperacionController::class, 'show'])->name('admin.operaciones.show')->middleware(['auth', 'can:admin.operaciones.show']);
 Route::get('/admin/operaciones/afectar', [OperacionController::class, 'afectarCreate'])->name('admin.operaciones.afectar')->middleware(['auth', 'can:admin.operaciones.afectar']);
 
+// Consulta de operaciones por documento (API externa)
+Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consultarApiPorDocumento'])->name('admin.operaciones.consultar.api')->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/informe', [OperacionController::class, 'informe'])->name('admin.operaciones.informe')->middleware(['auth']);
+Route::get('/admin/operaciones/pdf', [OperacionController::class, 'pdf'])->name('admin.operaciones.pdf.api')->middleware(['auth']);
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);

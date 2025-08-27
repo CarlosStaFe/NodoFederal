@@ -15,32 +15,50 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //seeder para roles y permisos admin, secretaria, nodos, socios
-        $admin = Role::create(['name' => 'admin', 'guard_name' => 'web']);
-        $secretaria = Role::create(['name' => 'secretaria', 'guard_name' => 'web']);
-        $nodo = Role::create(['name' => 'nodo', 'guard_name' => 'web']);
-        $socio = Role::create(['name' => 'socio', 'guard_name' => 'web']);
 
-        User::create([
-            'name' => 'Administrador',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('sangreysudor'),
-        ])->assignRole($admin);
-        User::create([
-            'name' => 'Secretaria',
-            'email' => 'secretaria@secretaria.com',
-            'password' => Hash::make('sangreysudor'),
-        ])->assignRole($secretaria);
-        User::create([
-            'name' => 'Nodo',
-            'email' => 'nodo@nodo.com',
-            'password' => Hash::make('sangreysudor'),
-        ])->assignRole($nodo);
-        User::create([
-            'name' => 'Socio',
-            'email' => 'socio@socio.com',
-            'password' => Hash::make('sangreysudor'),
-        ])->assignRole($socio);
+    // Seeder para roles y permisos admin, secretaria, nodos, socios
+    $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    $secretaria = Role::firstOrCreate(['name' => 'secretaria', 'guard_name' => 'web']);
+    $nodo = Role::firstOrCreate(['name' => 'nodo', 'guard_name' => 'web']);
+    $socio = Role::firstOrCreate(['name' => 'socio', 'guard_name' => 'web']);
+    // Permiso para mostrar el menú de Operaciones
+    Permission::firstOrCreate(['name' => 'admin.operaciones.index'])->syncRoles([$admin]);
+
+        $adminUser = User::firstOrCreate(
+            ['email' => 'admin@admin.com'],
+            [
+                'name' => 'Administrador',
+                'password' => Hash::make('sangreysudor'),
+            ]
+        );
+        $adminUser->assignRole($admin);
+
+        $secretariaUser = User::firstOrCreate(
+            ['email' => 'secretaria@secretaria.com'],
+            [
+                'name' => 'Secretaria',
+                'password' => Hash::make('sangreysudor'),
+            ]
+        );
+        $secretariaUser->assignRole($secretaria);
+
+        $nodoUser = User::firstOrCreate(
+            ['email' => 'nodo@nodo.com'],
+            [
+                'name' => 'Nodo',
+                'password' => Hash::make('sangreysudor'),
+            ]
+        );
+        $nodoUser->assignRole($nodo);
+
+        $socioUser = User::firstOrCreate(
+            ['email' => 'socio@socio.com'],
+            [
+                'name' => 'Socio',
+                'password' => Hash::make('sangreysudor'),
+            ]
+        );
+        $socioUser->assignRole($socio);
 
         //RUTA PARA EL ADMIN
         Permission::create(['name' => 'admin.index']);
@@ -87,10 +105,10 @@ class DatabaseSeeder extends Seeder
 
         //RUTA PARA EL ADMIN - OPERACIONES
         Permission::create(['name' => 'admin.operaciones.consulta'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.create'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::create(['name' => 'admin.operaciones.consultar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        //Permission::create(['name' => 'admin.operaciones.informe'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        //Permission::create(['name' => 'admin.operaciones.pdf'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
         Permission::create(['name' => 'admin.operaciones.afectar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-
 
         $this->call([
             LocalidadesSeeder::class
