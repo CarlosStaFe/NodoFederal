@@ -209,7 +209,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ url('admin/operaciones/afectar') }}" class="nav-link active">
+                                        <a href="{{ url('admin/operaciones/show') }}" class="nav-link active">
                                             <i class="bi bi-fire nav-icon"></i>
                                             <p>Afectar Cliente</p>
                                         </a>

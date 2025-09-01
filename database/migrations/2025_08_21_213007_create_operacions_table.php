@@ -25,9 +25,9 @@ return new class extends Migration
 
             $table->string('tipo', 20)->default('Solicitante');
             $table->date('fecha_operacion');
-            $table->double('valor_cuota', 15, 2);
+            $table->decimal('valor_cuota', 15, 2);
             $table->integer('cant_cuotas');
-            $table->double('total', 15, 2);
+            $table->decimal('total', 15, 2);
             $table->date('fecha_cuota');
             $table->string('clase', 20)->default('Comercial');
 

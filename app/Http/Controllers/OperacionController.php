@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Operacion;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -85,6 +86,9 @@ class OperacionController extends Controller
         }
     }
 
+    /**
+     * Muestra los datos de la consulta en el formulario informe.
+     */
     public function informe()
     {
         $datos = session('datos_api');
@@ -95,6 +99,9 @@ class OperacionController extends Controller
         return view('admin.operaciones.informe', compact('datos'));
     }
 
+    /**
+     * Genera un PDF con los datos de la consulta.
+     */
     public function pdf()
     {
         $datos = session('datos_api');
@@ -105,17 +112,12 @@ class OperacionController extends Controller
         return $pdf->stream();
     }
 
+    /**
+     * Carga la operación de un cliente.
+     */
     public function cargar()
     {
         return view('admin.operaciones.cargar');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -123,16 +125,69 @@ class OperacionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validar datos básicos
+        $request->validate([
+            'cuit' => 'required',
+            'numero_socio' => 'required',
+            'valor' => 'required|numeric',
+            'cuotas' => 'required|integer',
+            'total' => 'required|numeric',
+            'vencimiento' => 'required|date',
+            'operacion' => 'required',
+        ]);
+
+        // Buscar cliente y socio
+        $cliente = \App\Models\Cliente::where('cuit', $request->cuit)->firstOrFail();
+        $socio = \App\Models\Socio::where('numero', $request->numero_socio)->firstOrFail();
+        $user = Auth::user();
+
+        // Crear operación
+        $operacion = new \App\Models\Operacion();
+        $operacion->numero = rand(100000, 999999); // O usa lógica adecuada
+        $operacion->id_cliente = $cliente->id;
+        $operacion->estado_actual = $cliente->estado;
+        $operacion->fecha_estado = $cliente->fechaestado ?? now();
+        $operacion->id_socio = $socio->id;
+        $operacion->tipo = 'Solicitante';
+        $operacion->fecha_operacion = now();
+        $operacion->valor_cuota = $request->valor;
+        $operacion->cant_cuotas = $request->cuotas;
+        $operacion->total = $request->total;
+        $operacion->fecha_cuota = $request->vencimiento;
+        $operacion->clase = $request->operacion;
+        $operacion->id_usuario = $user->id;
+        $operacion->save();
+
+        // Guardar garantes si existen
+        if ($request->filled('garantes_json')) {
+            $garantes = json_decode($request->garantes_json, true);
+            if (is_array($garantes)) {
+                foreach ($garantes as $garante) {
+                    \App\Models\Garante::create([
+                        'operacion_id' => $operacion->id,
+                        'cuit' => $garante['cuit'] ?? '',
+                        'tipodoc' => $garante['tipodoc'] ?? '',
+                        'sexo' => $garante['sexo'] ?? '',
+                        'documento' => $garante['documento'] ?? '',
+                        'apelnombres' => $garante['apelnombres'] ?? '',
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('admin.operaciones.show', ['id' => $operacion->id])
+            ->with('mensaje', 'Operación registrada correctamente.')
+            ->with('icono', 'success');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Operacion $operacion)
+    * Carga la operación de un cliente.
+    */
+    public function show()
     {
-        //
+        return view('admin.operaciones.show');
     }
+
 
     /**
      * Show the form for editing the specified resource.

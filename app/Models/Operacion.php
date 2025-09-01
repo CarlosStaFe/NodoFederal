@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Operacion extends Model
 {
+    protected $table = 'operaciones';
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'id_cliente');

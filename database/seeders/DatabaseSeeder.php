@@ -154,6 +154,8 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'admin.operaciones.informe'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
         Permission::create(['name' => 'admin.operaciones.pdf'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
         Permission::create(['name' => 'admin.operaciones.cargar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::create(['name' => 'admin.operaciones.store'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::create(['name' => 'admin.operaciones.show'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
 
         Permission::create(['name' => 'admin.operaciones.afectar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
 

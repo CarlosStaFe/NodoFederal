@@ -1,4 +1,3 @@
-
 @extends('layouts.admin')
 
 @section('content')
@@ -14,14 +13,9 @@
         </div>
 
         <div class="card-body">
-            <form action="{{url('/admin/operaciones/cargar')}}" method="POST">
-                <div id="mensajeNoExiste" class="alert alert-warning" style="display:none;">Cliente no encontrado.</div>
+            <form action="{{ route('admin.operaciones.store') }}" method="POST" id="formOperacion">
                 @csrf
                 <div class="row">
-                    <div>
-                        <input id="nombrelocal" name="nombrelocal" type="hidden">
-                        <input id="nombreprov" name="nombreprov" type="hidden">
-                    </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="cuit">C.U.I.T.</label><b>*</b>
@@ -180,9 +174,31 @@
                             <input type="text" class="form-control" id="apelnombres_garante" name="apelnombres_garante" value="{{ old('apelnombres_garante', isset($cliente) ? $cliente->apelnombres : '') }}" readonly>
                         </div>
                     </div>
+
                     <div class="col-lg-2 p-4 col-md-12">
                         <button type="button" class="btn btn-success btn-sm" id="agregarGarante">Agregar Garante</button>
                     </div>
+                    <div class="col-lg-12 mt-4">
+                        <h5 class="text-primary">Lista de Garantes</h5>
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-primary text-center">
+                                <tr>
+                                    <th>#</th>
+                                    <th>C.U.I.T.</th>
+                                    <th>Tipo Doc.</th>
+                                    <th>Sexo</th>
+                                    <th>Documento</th>
+                                    <th>Apellido y Nombres</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaGarantes">
+                                <!-- Las filas se agregarán dinámicamente aquí -->
+                            </tbody>
+                        </table>
+                        <!-- <button type="button" class="btn btn-success btn-sm" id="agregarGarante">Agregar Garante</button> -->
+                    </div>
+                    
                 </div>
                 <br>
                 <div class="form group">
@@ -308,6 +324,103 @@
                         }
                     });
             }
+        });
+    });
+</script>
+
+<script>
+    // Referencias a los elementos del formulario
+    const cuitInput = document.getElementById('cuit_garante');
+    const tipoInput = document.getElementById('tipodoc_garante');
+    const sexoInput = document.getElementById('sexo_garante');
+    const documentoInput = document.getElementById('documento_garante');
+    const apelnombresInput = document.getElementById('apelnombres_garante');
+    const agregarGaranteBtn = document.getElementById('agregarGarante');
+
+    // Contador para las filas
+    let contadorGarantes = 0;
+
+    // Función para agregar un garante a la tabla
+    agregarGaranteBtn.addEventListener('click', () => {
+        const cuit = cuitInput.value;
+        const tipoDoc = tipoInput.value;
+        const sexo = sexoInput.value;
+        const nroDoc = documentoInput.value;
+        const apeNom = apelnombresInput.value;
+        // Validar que los campos no estén vacíos
+        if (!cuit) {
+            alert('Por favor, ingrese el C.U.I.T. del garante antes de agregarlo.');
+            return;
+        }
+
+        // Incrementar el contador
+        contadorGarantes++;
+
+        // Crear una nueva fila
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${contadorGarantes}</td>
+            <td>${cuit}</td>
+            <td>${tipoDoc}</td>
+            <td>${sexo}</td>
+            <td>${nroDoc}</td>
+            <td>${apeNom}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-info btn-sm editarGarante">Editar</button>
+                <button type="button" class="btn btn-danger btn-sm eliminarGarante">Eliminar</button>
+            </td>
+        `;
+
+        // Agregar la fila a la tabla
+        tablaGarantes.appendChild(fila);
+
+        // Limpiar los campos del formulario
+        cuit_garante.value = '';
+        tipoInput.value = '';
+        sexoInput.value = '';
+        documentoInput.value = '';
+        apelnombresInput.value = '';
+
+        // Agregar funcionalidad al botón "Eliminar"
+        fila.querySelector('.eliminarGarante').addEventListener('click', () => {
+            fila.remove();
+            actualizarNumeracion();
+        });
+
+        // Agregar funcionalidad al botón "Editar" (opcional)
+        fila.querySelector('.editarGarante').addEventListener('click', () => {
+            cuitInput.value = cuit;
+            tipoInput.value = tipoDoc;
+            sexoInput.value = sexo;
+            documentoInput.value = nroDoc;
+            apelnombresInput.value = apeNom;
+            fila.remove();
+            actualizarNumeracion();
+        });
+    });
+</script>
+
+<script>
+// Serializar garantes antes de enviar el formulario
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('formOperacion');
+        const tablaGarantes = document.getElementById('tablaGarantes');
+        form.addEventListener('submit', function(e) {
+            const filas = tablaGarantes.querySelectorAll('tr');
+            const garantes = [];
+            filas.forEach(fila => {
+                const celdas = fila.querySelectorAll('td');
+                if (celdas.length >= 6) {
+                    garantes.push({
+                        cuit: celdas[1].innerText.trim(),
+                        tipodoc: celdas[2].innerText.trim(),
+                        sexo: celdas[3].innerText.trim(),
+                        documento: celdas[4].innerText.trim(),
+                        apelnombres: celdas[5].innerText.trim(),
+                    });
+                }
+            });
+            document.getElementById('garantes_json').value = JSON.stringify(garantes);
         });
     });
 </script>
