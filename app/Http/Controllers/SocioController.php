@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Socio;
@@ -111,5 +110,15 @@ class SocioController extends Controller
         return redirect()->route('admin.socios.index')
             ->with('mensaje', 'Socio eliminado con éxito.')
             ->with('icono', 'success');
+    }
+
+    public function buscarPorNumero($numero)
+    {
+        $socio = Socio::where('numero', $numero)->first();
+        if ($socio) {
+            return response()->json(['success' => true, 'socio' => $socio]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 }

@@ -105,12 +105,9 @@ class OperacionController extends Controller
         return $pdf->stream();
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function cargar()
     {
-        //
+        return view('admin.operaciones.cargar');
     }
 
     /**

@@ -20,7 +20,7 @@
                 </div>
                 <div class="col-md-1 col-sm-12 position-relative">
                     <div class="form group">
-                        <label for="tipodoc">Tipo Doc</label>
+                        <label for="tipodoc">Tipo Doc.</label>
                         <p>{{$cliente->tipodoc}}</p>
                     </div>
                 </div>

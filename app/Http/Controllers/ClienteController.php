@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
@@ -141,6 +140,19 @@ class ClienteController extends Controller
             $cuit = CuitHelper::calcularCuit($dni, $sexo);
         }
         return response()->json(['cuit' => $cuit]);
+    }
+    
+    /**
+     * Buscar cliente por CUIT (AJAX)
+     */
+    public function buscarPorCuit($cuit)
+    {
+        $cliente = Cliente::where('cuit', $cuit)->first();
+        if ($cliente) {
+            return response()->json(['success' => true, 'cliente' => $cliente]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 
 }

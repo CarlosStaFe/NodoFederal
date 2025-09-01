@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 // Endpoint AJAX para calcular CUIT
 Route::post('/admin/clientes/calcular-cuit', [\App\Http\Controllers\ClienteController::class, 'calcularCuit'])->name('clientes.calcular-cuit');
@@ -55,6 +54,7 @@ Route::get('/admin/socios/{id}/edit', [SocioController::class, 'edit'])->name('a
 Route::put('/admin/socios/{id}', [SocioController::class, 'update'])->name('admin.socios.update')->middleware(['auth', 'can:admin.socios.update']);
 Route::get('/admin/socios/{id}/confirm-delete', [SocioController::class, 'confirmDelete'])->name('admin.socios.confirm-delete')->middleware(['auth', 'can:admin.socios.confirm-delete']);
 Route::delete('/admin/socios/{id}', [SocioController::class, 'destroy'])->name('admin.socios.destroy')->middleware(['auth', 'can:admin.socios.destroy']);
+Route::get('/admin/socios/buscar-por-numero/{numero}', [SocioController::class, 'buscarPorNumero'])->name('socios.buscar-por-numero')->middleware(['auth', 'can:admin.socios.destroy']);
 
 // RUTAS PARA EL ADMIN - CLIENTES
 Route::get('/admin/clientes', [ClienteController::class, 'index'])->name('admin.clientes.index')->middleware(['auth', 'can:admin.clientes.index']);
@@ -65,6 +65,8 @@ Route::get('/admin/clientes/{id}/edit', [ClienteController::class, 'edit'])->nam
 Route::put('/admin/clientes/{id}', [ClienteController::class, 'update'])->name('admin.clientes.update')->middleware(['auth', 'can:admin.clientes.update']);
 Route::get('/admin/clientes/{id}/confirm-delete', [ClienteController::class, 'confirmDelete'])->name('admin.clientes.confirm-delete')->middleware(['auth', 'can:admin.clientes.confirm-delete']);
 Route::delete('/admin/clientes/{id}', [ClienteController::class, 'destroy'])->name('admin.clientes.destroy')->middleware(['auth', 'can:admin.clientes.destroy']);
+// Endpoint AJAX para buscar cliente por CUIT (sin middleware, antes de rutas protegidas)
+Route::get('/admin/clientes/buscar-por-cuit/{cuit}', [ClienteController::class, 'buscarPorCuit'])->name('admin.clientes.buscar-por-cuit');
 
 // RUTAS PARA EL ADMIN - OPERACIONES
 Route::get('/admin/operaciones/consultar', [OperacionController::class, 'consultar'])->name('admin.operaciones.consulta')->middleware(['auth', 'can:admin.operaciones.consultar']);
@@ -72,13 +74,15 @@ Route::get('/admin/operaciones/informe', [OperacionController::class, 'informe']
 Route::get('/admin/operaciones/pdf', [OperacionController::class, 'pdf'])->name('admin.operaciones.pdf')->middleware(['auth', 'can:admin.operaciones.pdf']);
 // Consulta de operaciones por documento (API externa)
 Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consultarApiPorDocumento'])->name('admin.operaciones.consultar.api')->middleware(['auth', 'can:admin.operaciones.consultar']);
-
-
-Route::get('/admin/operaciones/create', [OperacionController::class, 'create'])->name('admin.operaciones.create')->middleware(['auth', 'can:admin.operaciones.create']);
-Route::post('/admin/operaciones/create', [OperacionController::class, 'store'])->name('admin.operaciones.store')->middleware(['auth', 'can:admin.operaciones.store']);
-Route::get('/admin/operaciones/{id}', [OperacionController::class, 'show'])->name('admin.operaciones.show')->middleware(['auth', 'can:admin.operaciones.show']);
-Route::get('/admin/operaciones/afectar', [OperacionController::class, 'afectarCreate'])->name('admin.operaciones.afectar')->middleware(['auth', 'can:admin.operaciones.afectar']);
+Route::get('/admin/operaciones/cargar', [OperacionController::class, 'cargar'])->name('admin.operaciones.cargar')->middleware(['auth', 'can:admin.operaciones.cargar']);
+Route::post('/admin/operaciones/cargar', [OperacionController::class, 'cargar'])->name('admin.operaciones.cargar')->middleware(['auth', 'can:admin.operaciones.cargar']);
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);
 Route::get('/admin/codpostales/{idLocal}', [LocalidadController::class, 'getCodigosPostales']);
+
+
+Route::get('/admin/operaciones/{id}', [OperacionController::class, 'show'])->name('admin.operaciones.show')->middleware(['auth', 'can:admin.operaciones.show']);
+Route::get('/admin/operaciones/afectar', [OperacionController::class, 'afectarCreate'])->name('admin.operaciones.afectar')->middleware(['auth', 'can:admin.operaciones.afectar']);
+
+

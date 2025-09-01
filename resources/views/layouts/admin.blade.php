@@ -203,7 +203,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ url('admin/operaciones/create') }}" class="nav-link active">
+                                        <a href="{{ url('admin/operaciones/cargar') }}" class="nav-link active">
                                             <i class="bi bi-bag-plus nav-icon"></i>
                                             <p>Cargar Operaciones</p>
                                         </a>
