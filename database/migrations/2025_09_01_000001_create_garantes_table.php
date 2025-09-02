@@ -14,11 +14,7 @@ return new class extends Migration
         Schema::create('garantes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('operacion_id')->constrained('operaciones')->onDelete('cascade');
-            $table->string('cuit', 11);
-            $table->string('tipodoc', 5);
-            $table->string('sexo', 1);
-            $table->string('documento', 20);
-            $table->string('apelnombres', 50);
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
             $table->timestamps();
         });
     }

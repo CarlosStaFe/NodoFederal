@@ -160,7 +160,8 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'admin.operaciones.afectar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
 
         $this->call([
-            LocalidadesSeeder::class
+            LocalidadesSeeder::class,
+            NodosSeeder::class,
         ]);
 
     }

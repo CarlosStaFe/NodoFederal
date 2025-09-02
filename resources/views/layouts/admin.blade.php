@@ -258,8 +258,8 @@
                     //position: "top-end",
                     icon: "{{$icono}}",
                     title: "{{$message}}",
-                    showConfirmButton: false,
-                    timer: 3000
+                    showConfirmButton: "{{$showConfirmButton ?? 'false'}}",
+                    timer: "{{$timer ?? 3000}}",
                 });
             </script>
         @endif

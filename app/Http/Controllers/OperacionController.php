@@ -142,8 +142,13 @@ class OperacionController extends Controller
         $user = Auth::user();
 
         // Crear operación
-        $operacion = new \App\Models\Operacion();
-        $operacion->numero = rand(100000, 999999); // O usa lógica adecuada
+        $operacion = new Operacion();
+        // Buscar el primer número libre desde 1
+        $numero = 1;
+        while (Operacion::where('numero', $numero)->exists()) {
+            $numero++;
+        }
+        $operacion->numero = $numero;
         $operacion->id_cliente = $cliente->id;
         $operacion->estado_actual = $cliente->estado;
         $operacion->fecha_estado = $cliente->fechaestado ?? now();
@@ -163,21 +168,21 @@ class OperacionController extends Controller
             $garantes = json_decode($request->garantes_json, true);
             if (is_array($garantes)) {
                 foreach ($garantes as $garante) {
+                    // Buscar el cliente por cuit del garante
+                    $clienteGarante = \App\Models\Cliente::where('cuit', $garante['cuit'] ?? '')->first();
                     \App\Models\Garante::create([
+                        'cliente_id' => $clienteGarante ? $clienteGarante->id : null,
                         'operacion_id' => $operacion->id,
-                        'cuit' => $garante['cuit'] ?? '',
-                        'tipodoc' => $garante['tipodoc'] ?? '',
-                        'sexo' => $garante['sexo'] ?? '',
-                        'documento' => $garante['documento'] ?? '',
-                        'apelnombres' => $garante['apelnombres'] ?? '',
                     ]);
                 }
             }
         }
 
-        return redirect()->route('admin.operaciones.show', ['id' => $operacion->id])
-            ->with('mensaje', 'Operación registrada correctamente.')
-            ->with('icono', 'success');
+        return redirect()->route('admin.operaciones.cargar', ['id' => $operacion->id])
+            ->with('mensaje', "Operación registrada ->>> NÚMERO: " . $numero)
+            ->with('icono', 'success')
+            ->with('showConfirmButton', true)
+            ->with('timer', 100000);
     }
 
     /**
@@ -188,28 +193,4 @@ class OperacionController extends Controller
         return view('admin.operaciones.show');
     }
 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Operacion $operacion)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Operacion $operacion)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Operacion $operacion)
-    {
-        //
-    }
 }

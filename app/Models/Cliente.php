@@ -26,4 +26,10 @@ class Cliente extends Model
     {
         return $this->belongsTo(Localidad::class, 'cod_postal_id');
     }
+
+    // Un cliente puede tener muchos garantes
+    public function garantes()
+    {
+        return $this->hasMany(Garante::class);
+    }
 }

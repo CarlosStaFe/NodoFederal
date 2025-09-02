@@ -22,9 +22,9 @@
                             <th style="text-align: center; width: 5%;">#</th>
                             <th style="text-align: center; width: 6%;">NRO.</th>
                             <th style="text-align: center; width: 6%;">FACT.</th>
-                            <th style="text-align: center; width: 30%;">NOMBRE</th>
-                            <th style="text-align: center; width: 20%;">TELÉFONO</th>
-                            <th style="text-align: center; width: 10%;">ESTADO</th>
+                            <th style="text-align: center; width: 37%;">NOMBRE</th>
+                            <th style="text-align: center; width: 15%;">TELÉFONO</th>
+                            <th style="text-align: center; width: 8%;">ESTADO</th>
                             <th style="text-align: center; width: 11%;">ACCIONES</th>
                         </tr>
                     </thead>

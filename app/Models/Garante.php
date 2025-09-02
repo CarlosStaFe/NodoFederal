@@ -8,15 +8,17 @@ class Garante extends Model
 {
     protected $fillable = [
         'operacion_id',
-        'cuit',
-        'tipodoc',
-        'sexo',
-        'documento',
-        'apelnombres',
+        'cliente_id',
     ];
 
     public function operacion()
     {
         return $this->belongsTo(Operacion::class);
+    }
+
+    // Un garante pertenece a un cliente
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 }

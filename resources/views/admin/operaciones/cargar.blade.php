@@ -15,11 +15,16 @@
         <div class="card-body">
             <form action="{{ route('admin.operaciones.store') }}" method="POST" id="formOperacion">
                 @csrf
+                <input type="hidden" id="garantes_json" name="garantes_json" value="[]">
                 <div class="row">
+                    <div>
+                        <input id="id_cliente_garante" name="id_cliente_garante" type="hidden">
+                    </div>
+
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="cuit">C.U.I.T.</label><b>*</b>
-                            <input type="text" class="form-control" value="{{ old('cuit', isset($cuit) ? $cuit : '') }}" id="cuit" name="cuit" placeholder="C.U.I.T." required autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('cuit', isset($cuit) ? $cuit : '') }}" id="cuit" name="cuit" placeholder="C.U.I.T." required autocomplete="off" autofocus>
                             @error('cuit')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -72,7 +77,7 @@
                     <div class="col-md-2 col-sm-2 position-relative">
                         <div class="form-group">
                             <label for="numero_socio">Nro. Socio</label><b>*</b>
-                            <input type="number" class="form-control" id="numero_socio" name="numero_socio" value="{{ old('numero_socio', isset($socio) ? $socio->numero : '') }}" placeholder="Ingrese número" required>
+                            <input type="number" class="form-control" id="numero_socio" name="numero_socio" value="{{ old('numero_socio', isset($socio) ? $socio->numero : '') }}" placeholder="Ingrese número" required autofocus>
                             @error('numero_socio')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -144,7 +149,7 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="cuit_garante">CUIT Garante</label><b>*</b>
-                            <input type="text" class="form-control" value="{{ old('cuit_garante', isset($cuit) ? $cuit : '') }}" id="cuit_garante" name="cuit_garante" placeholder="C.U.I.T." required autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('cuit_garante', isset($cuit) ? $cuit : '') }}" id="cuit_garante" name="cuit_garante" placeholder="C.U.I.T." autocomplete="off">
                             @error('cuit_garante')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -184,6 +189,7 @@
                             <thead class="table-primary text-center">
                                 <tr>
                                     <th>#</th>
+                                    <th class="d-none">id</th>
                                     <th>C.U.I.T.</th>
                                     <th>Tipo Doc.</th>
                                     <th>Sexo</th>
@@ -274,6 +280,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         // ...existing code...
         const cuitGaranteInput = document.getElementById('cuit_garante');
+        // Prevenir Enter en CUIT Garante
+        cuitGaranteInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                return false;
+            }
+        });
         // Utilidad para setear valor solo si el input existe
         function setInputValue(id, value) {
             const el = document.getElementById(id);
@@ -291,11 +304,13 @@
                     .then(data => {
                         if (data.success) {
                             const cliente = data.cliente;
+                            setInputValue('id_cliente_garante', cliente.id || '');
                             setInputValue('tipodoc_garante', cliente.tipodoc || '');
                             setInputValue('sexo_garante', cliente.sexo || '');
                             setInputValue('documento_garante', cliente.documento || '');
                             setInputValue('apelnombres_garante', cliente.apelnombres || '');
                         } else {
+                            setInputValue('id_cliente_garante', '');
                             setInputValue('tipodoc_garante', '');
                             setInputValue('sexo_garante', '');
                             setInputValue('documento_garante', '');
@@ -330,6 +345,7 @@
 
 <script>
     // Referencias a los elementos del formulario
+    const idInput = document.getElementById('id_cliente_garante');
     const cuitInput = document.getElementById('cuit_garante');
     const tipoInput = document.getElementById('tipodoc_garante');
     const sexoInput = document.getElementById('sexo_garante');
@@ -340,8 +356,17 @@
     // Contador para las filas
     let contadorGarantes = 0;
 
+    // Función para actualizar la numeración de la tabla
+    function actualizarNumeracion() {
+        const filas = tablaGarantes.querySelectorAll('tr');
+        filas.forEach((fila, idx) => {
+            fila.querySelector('td').innerText = idx + 1;
+        });
+        contadorGarantes = filas.length;
+    }
     // Función para agregar un garante a la tabla
     agregarGaranteBtn.addEventListener('click', () => {
+        const id = idInput.value;
         const cuit = cuitInput.value;
         const tipoDoc = tipoInput.value;
         const sexo = sexoInput.value;
@@ -353,29 +378,39 @@
             return;
         }
 
-        // Incrementar el contador
-        contadorGarantes++;
+        // Validar que no se repita el CUIT
+        const filas = tablaGarantes.querySelectorAll('tr');
+        for (let fila of filas) {
+            const cuitExistente = fila.querySelectorAll('td')[2].innerText.trim();
+            if (cuitExistente === cuit) {
+                alert('Ya existe un garante con ese C.U.I.T. en la tabla.');
+                return;
+            }
+        }
 
         // Crear una nueva fila
         const fila = document.createElement('tr');
         fila.innerHTML = `
-            <td>${contadorGarantes}</td>
+            <td></td>
+            <td class="d-none">${id}</td>
             <td>${cuit}</td>
             <td>${tipoDoc}</td>
             <td>${sexo}</td>
             <td>${nroDoc}</td>
             <td>${apeNom}</td>
             <td class="text-center">
-                <button type="button" class="btn btn-info btn-sm editarGarante">Editar</button>
-                <button type="button" class="btn btn-danger btn-sm eliminarGarante">Eliminar</button>
+                <button type="button" class="btn btn-info btn-sm bi bi-pencil editarGarante"></button>
+                <button type="button" class="btn btn-danger btn-sm bi bi-trash eliminarGarante"></button>
             </td>
         `;
 
         // Agregar la fila a la tabla
         tablaGarantes.appendChild(fila);
+        actualizarNumeracion();
 
         // Limpiar los campos del formulario
-        cuit_garante.value = '';
+        idInput.value = '';
+        cuitInput.value = '';
         tipoInput.value = '';
         sexoInput.value = '';
         documentoInput.value = '';
@@ -387,8 +422,9 @@
             actualizarNumeracion();
         });
 
-        // Agregar funcionalidad al botón "Editar" (opcional)
+        // Agregar funcionalidad al botón "Editar"
         fila.querySelector('.editarGarante').addEventListener('click', () => {
+            idInput.value = id;
             cuitInput.value = cuit;
             tipoInput.value = tipoDoc;
             sexoInput.value = sexo;
@@ -410,13 +446,15 @@
             const garantes = [];
             filas.forEach(fila => {
                 const celdas = fila.querySelectorAll('td');
-                if (celdas.length >= 6) {
+                // celdas: 0=#, 1=id (oculto), 2=cuit, 3=tipodoc, 4=sexo, 5=documento, 6=apelnombres
+                if (celdas.length >= 7) {
                     garantes.push({
-                        cuit: celdas[1].innerText.trim(),
-                        tipodoc: celdas[2].innerText.trim(),
-                        sexo: celdas[3].innerText.trim(),
-                        documento: celdas[4].innerText.trim(),
-                        apelnombres: celdas[5].innerText.trim(),
+                        id: celdas[1].innerText.trim(),
+                        cuit: celdas[2].innerText.trim(),
+                        tipodoc: celdas[3].innerText.trim(),
+                        sexo: celdas[4].innerText.trim(),
+                        documento: celdas[5].innerText.trim(),
+                        apelnombres: celdas[6].innerText.trim(),
                     });
                 }
             });
