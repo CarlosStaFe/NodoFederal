@@ -3,23 +3,22 @@
 @section('content')
 
 <div class="row">
-    <h1>Afectar una Operación</h1>
+    <h1>Buscar Operación</h1>
 </div>
 
 <div class="col-md-12">
-    <div class="card card-outline card-danger">
+    <div class="card card-outline card-warning">
         <div class="card-header">
-            <h3 class="card-title">Completar los datos</h3>
+            <h3 class="card-title">Datos del cliente</h3>
         </div>
 
         <div class="card-body">
-            <form action="{{ route('admin.operaciones.show') }}" method="POST" id="formOperacion">
-                @csrf
+            <form action="{{ route('admin.operaciones.show') }}" method="GET" id="formOperacion">
                 <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="cuit">C.U.I.T.</label><b>*</b>
-                            <input type="text" class="form-control" value="{{ old('cuit', isset($cuit) ? $cuit : '') }}" id="cuit" name="cuit" placeholder="C.U.I.T." required autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('cuit', isset($cuit) ? $cuit : '') }}" id="cuit" name="cuit" placeholder="C.U.I.T." required autocomplete="off" autofocus>
                             @error('cuit')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -60,9 +59,88 @@
                 <br>
                 <div class="form group">
                     <a href="{{url('admin')}}" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-primary">Afectar Operación</button>
+                    <button type="submit" class="btn btn-primary">Buscar Operaciones</button>
                 </div>
             </form>
+        </div>
+
+        <div class="card-body">
+            @if(isset($cliente) && $cliente)
+                <h4>Operaciones donde es titular</h4>
+
+                <div class="card-body">
+                    <table id="example1" class="table table-striped table-bordered table-hover table-sm">
+                        <thead style="background-color:rgb(14, 107, 169); color: white;">
+                            <tr>
+                                <th class="text-align: center; width: 50px;">NRO.</th>
+                                <th class="text-align: center; width: 120px;">FECHA</th>
+                                <th class="text-align: center; width: 200px;">CLASE</th>
+                                <th class="text-align: center; width: 150px;">VALOR CUOTA</th>
+                                <th class="text-align: center; width: 150px;">CANT. CUOTAS</th>
+                                <th class="text-align: center; width: 150px;">TOTAL</th>
+                                <th class="text-align: center; width: 150px;">ESTADO</th>
+                                <th class="text-align: center; width: 150px;">FECHA ESTADO</th>
+                                <th class="text-align: center; width: 150px;">AFECTAR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($operaciones as $op)
+                                <tr>
+                                    <td class="text-right">{{ $op->numero }}</td>
+                                    <td class="text-center">{{ \Carbon\Carbon::parse($op->fecha_operacion)->format('d-m-Y') }}</td>
+                                    <td>{{ $op->clase }}</td>
+                                    <td class="text-right">{{ $op->valor_cuota }}</td>
+                                    <td class="text-right">{{ $op->cant_cuotas }}</td>
+                                    <td class="text-right">{{ $op->total }}</td>
+                                    <td class="text-center" style="color: {{ $op->estado_actual == 'Afectado' ? 'red' : 'black' }};">{{ $op->estado_actual ?? '' }}</td>
+                                    <td class="text-center">{{ $op->fecha_estado ? \Carbon\Carbon::parse($op->fecha_estado)->format('d-m-Y') : '' }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.operaciones.afectar', ['id' => $op->id]) }}" class="btn btn-sm btn-danger bi bi-fire"></a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="6">No tiene operaciones como titular.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>                
+                </div>
+
+                <h4>Operaciones donde es garante</h4>
+                <div class="card-body">
+                        <table id="example2" class="table table-striped table-bordered table-hover table-sm">
+                        <thead style="background-color:rgb(14, 107, 169); color: white;">
+                            <tr>
+                                <th class="text-align: center; width: 50px;">NRO.</th>
+                                <th class="text-align: center; width: 120px;">FECHA</th>
+                                <th class="text-align: center; width: 200px;">CLASE</th>
+                                <th class="text-align: center; width: 150px;">VALOR CUOTA</th>
+                                <th class="text-align: center; width: 150px;">CANT. CUOTAS</th>
+                                <th class="text-align: center; width: 150px;">TOTAL</th>
+                                <th class="text-align: center; width: 150px;">ESTADO</th>
+                                <th class="text-align: center; width: 150px;">FECHA ESTADO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($operacionesComoGarante as $g)
+                                @if($g->operacion)
+                                    <tr @if(($g->operacion->estado_actual ?? '') == 'Afectado') style="background-color: #ffcc80 !important;" @endif>
+                                        <td class="text-right">{{ $g->operacion->numero }}</td>
+                                        <td class="text-center">{{ \Carbon\Carbon::parse($g->operacion->fecha_operacion)->format('d-m-Y') }}</td>
+                                        <td>{{ $g->operacion->clase }}</td>
+                                        <td class="text-right">{{ $g->operacion->valor_cuota }}</td>
+                                        <td class="text-right">{{ $g->operacion->cant_cuotas }}</td>
+                                        <td class="text-right">{{ $g->operacion->total }}</td>
+                                        <td class="text-center" style="color: {{ $g->operacion->estado_actual == 'Afectado' ? 'red' : 'black' }};">{{ $g->operacion->estado_actual ?? '' }}</td>
+                                        <td class="text-center">{{ $g->operacion->fecha_estado ? \Carbon\Carbon::parse($g->operacion->fecha_estado)->format('d-m-Y') : '' }}</td>
+                                    </tr>
+                                @endif
+                            @empty
+                                <tr><td colspan="7">No figura como garante en ninguna operación.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </div>
 </div>
@@ -114,6 +192,66 @@
         }
         cuitInput.addEventListener('blur', buscarClientePorCuit);
         cuitInput.addEventListener('change', buscarClientePorCuit);
+    });
+</script>
+
+<script>
+    $(function() {
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false,
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+            "pageLength": 10,
+            //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+            },
+            "columnDefs": [
+                { "orderable": false, "targets": [7] }
+            ]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+</script>
+
+<script>
+    $(function() {
+        $("#example2").DataTable({
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false,
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+            "pageLength": 10,
+            //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+            },
+            "columnDefs": [
+                { "orderable": false, "targets": [] }
+            ]
+        }).buttons().container().appendTo('#example2_wrapper .col-md-6:eq(0)');
     });
 </script>
 

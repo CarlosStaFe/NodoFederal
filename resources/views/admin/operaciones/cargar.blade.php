@@ -202,7 +202,6 @@
                                 <!-- Las filas se agregarán dinámicamente aquí -->
                             </tbody>
                         </table>
-                        <!-- <button type="button" class="btn btn-success btn-sm" id="agregarGarante">Agregar Garante</button> -->
                     </div>
                     
                 </div>

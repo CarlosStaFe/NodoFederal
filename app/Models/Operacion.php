@@ -21,4 +21,9 @@ class Operacion extends Model
     {
         return $this->belongsTo(User::class, 'id_usuario');
     }
+
+    public function garantes()
+    {
+        return $this->hasMany(\App\Models\Garante::class, 'operacion_id');
+    }
 }

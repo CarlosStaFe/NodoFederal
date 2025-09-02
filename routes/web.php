@@ -77,6 +77,8 @@ Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consul
 Route::get('/admin/operaciones/cargar', [OperacionController::class, 'cargar'])->name('admin.operaciones.cargar')->middleware(['auth', 'can:admin.operaciones.cargar']);
 Route::post('/admin/operaciones/store', [OperacionController::class, 'store'])->name('admin.operaciones.store')->middleware(['auth', 'can:admin.operaciones.store']);
 Route::get('/admin/operaciones/show', [OperacionController::class, 'show'])->name('admin.operaciones.show')->middleware(['auth', 'can:admin.operaciones.show']);
+Route::get('/admin/operaciones/afectar/{id}', [OperacionController::class, 'afectar'])->name('admin.operaciones.afectar')->middleware(['auth', 'can:admin.operaciones.cargar']);
+Route::post('/admin/operaciones/afectar/{id}', [OperacionController::class, 'afectarStore'])->name('admin.operaciones.afectar.store')->middleware(['auth', 'can:admin.operaciones.cargar']);
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);

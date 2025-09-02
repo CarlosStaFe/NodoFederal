@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('operacion_id')->constrained('operaciones')->onDelete('cascade');
             $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            $table->date('fecha_estado')->nullable();
+            $table->string('estado')->default('Activo');
             $table->timestamps();
         });
     }

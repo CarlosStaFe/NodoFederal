@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Operacion;
@@ -188,9 +187,59 @@ class OperacionController extends Controller
     /**
     * Carga la operación de un cliente.
     */
-    public function show()
+    public function show(Request $request)
     {
-        return view('admin.operaciones.show');
+        $cuit = $request->input('cuit');
+        $cliente = null;
+        $operaciones = collect();
+        $operacionesComoGarante = collect();
+        if ($cuit) {
+            $cliente = \App\Models\Cliente::where('cuit', $cuit)->first();
+            if ($cliente) {
+                // Operaciones donde es titular
+                $operaciones = \App\Models\Operacion::where('id_cliente', $cliente->id)->get();
+                // Operaciones donde es garante
+                $operacionesComoGarante = \App\Models\Garante::where('cliente_id', $cliente->id)->with('operacion')->get();
+            }
+        }
+        return view('admin.operaciones.show', compact('cliente', 'operaciones', 'operacionesComoGarante', 'cuit'));
+    }
+
+    /**
+    * Muestra el formulario para afectar una operación.
+    */
+    public function afectar($id)
+    {
+        $operacion = Operacion::findOrFail($id);
+        $cliente = $operacion->cliente;
+        $socio = $operacion->socio;
+        // Puedes agregar más datos si lo necesitas
+        return view('admin.operaciones.afectar', compact('operacion', 'cliente', 'socio'));
+    }
+
+    /**
+    * Procesa la afectación de una operación.
+    */
+    public function afectarStore(Request $request, $id)
+    {
+        $operacion = Operacion::findOrFail($id);
+        $fechaAfectacion = $request->input('fecha_afectacion') ?? now();
+        // Actualizar operación
+        $operacion->fecha_estado = $fechaAfectacion;
+        $operacion->estado_actual = 'Afectado';
+        $operacion->save();
+
+        // Actualizar garantes
+        foreach ($operacion->garantes as $garante) {
+            $garante->fecha_estado = $fechaAfectacion;
+            $garante->estado = 'Afectado';
+            $garante->save();
+        }
+
+        return redirect()->route('admin.operaciones.show', ['id' => $operacion->id])
+            ->with('mensaje', 'Operación y garantes afectados correctamente.')
+            ->with('icono', 'success')
+            ->with('showConfirmButton', false);
     }
 
 }
