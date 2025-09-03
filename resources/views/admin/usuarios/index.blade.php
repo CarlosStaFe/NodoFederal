@@ -21,9 +21,10 @@
                         <tr>
                             <th style="text-align: center; width: 5%;">#</th>
                             <th style="text-align: center; width: 13%;">USUARIO</th>
+                            <th style="text-align: center; width: 10%;">ROL</th>
                             <th style="text-align: center; width: 20%;">E-MAIL</th>
-                            <th style="text-align: center; width: 26%;">NODO</th>
-                            <th style="text-align: center; width: 25%;">SOCIO</th>
+                            <th style="text-align: center; width: 21%;">NODO</th>
+                            <th style="text-align: center; width: 20%;">SOCIO</th>
                             <th style="text-align: center; width: 11%;">ACCIONES</th>
                         </tr>
                     </thead>
@@ -33,9 +34,10 @@
                         <tr>
                             <td style="text-align: right;">{{ $linea++ }}</td>
                             <td>{{ $usuario->name }}</td>
+                            <td>{{ $usuario->roles->first()->name ?? '' }}</td>
                             <td>{{ $usuario->email }}</td>
                             <td>{{ $usuario->nodo->nombre ?? '' }}</td>
-                            <td>{{ $usuario->socio->nombre ?? '' }}</td>
+                            <td>{{ $usuario->socio->razon_social ?? '' }}</td>
                             <td>
                                 <a href="{{url('admin/usuarios/'.$usuario->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
                                 <a href="{{url('admin/usuarios/'.$usuario->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>

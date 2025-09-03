@@ -172,6 +172,8 @@ class OperacionController extends Controller
                     \App\Models\Garante::create([
                         'cliente_id' => $clienteGarante ? $clienteGarante->id : null,
                         'operacion_id' => $operacion->id,
+                        'estado' => 'Activo',
+                        'fecha_estado' => now(),
                     ]);
                 }
             }

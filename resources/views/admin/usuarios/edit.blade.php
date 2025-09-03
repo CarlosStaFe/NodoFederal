@@ -21,11 +21,11 @@
                         <div class="form-group">
                             <label for="nodo_id">Nodo</label>
                             <select class="form-control" id="nodo_id" name="nodo_id" required>
-                            <option value="">Seleccione un Nodo</option>
+                                <option value="">Seleccione un Nodo</option>
                                 @foreach($nodos as $nodo)
                                     <option value="{{$nodo->id}}" 
                                         {{ (old('nodo_id', $usuario->nodo_id) == $nodo->id) ? 'selected' : '' }}>
-                                        {{$nodo->name}}
+                                        {{$nodo->nombre}}
                                     </option>
                                 @endforeach
                             </select>
@@ -39,14 +39,14 @@
                                 @foreach($socios as $socio)
                                     <option value="{{$socio->id}}" 
                                         {{ (old('socio_id', $usuario->socio_id) == $socio->id) ? 'selected' : '' }}>
-                                        {{$socio->name}}
+                                        {{$socio->razon_social}}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <br>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="name">Nombre del Usuario</label>
                             <input type="text" class="form-control" value="{{ old('name', $usuario->name) }}" id="name" name="name" placeholder="Nombre del Usuario" required>
@@ -55,7 +55,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="email">E-mail</label>
                             <input type="email" class="form-control" value="{{ old('email', $usuario->email) }}" id="email" name="email" placeholder="Email" required>
@@ -64,6 +64,20 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <label for="rol">Rol</label><b>*</b>
+                        <select class="form-control" id="rol" name="rol" required>
+                            <option value="" disabled>Seleccione un Rol</option>
+                            <option value="admin" {{ (old('rol', $usuario->roles->first()?->name) == 'admin') ? 'selected' : '' }}>Administrador</option>
+                            <option value="secretaria" {{ (old('rol', $usuario->roles->first()?->name) == 'secretaria') ? 'selected' : '' }}>Secretaria</option>
+                            <option value="nodo" {{ (old('rol', $usuario->roles->first()?->name) == 'nodo') ? 'selected' : '' }}>Nodo</option>
+                            <option value="socio" {{ (old('rol', $usuario->roles->first()?->name) == 'socio') ? 'selected' : '' }}>Socio</option>
+                        </select>
+                        @error('rol')
+                            <small style="color: red">{{$message}}</small>
+                        @enderror
+                    </div>
+
                     <br>
                     <div class="col-md-6">
                         <div class="form-group">

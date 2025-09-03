@@ -13,6 +13,7 @@ class Cliente extends Model
         'cuit',
         'apelnombres',
         'nacimiento',
+        'nacionalidad',
         'domicilio',
         'cod_postal_id',
         'telefono',

@@ -48,21 +48,35 @@
                         <p>{{$cliente->apelnombres}}</p>
                     </div>
                 </div>
+            </div>
+            <br>
+            <div class="row">
                 <div class="col-md-2 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="nacimiento">Fecha Nac.</label>
                         <p>{{ \Carbon\Carbon::parse($cliente->nacimiento)->format('d-m-Y') }}</p>
                     </div>
                 </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-md-4 col-sm-12 position-relative">
+                <div class="col-md-1 col-sm-12 position-relative">
+                    <div class="form group">
+                        <label for="edad">Edad</label>
+                        <p>{{ \Carbon\Carbon::parse($cliente->nacimiento)->age }}</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-12 position-relative">
+                    <div class="form group">
+                        <label for="nacionalidad">Nacionalidad</label>
+                        <p>{{ $cliente->nacionalidad }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="domicilio">Domicilio</label>
                         <p>{{$cliente->domicilio}}</p>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-3 col-sm-12 position-relative">
                     <div class="form-group">
                         <label for="provincia">Provincia</label>
@@ -84,7 +98,7 @@
             </div>
             <br>
             <div class="row">
-                <div class="col-md-3 col-sm-12 position-relative">
+                <div class="col-md-4 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="telefono">Teléfono</label>
                         <p>{{$cliente->telefono}}</p>
@@ -96,7 +110,7 @@
                         <p>{{$cliente->email}}</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-12 position-relative">
+                <div class="col-md-2 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="estado">Estado</label>
                         <p>{{$cliente->estado}}</p>

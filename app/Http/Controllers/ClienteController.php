@@ -34,6 +34,7 @@ class ClienteController extends Controller
             'cuit' => 'string|max:11',
             'apelnombres' => 'string|max:50',
             'nacimiento' => 'date|max:20',
+            'nacionalidad' => 'string|max:30',
             'domicilio' => 'string|max:100',
             'cod_postal' => 'required|exists:localidades,id',
             'telefono' => 'string|max:50',
@@ -49,6 +50,7 @@ class ClienteController extends Controller
         $cliente->cuit = $request->cuit;
         $cliente->apelnombres = strtoupper($request->apelnombres);
         $cliente->nacimiento = $request->nacimiento;
+        $cliente->nacionalidad = $request->nacionalidad;
         $cliente->domicilio = $request->domicilio;
         $cliente->cod_postal_id = $request->cod_postal;
         $cliente->telefono = $request->telefono;
@@ -86,6 +88,7 @@ class ClienteController extends Controller
             'cuit' => 'string|max:11',
             'apelnombres' => 'string|max:50',
             'nacimiento' => 'date|max:20',
+            'nacionalidad' => 'string|max:30',
             'domicilio' => 'string|max:100',
             'cod_postal' => 'required|exists:localidades,id',
             'telefono' => 'string|max:50',
@@ -100,6 +103,7 @@ class ClienteController extends Controller
         $cliente->cuit = $request->cuit;
         $cliente->apelnombres = strtoupper($request->apelnombres);
         $cliente->nacimiento = $request->nacimiento ? date('Y-m-d', strtotime($request->nacimiento)) : null;
+        $cliente->nacionalidad = $request->nacionalidad;
         $cliente->domicilio = $request->domicilio;
         $cliente->cod_postal_id = $request->cod_postal;
         $cliente->telefono = $request->telefono;

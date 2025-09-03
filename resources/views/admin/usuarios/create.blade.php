@@ -19,10 +19,10 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="nodo_id">Nodo</label><b>*</b>
-                            <select class="form-control" id="nodo_id" name="nodo_id" required>
-                                <option value="">Seleccione un Nodo</option>
+                            <select class="form-control" id="nodo_id" name="nodo_id">
+                                <option selected disabled>Seleccione un Nodo</option>
                                 @foreach($nodos as $nodo)
-                                    <option value="{{$nodo->id}}" {{old('nodo_id') == $nodo->id ? 'selected' : ''}}>{{$nodo->name}}</option>
+                                    <option value="{{$nodo->id}}" {{old('nodo_id') == $nodo->id ? 'selected' : ''}}>{{$nodo->nombre}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -30,16 +30,16 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="socio_id">Socio</label><b>*</b>
-                            <select class="form-control" id="socio_id" name="socio_id" required>
-                                <option value="">Seleccione un Socio</option>
+                            <select class="form-control" id="socio_id" name="socio_id">
+                                <option selected disabled>Seleccione un Socio</option>
                                 @foreach($socios as $socio)
-                                    <option value="{{$socio->id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->name}}</option>
+                                    <option value="{{$socio->id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <br>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="name">Nombre del Usuario</label><b>*</b>
                             <input type="text" class="form-control" value="{{old('name')}}" id="name" name="name" placeholder="Nombre del Usuario" required>
@@ -48,11 +48,26 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="email">E-mail</label><b>*</b>
                             <input type="email" class="form-control" value="{{old('email')}}" id="email" name="email" placeholder="Email" required>
                             @error('email')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="rol">Rol</label><b>*</b>
+                            <select class="form-control" id="rol" name="rol" required>
+                                <option selected disabled>Seleccione un Rol</option>
+                                <option value="admin" {{old('rol') == 'admin' ? 'selected' : ''}}>Administrador</option>
+                                <option value="secretaria" {{old('rol') == 'secretaria' ? 'selected' : ''}}>Secretaria</option>
+                                <option value="nodo" {{old('rol') == 'nodo' ? 'selected' : ''}}>Nodo</option>
+                                <option value="socio" {{old('rol') == 'socio' ? 'selected' : ''}}>Socio</option>
+                            </select>
+                            @error('rol')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>

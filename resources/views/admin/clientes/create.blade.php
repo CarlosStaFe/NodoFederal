@@ -20,7 +20,7 @@
                         <input id="nombrelocal" name="nombrelocal" type="hidden">
                         <input id="nombreprov" name="nombreprov" type="hidden">
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="tipodoc" class="form-label">Tipo Doc.</label><b>*</b>
                             <select id="tipodoc" name="tipodoc" class="form-select" required>
@@ -36,7 +36,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-1 col-sm-4">
+                    <div class="col-md-2 col-sm-4">
                         <div class="form group">
                             <label for="sexo">Sexo</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('sexo')}}" id="sexo" name="sexo" placeholder="Sexo" required>
@@ -77,6 +77,8 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="nacimiento" class="form-label">Fecha Nac.</label><b>*</b>
@@ -86,9 +88,38 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label for="edad" class="form-label">Edad</label>
+                            <input id="edad" name="edad" type="number" class="form-control" required readonly>
+                            @error('edad')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="nacionalidad" class="form-label">Nacionalidad</label><b>*</b>
+                            <select id="nacionalidad" name="nacionalidad" class="form-control" required>
+                                <option selected disabled>Elige nacionalidad...</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Boliviana">Boliviana</option>
+                                <option value="Brasileña">Brasileña</option>
+                                <option value="Chilena">Chilena</option>
+                                <option value="Colombiana">Colombiana</option>
+                                <option value="Ecuatoriana">Ecuatoriana</option>
+                                <option value="Paraguaya">Paraguaya</option>
+                                <option value="Peruana">Peruana</option>
+                                <option value="Uruguaya">Uruguaya</option>
+                                <option value="Venezolana">Venezolana</option>
+                                <option value="Otra">Otra</option>
+                            </select>
+                            @error('nacionalidad')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="domicilio">Domicilio</label><b>*</b>
                             <input type="text" class="form-control" value="{{old('domicilio')}}" id="domicilio" name="domicilio" placeholder="Domicilio" required>
@@ -97,7 +128,9 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-12">
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-12">
                         <div class="form-group">
                             <label for="provincia">Provincia</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('provincia')}}" id="provincia" name="provincia" placeholder="Provincia">
@@ -132,7 +165,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-12">
+                    <div class="col-md-4 col-sm-12">
                         <div class="form-group">
                             <label for="localidad">Localidad</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('localidad')}}" id="localidad" name="localidad" placeholder="Localidad">
@@ -154,7 +187,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3 col-sm-12">
+                    <div class="col-md-4 col-sm-12">
                         <div class="form group">
                             <label for="telefono">Teléfono</label><b>*</b>
                             <input type="text" class="form-control" value="{{old('telefono')}}" id="telefono" name="telefono" placeholder="Teléfono" required>
@@ -172,7 +205,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-4">
+                    <div class="col-md-2 col-sm-4">
                         <div class="form group">
                             <label for="estado">Estado</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('estado')}}" id="estado" name="estado" placeholder="Estado">
@@ -213,8 +246,33 @@
     </div>
 </div>
 
-<!-- // Script para seleccionar la provincia y la localidad -->
 <script>
+    // Calcular edad automáticamente al ingresar la fecha de nacimiento
+    document.addEventListener('DOMContentLoaded', function() {
+        var nacimientoInput = document.getElementById('nacimiento');
+        var edadInput = document.getElementById('edad');
+        if(nacimientoInput && edadInput) {
+            nacimientoInput.addEventListener('change', function() {
+                var nacimiento = this.value;
+                if(nacimiento) {
+                    var hoy = new Date();
+                    var fechaNac = new Date(nacimiento);
+                    var edad = hoy.getFullYear() - fechaNac.getFullYear();
+                    var m = hoy.getMonth() - fechaNac.getMonth();
+                    if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                        edad--;
+                    }
+                    edadInput.value = edad > 0 ? edad : '';
+                } else {
+                    edadInput.value = '';
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    // Script para seleccionar la provincia y la localidad
     document.getElementById('provincia').addEventListener('change', function() {
         const idProv = this.value;
         const nombreProv = this.options[this.selectedIndex].text;

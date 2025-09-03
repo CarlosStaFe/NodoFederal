@@ -18,13 +18,13 @@
                     <input id="nombrelocal" name="nombrelocal" type="hidden">
                     <input id="nombreprov" name="nombreprov" type="hidden">
                 </div>
-                <div class="col-md-1 col-sm-12 position-relative">
+                <div class="col-md-2 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="tipodoc">Tipo Doc</label>
                         <p>{{$cliente->tipodoc}}</p>
                     </div>
                 </div>
-                <div class="col-md-1 col-sm-12 position-relative">
+                <div class="col-md-2 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="sexo">Sexo</label>
                         <p>{{$cliente->sexo}}</p>
@@ -48,28 +48,43 @@
                         <p>{{$cliente->apelnombres}}</p>
                     </div>
                 </div>
+            </div>
+            <br>
+            <div class="row">
                 <div class="col-md-2 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="nacimiento">Fecha Nac.</label>
                         <p>{{ \Carbon\Carbon::parse($cliente->nacimiento)->format('d-m-Y') }}</p>
                     </div>
                 </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-md-4 col-sm-12 position-relative">
+                <div class="col-md-1 col-sm-12 position-relative">
+                    <div class="form group">
+                        <label for="edad">Edad</label>
+                        <p>{{ \Carbon\Carbon::parse($cliente->nacimiento)->age }}</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-12 position-relative">
+                    <div class="form group">
+                        <label for="nacionalidad">Nacionalidad</label>
+                        <p>{{ $cliente->nacionalidad }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="domicilio">Domicilio</label>
                         <p>{{$cliente->domicilio}}</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-12 position-relative">
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-4 col-sm-12 position-relative">
                     <div class="form-group">
                         <label for="provincia">Provincia</label>
                         <p>{{strtoupper($cliente->localidad->provincia ?? 'N/A')}}</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-12 position-relative">
+                <div class="col-md-4 col-sm-12 position-relative">
                     <div class="form-group">
                         <label for="localidad">Localidad</label>
                         <p>{{strtoupper($cliente->localidad->localidad ?? 'N/A')}}</p>
@@ -84,7 +99,7 @@
             </div>
             <br>
             <div class="row">
-                <div class="col-md-3 col-sm-12 position-relative">
+                <div class="col-md-4 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="telefono">Teléfono</label>
                         <p>{{$cliente->telefono}}</p>
@@ -96,7 +111,7 @@
                         <p>{{$cliente->email}}</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-12 position-relative">
+                <div class="col-md-2 col-sm-12 position-relative">
                     <div class="form group">
                         <label for="estado">Estado</label>
                         <p>{{$cliente->estado}}</p>

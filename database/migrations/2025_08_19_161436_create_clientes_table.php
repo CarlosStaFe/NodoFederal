@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('sexo', 1);
             $table->string('cuit', 11)->unique();
             $table->string('apelnombres', 50);
-            $table->date('nacimiento');
+            $table->date('nacimiento')->nullable();
+            $table->string('nacionalidad', 30)->nullable();
             $table->string('domicilio', 100);
 
             $table->unsignedBigInteger('cod_postal_id');

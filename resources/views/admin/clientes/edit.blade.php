@@ -23,7 +23,7 @@
                         <input id="codigopostal" name="codigopostal" type="hidden" value="{{$cliente->localidad->id}}">
                     </div>
 
-                    <div class="col-md-1">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="tipodoc" class="form-label">Tipo Doc.</label><b>*</b>
                             <select id="tipodoc" name="tipodoc" class="form-select" required>
@@ -39,7 +39,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-1 col-sm-4">
+                    <div class="col-md-2 col-sm-4">
                         <div class="form group">
                             <label for="sexo">Sexo</label><b>*</b>
                             <select type="text" class="form-control" id="sexo" name="sexo" placeholder="Sexo" required>
@@ -80,6 +80,8 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="nacimiento" class="form-label">Fecha Nac.</label><b>*</b>
@@ -89,9 +91,35 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label for="edad" class="form-label">Edad</label>
+                            <input id="edad" name="edad" type="number" class="form-control" value="{{ $cliente->nacimiento ? \Carbon\Carbon::parse($cliente->nacimiento)->age : '' }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="nacionalidad" class="form-label">Nacionalidad</label><b>*</b>
+                            <select id="nacionalidad" name="nacionalidad" class="form-control" required>
+                                <option disabled {{ !$cliente->nacionalidad ? 'selected' : '' }}>Elige nacionalidad...</option>
+                                <option value="Argentina" {{ $cliente->nacionalidad == 'Argentina' ? 'selected' : '' }}>Argentina</option>
+                                <option value="Boliviana" {{ $cliente->nacionalidad == 'Boliviana' ? 'selected' : '' }}>Boliviana</option>
+                                <option value="Brasileña" {{ $cliente->nacionalidad == 'Brasileña' ? 'selected' : '' }}>Brasileña</option>
+                                <option value="Chilena" {{ $cliente->nacionalidad == 'Chilena' ? 'selected' : '' }}>Chilena</option>
+                                <option value="Colombiana" {{ $cliente->nacionalidad == 'Colombiana' ? 'selected' : '' }}>Colombiana</option>
+                                <option value="Ecuatoriana" {{ $cliente->nacionalidad == 'Ecuatoriana' ? 'selected' : '' }}>Ecuatoriana</option>
+                                <option value="Paraguaya" {{ $cliente->nacionalidad == 'Paraguaya' ? 'selected' : '' }}>Paraguaya</option>
+                                <option value="Peruana" {{ $cliente->nacionalidad == 'Peruana' ? 'selected' : '' }}>Peruana</option>
+                                <option value="Uruguaya" {{ $cliente->nacionalidad == 'Uruguaya' ? 'selected' : '' }}>Uruguaya</option>
+                                <option value="Venezolana" {{ $cliente->nacionalidad == 'Venezolana' ? 'selected' : '' }}>Venezolana</option>
+                                <option value="Otra" {{ $cliente->nacionalidad == 'Otra' ? 'selected' : '' }}>Otra</option>
+                            </select>
+                            @error('nacionalidad')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="domicilio">Domicilio</label><b>*</b>
                             <input type="text" class="form-control" value="{{$cliente->domicilio}}" id="domicilio" name="domicilio" placeholder="Domicilio" required>
@@ -100,7 +128,9 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-12">
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-12">
                         <div class="form-group">
                             <label for="provincia">Provincia</label><b>*</b>
                             <select type="text" class="form-control" value="{{strtoupper($cliente->localidad->provincia ?? 'N/A')}}" id="provincia" name="provincia" placeholder="Provincia">
@@ -135,7 +165,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-12">
+                    <div class="col-md-4 col-sm-12">
                         <div class="form-group">
                             <label for="localidad">Localidad</label><b>*</b>
                             <select type="text" class="form-control" value="{{strtoupper($cliente->localidad->localidad ?? 'N/A')}}" id="localidad" name="localidad" placeholder="Localidad">
@@ -159,7 +189,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3 col-sm-12">
+                    <div class="col-md-4 col-sm-12">
                         <div class="form group">
                             <label for="telefono">Teléfono</label><b>*</b>
                             <input type="text" class="form-control" value="{{ $cliente->telefono }}" id="telefono" name="telefono" placeholder="Teléfono" required>
@@ -177,7 +207,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-4">
+                    <div class="col-md-2 col-sm-4">
                         <div class="form group">
                             <label for="estado">Estado</label><b>*</b>
                             <select type="text" class="form-control" value="{{$cliente->estado}}" id="estado" name="estado" placeholder="Estado">
@@ -228,8 +258,35 @@
     </div>
 </div>
 
-<!-- // Script para seleccionar la provincia y la localidad -->
 <script>
+    // Calcular edad automáticamente al cambiar la fecha de nacimiento en edición
+    document.addEventListener('DOMContentLoaded', function() {
+        var nacimientoInput = document.getElementById('nacimiento');
+        var edadInput = document.getElementById('edad');
+        if(nacimientoInput && edadInput) {
+            nacimientoInput.addEventListener('change', function() {
+                var nacimiento = this.value;
+                if(nacimiento) {
+                    // Soporta formato dd-mm-yyyy
+                    var partes = nacimiento.split('-');
+                    var fechaNac = new Date(partes[2], partes[1] - 1, partes[0]);
+                    var hoy = new Date();
+                    var edad = hoy.getFullYear() - fechaNac.getFullYear();
+                    var m = hoy.getMonth() - fechaNac.getMonth();
+                    if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                        edad--;
+                    }
+                    edadInput.value = edad > 0 ? edad : '';
+                } else {
+                    edadInput.value = '';
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    // Script para seleccionar la provincia y la localidad
     document.getElementById('provincia').addEventListener('change', function () {
         const idProv = this.value;
         const nombreProv = this.options[this.selectedIndex].text;

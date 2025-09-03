@@ -30,13 +30,24 @@ class UsuarioController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'rol' => 'required|in:admin,secretaria,nodo,socio',
         ]);
 
         $usuario = new User();
         $usuario->name = $request->name;
         $usuario->email = $request->email;
         $usuario->password = bcrypt($request->password);
+        if (in_array($request->rol, ['admin', 'secretaria'])) {
+            $usuario->nodo_id = null;
+            $usuario->socio_id = null;
+        } else {
+            $usuario->nodo_id = $request->nodo_id;
+            $usuario->socio_id = $request->socio_id;
+        }
         $usuario->save();
+
+        // Asignar el rol seleccionado
+        $usuario->assignRole($request->rol);
 
         return redirect()->route('admin.usuarios.index')
             ->with('mensaje', 'Usuario creado con éxito.')
@@ -63,15 +74,26 @@ class UsuarioController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
+            'rol' => 'required|in:admin,secretaria,nodo,socio',
         ]);
 
         $usuario = User::findOrFail($id);
         $usuario->name = $request->name;
         $usuario->email = $request->email;
+        if (in_array($request->rol, ['admin', 'secretaria'])) {
+            $usuario->nodo_id = null;
+            $usuario->socio_id = null;
+        } else {
+            $usuario->nodo_id = $request->nodo_id;
+            $usuario->socio_id = $request->socio_id;
+        }
         if ($request->password) {
             $usuario->password = bcrypt($request->password);
         }
         $usuario->save();
+
+        // Quitar roles anteriores y asignar el nuevo
+        $usuario->syncRoles([$request->rol]);
 
         return redirect()->route('admin.usuarios.index')
             ->with('mensaje', 'Usuario actualizado con éxito.')
