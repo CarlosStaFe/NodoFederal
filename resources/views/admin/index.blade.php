@@ -32,9 +32,9 @@
                         <p>Nodos</p>
                     </div>
                     <div class="icon">
-                        <i class="fas bi bi-geo-alt-fill"></i>
+                        <i class="fas bi bi bi-diagram-3-fill"></i>
                     </div>
-                    <a href="{{url('admin/nodos')}}" class="small-box-footer">Más información <i class="fas bi bi-geo-alt-fill"></i></a>
+                    <a href="{{url('admin/nodos')}}" class="small-box-footer">Más información <i class="fas bi bi-diagram-3-fill"></i></a>
                 </div>
             </div>
         @endcan

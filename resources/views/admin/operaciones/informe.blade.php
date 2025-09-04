@@ -26,6 +26,9 @@
                 @php $p = $datos['data'][0] ?? null; @endphp
                 @if ($p)
                     <form class="row g-3 mt-4">
+
+                        {{-- <div id="chart"></div> --}}
+
                         <div class="col-12"><strong>Datos Personales</strong></div>
                         <div class="col-md-3">
                             <label class="form-label">Apellido</label>
@@ -230,17 +233,95 @@
                     </form>
                 @else
                     <div class="alert alert-warning mt-4">
-                            <strong>No se encontraron datos para la consulta.</strong>
+                        <strong>No se encontraron datos para la consulta.</strong>
                     </div>
                 @endif
             @else
                 <div class="alert alert-warning mt-4">
-                        <strong>Realice una consulta para ver el informe.</strong>
+                    <strong>Realice una consulta para ver el informe.</strong>
                 </div>
             @endif
         </div>
     </div>
 </div>
+
+<script>
+
+    var options = {
+      series: [{
+      data: [800, 700, 600, 500, 400, 300, 200, 100]
+    }],
+      chart: {
+      type: 'bar',
+      height: 300
+    },
+    plotOptions: {
+      bar: {
+        barHeight: '100%',
+        distributed: true,
+        horizontal: true,
+        // dataLabels: {
+        //   position: 'bottom'
+        // },
+      }
+    },
+    colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#90ee7e', '#69d2e7'],
+    dataLabels: {
+      enabled: true,
+      textAnchor: 'start',
+      style: {
+        colors: ['#fff']
+      },
+      formatter: function (val, opt) {
+        return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+      },
+      offsetX: 0,
+      dropShadow: {
+        enabled: true
+      }
+    },
+    stroke: {
+      width: 1,
+      colors: ['#fff']
+    },
+    xaxis: {
+      categories: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8'
+      ],
+    },
+    yaxis: {
+      labels: {
+        show: false
+      }
+    },
+    title: {
+        text: 'Nivel de Ingresos',
+        align: 'center',
+        floating: true
+    },
+    subtitle: {
+        text: '',
+        align: 'center',
+    },
+    tooltip: {
+      theme: 'dark',
+      x: {
+        show: false
+      },
+      y: {
+        title: {
+          formatter: function () {
+            return ''
+          }
+        }
+      }
+    }
+    };
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+    chart.render();
+
+</script>
+
+
 
 @endsection
  

@@ -174,6 +174,27 @@
                 </div>
                 <br>
                 <div class="row">
+                    <div class="col-md-3 col-sm-4">
+                        <div class="form group">
+                            <label for="valor_consulta">Valor por Consulta</label>
+                            <input type="number" class="form-control" value="{{ old('valor_consulta') }}" id="valor_consulta" name="valor_consulta" placeholder="Valor por consulta" step="0.01" min="0" pattern="^\d+(\.\d{1,2})?$" inputmode="decimal">
+                            @error('valor_consulta')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-4">
+                        <div class="form group">
+                            <label for="valor_afectar">Valor por Afectar</label>
+                            <input type="number" class="form-control" value="{{ old('valor_afectar') }}" id="valor_afectar" name="valor_afectar" placeholder="Valor por afectar"  step="0.01" min="0" pattern="^\d+(\.\d{1,2})?$" inputmode="decimal">
+                            @error('valor_afectar')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
                     <div class="col-md-12 col-sm-4">
                         <div class="form-group">
                             <label for="observacion">Observación</label>

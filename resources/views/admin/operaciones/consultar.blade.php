@@ -67,15 +67,7 @@
 </div>
 
 @isset($datos)
-    {{-- <div class="alert alert-warning">
-        <strong>Debug datos:</strong>
-        <pre>{{ print_r($datos, true) }}</pre>
-    </div> --}}
     @php $data = $datos['data'] ?? null; @endphp
-    {{-- <div class="alert alert-warning">
-        <strong>Debug data:</strong>
-        <pre>{{ print_r($data, true) }}</pre>
-    </div> --}}
     @php $p = $datos['data'][0] ?? null; @endphp
     @if($p)
         <div class="alert alert-info mt-4">

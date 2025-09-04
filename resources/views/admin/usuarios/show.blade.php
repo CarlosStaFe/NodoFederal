@@ -26,16 +26,22 @@
                         <p>{{ $usuario->socio ? $usuario->socio->nombre : 'Sin asignar' }}</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-sm-4 position-relative">
+                <div class="col-md-4 col-sm-4 position-relative">
                     <div class="form-group">
                         <label for="sexo">Nombre del Usuario</label>
                         <p>{{$usuario->name}}</p>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-4 position-relative">
+                <div class="col-md-4 col-sm-4 position-relative">
                     <div class="form-group">
                         <label for="email">E-mail</label>
                         <p>{{$usuario->email}}</p>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 position-relative">
+                    <div class="form-group">
+                        <label for="rol">Rol</label>
+                        <p>{{ $usuario->getRoleNames()->first() ?? 'Sin asignar' }}</p>
                     </div>
                 </div>
             </div>

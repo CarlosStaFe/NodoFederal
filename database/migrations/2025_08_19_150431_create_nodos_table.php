@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('cuit', 11)->nullable();
             $table->string('tipo', 20)->nullable();
             $table->string('estado', 20)->default('Activo');
+            $table->decimal('valor_consulta', 15, 2)->nullable();
+            $table->decimal('valor_afectar', 15, 2)->nullable();
             $table->string('observacion', 255)->nullable();
             $table->timestamps();
         });

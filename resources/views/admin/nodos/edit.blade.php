@@ -178,6 +178,27 @@
                 </div>
                 <br>
                 <div class="row">
+                    <div class="col-md-2 col-sm-4">
+                        <div class="form-group">
+                            <label for="valor_consulta">Valor Consulta</label>
+                            <input type="number" step="0.01" class="form-control" value="{{$nodo->valor_consulta}}" id="valor_consulta" name="valor_consulta" placeholder="Valor Consulta" required>
+                            @error('valor_consulta')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4">
+                        <div class="form-group">
+                            <label for="valor_afectar">Valor Afectar</label>
+                            <input type="number" step="0.01" class="form-control" value="{{$nodo->valor_afectar}}" id="valor_afectar" name="valor_afectar" placeholder="Valor Afectar" required>
+                            @error('valor_afectar')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
                     <div class="col-md-12 col-sm-4">
                         <div class="form-group">
                             <label for="observacion">Observación</label>

@@ -32,6 +32,11 @@
                 </div>
                 <br>
                 <div class="form group">
+                    <label for="rol">Rol</label>
+                    <p>{{ $usuario->getRoleNames()->first() ?? 'Sin asignar' }}</p>
+                </div>
+                <br>
+                <div class="form group">
                     <a href="{{url('admin/usuarios')}}" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
                 </div>

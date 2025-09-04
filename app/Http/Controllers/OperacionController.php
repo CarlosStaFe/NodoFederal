@@ -52,8 +52,17 @@ class OperacionController extends Controller
     public function consultarApiPorDocumento(Request $request)
     {
         $dni = $request->input('documento');
-        $apiUrl = env('API_DOC');
-        $apiUrl = preg_replace('/=(\?)/', '='.$dni, $apiUrl, 1);
+        $cuit = $request->input('cuit');
+        $apiUrl = env('API_CUIL');
+        //$apiUrl = preg_replace('/=(\?)/', '='.$dni, $apiUrl, 1);
+        // Construir la URL de consulta agregando el cuil/dni como parámetro
+        // Reemplazar el primer signo de pregunta (?) por el valor de cuit o dni
+        if ($cuit) {
+            $apiUrl = preg_replace('/\?/', $cuit, $apiUrl, 1);
+        } elseif ($dni) {
+            $apiUrl = preg_replace('/\?/', $dni, $apiUrl, 1);
+        }
+        //dd($apiUrl);
 
         // Obtener el token
         $token = $this->obtenerTokenApi();
@@ -74,9 +83,24 @@ class OperacionController extends Controller
 
         if ($response->successful()) {
             $datos = $response->json();
+            //dd($datos);
             // Guardar en sesión para el informe
             session(['datos_api' => $datos]);
             // Persistir los datos en la sesión para el próximo request
+                // Guardar en la tabla consultas si status 200 y info OK
+                if (($datos['status'] ?? null) == 200 && ($datos['info'] ?? null) == 'OK') {
+                    $user = Auth::user();
+                    \App\Models\Consulta::create([
+                        'numero' => $datos['idLog'] ?? null,
+                        'tipo' => 'Consulta',
+                        'cuit' => $datos['cuit'] ?? null,
+                        'apelynombres' => $datos['apellidoNombre'] ?? null,
+                        'fecha' => now(),
+                        'nodo_id' => $user->nodo_id ?? null,
+                        'socio_id' => $user->socio_id ?? null,
+                        'user_id' => $user->id,
+                    ]);
+                }
             $request->session()->put('datos_api', $datos);
             // Redirigir al informe después de consultar
             return redirect()->route('admin.operaciones.informe');

@@ -1,3 +1,8 @@
+
+@section('head')
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/ICONO_LF.ico') }}" />
+@endsection
+
 @extends('layouts.admin')
 
 @section('content')
@@ -140,6 +145,20 @@
                         </tbody>
                     </table>
                 </div>
+            @else
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var cuit = document.getElementById('cuit').value.trim();
+                        if (cuit !== '') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Sin resultados',
+                                text: 'No se encontraron datos para el CUIT ingresado o hubo un error en la búsqueda.',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        }
+                    });
+                </script>
             @endif
         </div>
     </div>

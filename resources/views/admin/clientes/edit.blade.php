@@ -269,14 +269,18 @@
                 if(nacimiento) {
                     // Soporta formato dd-mm-yyyy
                     var partes = nacimiento.split('-');
-                    var fechaNac = new Date(partes[2], partes[1] - 1, partes[0]);
-                    var hoy = new Date();
-                    var edad = hoy.getFullYear() - fechaNac.getFullYear();
-                    var m = hoy.getMonth() - fechaNac.getMonth();
-                    if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
-                        edad--;
+                    if(partes.length === 3) {
+                        var fechaNac = new Date(partes[2], partes[1] - 1, partes[0]);
+                        var hoy = new Date();
+                        var edad = hoy.getFullYear() - fechaNac.getFullYear();
+                        var m = hoy.getMonth() - fechaNac.getMonth();
+                        if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                            edad--;
+                        }
+                        edadInput.value = edad > 0 ? edad : '';
+                    } else {
+                        edadInput.value = '';
                     }
-                    edadInput.value = edad > 0 ? edad : '';
                 } else {
                     edadInput.value = '';
                 }

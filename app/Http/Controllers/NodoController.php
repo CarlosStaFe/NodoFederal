@@ -51,6 +51,8 @@ class NodoController extends Controller
         $nodo->cuit = $request->cuit;
         $nodo->tipo = $request->tipo;
         $nodo->estado = empty($request->estado) ? 'Activo' : $request->estado;
+        $nodo->valor_consulta = $request->valor_consulta;
+        $nodo->valor_afectar = $request->valor_afectar;
         $nodo->observacion = $request->observacion;
         $nodo->save();
 
@@ -97,6 +99,8 @@ class NodoController extends Controller
         $nodo->cuit = $request->cuit;
         $nodo->tipo = $request->tipo;
         $nodo->estado = empty($request->estado) ? 'Activo' : $request->estado;
+        $nodo->valor_consulta = $request->valor_consulta;
+        $nodo->valor_afectar = $request->valor_afectar;
         $nodo->observacion = $request->observacion;
         $nodo->save();
 

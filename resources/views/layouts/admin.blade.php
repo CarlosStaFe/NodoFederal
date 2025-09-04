@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nodo Federal</title>
 
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/ICONO_LF.ico') }}" />
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
@@ -24,6 +25,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 </head>
 
@@ -81,6 +84,32 @@
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Administración -->
+                        @can('admin.administracion.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-coin"></i>
+                                    <p>
+                                        Administración
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/administracion/consultar') }}" class="nav-link active">
+                                            <i class="bi bi-inboxes nav-icon"></i>
+                                            <p>Consultar Totales</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/administracion/liquidar') }}" class="nav-link active">
+                                            <i class="bi bi-gear nav-icon"></i>
+                                            <p>Liquidar</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
                         <!-- Usuarios -->
                         @can('admin.usuarios.index')
                             <li class="nav-item">
@@ -111,7 +140,7 @@
                         @can('admin.nodos.index')
                             <li class="nav-item">
                                 <a href="#" class="nav-link active">
-                                    <i class="nav-icon fas bi bi-geo-alt-fill"></i>
+                                    <i class="nav-icon fas bi bi-diagram-3-fill"></i>
                                     <p>
                                         Nodos
                                         <i class="right fas fa-angle-left"></i>
@@ -258,6 +287,8 @@
                     //position: "top-end",
                     icon: "{{$icono}}",
                     title: "{{$message}}",
+                    text: "{{$text ?? ''}}",
+                    confirmButtonText: "{{$confirmButtonText ?? 'Aceptar'}}",
                     showConfirmButton: "{{$showConfirmButton ?? 'false'}}",
                     timer: "{{$timer ?? 3000}}",
                 });

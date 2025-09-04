@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
     $nodo = Role::firstOrCreate(['name' => 'nodo', 'guard_name' => 'web']);
     $socio = Role::firstOrCreate(['name' => 'socio', 'guard_name' => 'web']);
     // Permiso para mostrar el menú de Operaciones
-    Permission::firstOrCreate(['name' => 'admin.operaciones.index'])->syncRoles([$admin, $nodo, $socio]);
+    Permission::firstOrCreate(['name' => 'admin.operaciones.index'])->syncRoles([$admin, $secretaria, $nodo, $socio]);
+    Permission::firstOrCreate(['name' => 'admin.administracion.index'])->syncRoles([$admin, $secretaria]);
 
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@admin.com'],

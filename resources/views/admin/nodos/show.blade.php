@@ -99,6 +99,21 @@
             </div>
             <br>
             <div class="row">
+                <div class="col-md-3 position-relative">
+                    <div class="form group">
+                        <label for="valor_consulta">Valor por Consulta</label>
+                        <p>{{$nodo->valor_consulta}}</p>
+                    </div>
+                </div>
+                <div class="col-md-3 position-relative">
+                    <div class="form group">
+                        <label for="valor_afectar">Valor por Afectar</label>
+                        <p>{{$nodo->valor_afectar}}</p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
                 <div class="col-md-12 position-relative">
                     <div class="form-group">
                         <label for="observacion">Observación</label>
