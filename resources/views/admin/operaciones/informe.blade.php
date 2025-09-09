@@ -7,7 +7,7 @@
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="card-title mb-0">Informe de Antecedentes</h1>
-                @if(isset($datos) && isset($datos['data'][0]))
+                @if(isset($datos) && isset($datos['data']))
                 <a href="{{ url('admin/operaciones/pdf') }}" class="btn btn-success" target="_blank">
                     <i class="bi bi-printer-fill"></i> Generar PDF
                 </a>
@@ -23,213 +23,208 @@
         <div class="card-body mt-0">
             @if (isset($datos))
                 @php $data = $datos['data'] ?? null; @endphp
-                @php $p = $datos['data'][0] ?? null; @endphp
+                @php $p = $data['datosParticulares'] ?? null; @endphp
                 @if ($p)
                     <form class="row g-3 mt-4">
 
                         {{-- <div id="chart"></div> --}}
+                        <style>
+                            .table thead th {
+                                background-color: #37a395;
+                                color: #fff;
+                                font-weight: bold;
+                            }
+                            .section-title {
+                                color: #0d6efd;
+                                font-size: 1.3rem;
+                                font-weight: bold;
+                                margin-bottom: 0.5em;
+                            }
+                        </style>
+                        <table class="table table-bordered">
+                            <div class="col-12 mt-3">
+                                <h3>Datos Personales</h3>
+                            </div>
+                            <tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Apellido y Nombres</th>
+                                        <th>CUIL</th>
+                                        <th>DNI</th>
+                                        <th>Tipo</th>
+                                        <th>Fecha Nacimiento</th>
+                                        <th>Edad</th>
+                                        <th>Sexo</th>
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td>{{ $p['apellidoNombre'] ?? '' }}</td>
+                                    <td>{{ $p['cuil'] ?? '' }}</td>
+                                    <td>{{ $p['dni'] ?? '' }}</td>
+                                    <td>{{ $p['tipo'] ?? '' }}</td>
+                                    <td>{{ isset($p['fechaNacimiento']) ? \Carbon\Carbon::parse($p['fechaNacimiento'])->format('d-m-Y') : '' }}</td>
+                                    <td>{{ $p['edad'] ?? '' }}</td>
+                                    <td>{{ $p['sexo'] ?? '' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 15%;">Nacionalidad</th>
+                                        <th style="width: 20%;">Localidad</th>
+                                        <th style="width: 20%;">Provincia</th>
+                                        <th style="width: 10%;">Cód.Postal</th>
+                                        <th style="width: 54%;">Domicilio</th>
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td>{{ $p['nacionalidad'] ?? '' }}</td>
+                                    <td>{{ $p['localidad'] ?? '' }}</td>
+                                    <td>{{ $p['provincia'] ?? '' }}</td>
+                                    <td>{{ $p['cp'] ?? '' }}</td>
+                                    <td colspan="5">{{ $p['domicilio'] ?? '' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                        <div class="col-12"><strong>Datos Personales</strong></div>
-                        <div class="col-md-3">
-                            <label class="form-label">Apellido</label>
-                            <input type="text" class="form-control" value="{{ $p['apellido'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" value="{{ $p['nombre'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">CUIL</label>
-                            <input type="text" class="form-control" value="{{ $p['cuil'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">DNI</label>
-                            <input type="text" class="form-control" value="{{ $p['dni'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Fecha Nacimiento</label>
-                            <input type="text" class="form-control" value="{{ $p['fechaNacimiento'] ?? '' }}"
-                                readonly>
-                        </div>
-                        <div class="col-md-1">
-                            <label class="form-label">Edad</label>
-                            <input type="text" class="form-control" value="{{ $p['edad'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-1">
-                            <label class="form-label">Sexo</label>
-                            <input type="text" class="form-control" value="{{ $p['sexo'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Estado Civil</label>
-                            <input type="text" class="form-control" value="{{ $p['estadoCivil'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Nacionalidad</label>
-                            <input type="text" class="form-control" value="{{ $p['nacionalidad'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Localidad</label>
-                            <input type="text" class="form-control" value="{{ $p['localidad'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Provincia</label>
-                            <input type="text" class="form-control" value="{{ $p['provincia'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Domicilio</label>
-                            <input type="text" class="form-control" value="{{ $p['domicilio'] ?? '' }}" readonly>
-                        </div>
-                        <div class="col-12 mt-3"><strong>Teléfonos Fijos</strong></div>
-                        @php $tf = $data['contactacion']['telefonosFijos']['datos'] ?? []; @endphp
-                        @foreach ($tf as $tel)
-                            <div class="col-md-3">
-                                <label class="form-label">{{ $tel['tipo'] ?? '' }}</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $tel['tel'] ?? '' }} ({{ $tel['operador'] ?? '' }})" readonly>
-                            </div>
-                        @endforeach
-                        <div class="col-12 mt-3"><strong>Teléfonos Celulares</strong></div>
-                        @php $tc = $data['contactacion']['telefonosCelulares']['datos'] ?? []; @endphp
-                        @foreach ($tc as $cel)
-                            <div class="col-md-3">
-                                <label class="form-label">{{ $cel['tipo'] ?? '' }}
-                                    {{ $cel['wsp'] ? '(WhatsApp)' : '' }}</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $cel['tel'] ?? '' }} ({{ $cel['operador'] ?? '' }})" readonly>
-                            </div>
-                        @endforeach
-                        <div class="col-12 mt-3"><strong>Mails</strong></div>
-                        @php $mails = $data['contactacion']['mails']['datos'] ?? []; @endphp
-                        @foreach ($mails as $mail)
-                            <div class="col-md-3">
-                                <label class="form-label">Email</label>
-                                <input type="text" class="form-control" value="{{ $mail['email'] ?? '' }}" readonly>
-                            </div>
-                        @endforeach
-                        <div class="col-12 mt-3"><strong>Monotributo</strong></div>
                         @php $monos = $data['datosLaborales']['monotributista']['datos'] ?? []; @endphp
-                        @foreach ($monos as $mono)
-                            <div class="col-md-4">
-                                <label class="form-label">Tipo</label>
-                                <input type="text" class="form-control" value="{{ $mono['tipo'] ?? '' }}" readonly>
+                        @if (count($monos) > 0)
+                            <div class="col-12 mt-3">
+                                <h3>Monotributo</h3>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Categoría</label>
-                                <input type="text" class="form-control" value="{{ $mono['categoria'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Estado</label>
-                                <input type="text" class="form-control" value="{{ $mono['estado'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Inicio</label>
-                                <input type="text" class="form-control" value="{{ $mono['fechaInicio'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Hasta</label>
-                                <input type="text" class="form-control" value="{{ $mono['fechaHasta'] ?? '' }}"
-                                    readonly>
-                            </div>
-                        @endforeach
-                        <div class="col-12 mt-3"><strong>Actividad</strong></div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Categoría</th>
+                                        <th>Estado</th>
+                                        <th>Inicio</th>
+                                        <th>Hasta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($monos as $mono)
+                                        <tr>
+                                            <td>{{ $mono['tipo'] ?? '' }}</td>
+                                            <td>{{ $mono['categoria'] ?? '' }}</td>
+                                            <td>{{ $mono['estado'] ?? '' }}</td>
+                                            <td>{{ $mono['fechaInicio'] ?? '' }}</td>
+                                            <td>{{ $mono['fechaHasta'] ?? '' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
+
                         @php $acts = $data['datosLaborales']['actividad']['datos'] ?? []; @endphp
-                        @foreach ($acts as $act)
-                            <div class="col-md-6">
-                                <label class="form-label">Descripción</label>
-                                <input type="text" class="form-control" value="{{ $act['descripcion'] ?? '' }}"
-                                    readonly>
+                        @if (count($acts) > 0)
+                            <div class="col-12 mt-3">
+                                <h3>Actividad</h3>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">CIIU</label>
-                                <input type="text" class="form-control" value="{{ $act['ciiu'] ?? '' }}"
-                                    readonly>
-                            </div>
-                        @endforeach
-                        <div class="col-12 mt-3"><strong>Jubilación</strong></div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Descripción</th>
+                                        <th>CIIU</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($acts as $act)
+                                        <tr>
+                                            <td>{{ $act['descripcion'] ?? '' }}</td>
+                                            <td>{{ $act['ciiu'] ?? '' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
+
                         @php $jubs = $data['datosLaborales']['jubilacion']['datos'] ?? []; @endphp
-                        @foreach ($jubs as $jub)
-                            <div class="col-md-4">
-                                <label class="form-label">Titular</label>
-                                <input type="text" class="form-control" value="{{ $jub['titular'] ?? '' }}"
-                                    readonly>
+                        @if (count($jubs) > 0)
+                            <div class="col-12 mt-3">
+                                <h3>Jubilación</h3>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Sueldo Bruto</label>
-                                <input type="text" class="form-control" value="{{ $jub['sueldoBruto'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Sueldo Neto</label>
-                                <input type="text" class="form-control" value="{{ $jub['sueldoNeto'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Periodo</label>
-                                <input type="text" class="form-control" value="{{ $jub['periodo'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Rango</label>
-                                <input type="text" class="form-control" value="{{ $jub['rango'] ?? '' }}"
-                                    readonly>
-                            </div>
-                        @endforeach
-                        <div class="col-12 mt-3"><strong>Automotores Historial</strong></div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Titular</th>
+                                        <th>Sueldo Bruto</th>
+                                        <th>Sueldo Neto</th>
+                                        <th>Periodo</th>
+                                        <th>Rango</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($jubs as $jub)
+                                        <tr>
+                                            <td>{{ $jub['titular'] ?? '' }}</td>
+                                            <td>{{ $jub['sueldoBruto'] ?? '' }}</td>
+                                            <td>{{ $jub['sueldoNeto'] ?? '' }}</td>
+                                            <td>{{ isset($jub['periodo']) ? \Carbon\Carbon::parse($jub['periodo'])->format('d-m-Y') : '' }}</td>
+                                            <td>{{ $jub['rango'] ?? '' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
                         @php $autos = $data['bienesPersonales']['automotores_historial']['datos'] ?? []; @endphp
-                        @foreach ($autos as $auto)
-                            <div class="col-md-3">
-                                <label class="form-label">Dominio</label>
-                                <input type="text" class="form-control" value="{{ $auto['dominio'] ?? '' }}"
-                                    readonly>
+                        @if (count($autos) > 0)
+                            <div class="col-12 mt-3">
+                                <h3>Automotores Historial</h3>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Marca</label>
-                                <input type="text" class="form-control" value="{{ $auto['marca'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Modelo</label>
-                                <input type="text" class="form-control" value="{{ $auto['modelo'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Año</label>
-                                <input type="text" class="form-control" value="{{ $auto['anioModelo'] ?? '' }}"
-                                    readonly>
-                            </div>
-                        @endforeach
-                        <div class="col-12 mt-3"><strong>Situación Financiera (BCRA)</strong></div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Dominio</th>
+                                        <th>Marca</th>
+                                        <th>Modelo</th>
+                                        <th>Año</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($autos as $auto)
+                                        <tr>
+                                            <td>{{ $auto['dominio'] ?? '' }}</td>
+                                            <td>{{ $auto['marca'] ?? '' }}</td>
+                                            <td>{{ $auto['modelo'] ?? '' }}</td>
+                                            <td>{{ $auto['anioModelo'] ?? '' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
                         @php $bcra = $data['situacionFinanciera']['informacionBcra']['datos'] ?? []; @endphp
-                        @foreach ($bcra as $b)
-                            <div class="col-md-3">
-                                <label class="form-label">Entidad</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $b['entidad']['entidad'] ?? '' }}" readonly>
+                        @if(count($bcra) > 0)
+                            <div class="col-12 mt-3">
+                                <h3>Situación Financiera (BCRA)</h3>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Tipo</label>
-                                <input type="text" class="form-control" value="{{ $b['entidad']['tipo'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Situación</label>
-                                <input type="text" class="form-control" value="{{ $b['situacion'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Periodo</label>
-                                <input type="text" class="form-control" value="{{ $b['periodo'] ?? '' }}"
-                                    readonly>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Préstamo</label>
-                                <input type="text" class="form-control" value="{{ $b['prestamo'] ?? '' }}"
-                                    readonly>
-                            </div>
-                        @endforeach
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Entidad</th>
+                                        <th>Tipo</th>
+                                        <th>Situación</th>
+                                        <th>Periodo</th>
+                                        <th>Préstamo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($bcra as $b)
+                                        <tr>
+                                            <td>{{ $b['entidad']['entidad'] ?? '' }}</td>
+                                            <td>{{ $b['entidad']['tipo'] ?? '' }}</td>
+                                            <td>{{ $b['situacion'] ?? '' }}</td>
+                                            <td>{{ $b['periodo'] ?? '' }}</td>
+                                            <td>{{ $b['prestamo'] ?? '' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @else
+                            <div class="alert alert-info">No hay datos de situación financiera BCRA.</div>
+                        @endif
                     </form>
                 @else
                     <div class="alert alert-warning mt-4">

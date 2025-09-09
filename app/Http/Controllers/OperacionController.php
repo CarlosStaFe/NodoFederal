@@ -86,6 +86,8 @@ class OperacionController extends Controller
             //dd($datos);
             // Guardar en sesión para el informe
             session(['datos_api' => $datos]);
+            // Mostrar en pantalla los datos obtenidos
+            //dd($datos);
             // Persistir los datos en la sesión para el próximo request
                 // Guardar en la tabla consultas si status 200 y info OK
                 if (($datos['status'] ?? null) == 200 && ($datos['info'] ?? null) == 'OK') {

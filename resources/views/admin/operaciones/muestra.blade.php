@@ -122,3 +122,91 @@
         </div>
     </div>
 </div>
+
+
+
+        <div class="card-header">
+            <h3 class="card-title mb-0">Resultado de la consulta</h3>
+        </div>
+        <div class="card-body">
+            @if(isset($datos) && is_array($datos))
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tbody>
+                        @foreach($datos as $key => $value)
+                            <tr>
+                                <th style="width: 250px;">{{ ucwords(str_replace('_', ' ', $key)) }}</th>
+                                <td>
+                                    @if(is_array($value) || is_object($value))
+                                        <pre style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border: 1px solid #ddd; padding: 1em;">{{ json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                    @else
+                                        {{ $value }}
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="alert alert-warning">No hay datos para mostrar.</div>
+            @endif
+        </div>
+        <div class="card-body mt-0">
+            @if (isset($datos))
+                @php $data = $datos['data'] ?? null; @endphp
+                @php $p = $datos['data'][0] ?? null; @endphp
+                @if ($datos)
+                    <form class="row g-3 mt-4">
+                        @php
+                        function renderJsonForm($data, $parentKey = '') {
+                            $html = '';
+                            if (is_array($data) || is_object($data)) {
+                                foreach ($data as $key => $value) {
+                                    $label = $parentKey ? $parentKey . ' &rarr; ' . $key : $key;
+                                    if (is_array($value) || is_object($value)) {
+                                        $html .= '<div class="col-12 mt-3"><h5 class="section-title">' . e(ucwords(str_replace('_', ' ', $label))) . '</h5></div>';
+                                        $html .= renderJsonForm($value, $label);
+                                    } else {
+                                        $html .= '<div class="col-md-4 mb-3"><div class="form-group"><label class="form-label fw-bold">' . e(ucwords(str_replace('_', ' ', $label))) . '</label>';
+                                        $html .= '<input type="text" class="form-control campo-json" value="' . e($value) . '" readonly></div></div>';
+                                    }
+                                }
+                            }
+                            return $html;
+                        }
+                        @endphp
+                        {!! renderJsonForm($datos) !!}
+                    </form>
+                @else
+                    <div class="alert alert-warning mt-4">
+                        <strong>No se encontraron datos para la consulta.</strong>
+                    </div>
+                @endif
+            @else
+                <div class="alert alert-warning mt-4">
+                    <strong>Realice una consulta para ver el informe.</strong>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <strong>JSON completo de la consulta</strong>
+    </div>
+    <div class="card-body">
+        @if(isset($datos))
+            <pre style="white-space: pre-wrap; word-break: break-all; background: #f8f9fa; border: 1px solid #ddd; padding: 1em;">
+                {{ json_encode($datos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}
+            </pre>
+        @else
+            <div class="alert alert-warning">No hay datos para mostrar.</div>
+        @endif
+    </div>
+</div>
+
+@endsection
+ 
+ 

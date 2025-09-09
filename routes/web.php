@@ -180,5 +180,5 @@ Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocal
 Route::get('/admin/codpostales/{idLocal}', [LocalidadController::class, 'getCodigosPostales']);
 
 // Endpoint AJAX para calcular CUIT
-Route::post('/admin/clientes/calcular-cuit', [\App\Http\Controllers\ClienteController::class, 'calcularCuit'])
+Route::post('/admin/clientes/calcular-cuit', [ClienteController::class, 'calcularCuit'])
     ->name('clientes.calcular-cuit');
