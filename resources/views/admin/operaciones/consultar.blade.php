@@ -66,16 +66,16 @@
     </div>
 </div>
 
-@isset($datos)
-    @php $data = $datos['data'] ?? null; @endphp
-    @php $p = $datos['data'][0] ?? null; @endphp
-    @if($p)
-        <div class="alert alert-info mt-4">
-            <h5>Datos obtenidos de la API:</h5>
-            <a href="{{ url('admin/operaciones/pdf') }}" class="btn btn-danger"><i class="bi bi-printer-fill"></i> Imprimir</a>
-        </div>
-    @endif
-@endisset
+{{-- @isset($datos) --}}
+    {{-- @php $data = $datos['data'] ?? null; @endphp --}}
+    {{-- @php $p = $datos['data'][0] ?? null; @endphp --}}
+    {{-- @if($p) --}}
+        {{-- <div class="alert alert-info mt-4"> --}}
+            {{-- <h5>Datos obtenidos de la API:</h5> --}}
+            {{-- <a href="{{ url('admin/operaciones/pdf') }}" class="btn btn-danger"><i class="bi bi-printer-fill"></i> Imprimir</a> --}}
+        {{-- </div> --}}
+    {{-- @endif --}}
+{{-- @endisset --}}
 
 <script>
     function calcularCuit(dni, sexo) {

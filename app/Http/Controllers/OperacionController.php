@@ -83,24 +83,27 @@ class OperacionController extends Controller
 
         if ($response->successful()) {
             $datos = $response->json();
-            //dd($datos);
             // Guardar en sesión para el informe
             session(['datos_api' => $datos]);
-            // Mostrar en pantalla los datos obtenidos
-            //dd($datos);
             // Persistir los datos en la sesión para el próximo request
-                // Guardar en la tabla consultas si status 200 y info OK
-                if (($datos['status'] ?? null) == 200 && ($datos['info'] ?? null) == 'OK') {
+                // Guardar en la tabla consultas si status 200
+                $result = $datos['result'] ?? [];
+                $idLog = $datos['data']['idLog'] ?? 0;
+                $p = $datos['data']['datosParticulares'] ?? null;
+                //dd($idLog, $result, $p);
+                if ((isset($result['code']) && $result['code'] == 200) && (isset($result['info']) && $result['info'] === 'OK')) {
                     $user = Auth::user();
+                    //dd($datos);
                     \App\Models\Consulta::create([
-                        'numero' => $datos['idLog'] ?? null,
+                        'numero' => $idLog,
                         'tipo' => 'Consulta',
-                        'cuit' => $datos['cuit'] ?? null,
-                        'apelynombres' => $datos['apellidoNombre'] ?? null,
+                        'cuit' => $p['cuit'] ?? ($p['CUIT'] ?? ''),
+                        'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? null),
                         'fecha' => now(),
-                        'nodo_id' => $user->nodo_id ?? null,
-                        'socio_id' => $user->socio_id ?? null,
+                        'nodo_id' => $user->nodo_id ?? 24,
+                        'socio_id' => $user->socio_id ?? 1,
                         'user_id' => $user->id,
+                        // Puedes agregar más campos si el JSON tiene otros datos relevantes
                     ]);
                 }
             $request->session()->put('datos_api', $datos);

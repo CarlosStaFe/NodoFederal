@@ -23,30 +23,36 @@
         <div class="card-body mt-0">
             @if (isset($datos))
                 @php $data = $datos['data'] ?? null; @endphp
+
+                <style>
+                    .table thead th {
+                        background-color: #37a395;
+                        color: #fff;
+                        font-weight: bold;
+                    }
+                    #datos-personales th {
+                        background-color: #3750a3;
+                        color: #fff;
+                        font-weight: bold;
+                    }
+                    .section-title {
+                        color: #0d6efd;
+                        font-size: 1.3rem;
+                        font-weight: bold;
+                        margin-bottom: 0.5em;
+                    }
+                </style>
+
                 @php $p = $data['datosParticulares'] ?? null; @endphp
                 @if ($p)
                     <form class="row g-3 mt-4">
 
-                        {{-- <div id="chart"></div> --}}
-                        <style>
-                            .table thead th {
-                                background-color: #37a395;
-                                color: #fff;
-                                font-weight: bold;
-                            }
-                            .section-title {
-                                color: #0d6efd;
-                                font-size: 1.3rem;
-                                font-weight: bold;
-                                margin-bottom: 0.5em;
-                            }
-                        </style>
                         <table class="table table-bordered">
                             <div class="col-12 mt-3">
                                 <h3>Datos Personales</h3>
                             </div>
                             <tbody>
-                                <thead>
+                                <thead id="datos-personales">
                                     <tr>
                                         <th>Apellido y Nombres</th>
                                         <th>CUIL</th>
@@ -70,7 +76,7 @@
                         </table>
                         <table class="table table-bordered">
                             <tbody>
-                                <thead>
+                                <thead id="datos-personales">
                                     <tr>
                                         <th style="width: 15%;">Nacionalidad</th>
                                         <th style="width: 20%;">Localidad</th>
@@ -88,6 +94,37 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                        @php $ver = $data['veraz'] ?? []; @endphp
+                        @if($ver)
+                            <div class="col-12 mt-3">
+                                <h3>Datos Veraz</h3>
+                            </div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Categoría</th>
+                                        <th>Documento</th>
+                                        <th>Predictor</th>
+                                        <th>Ingresos</th>
+                                        <th>Score Rango</th>
+                                        <th>Score Segmento</th>
+                                        <th>Score Texto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ $ver['categoria'] ?? '' }}</td>
+                                        <td>{{ $ver['documento'] ?? '' }}</td>
+                                        <td>{{ $ver['incomePredictor'] ?? '' }}</td>
+                                        <td>{{ $ver['incomePredictorRango'] ?? '' }}</td>
+                                        <td>{{ $ver['scoreRango'] ?? '' }}</td>
+                                        <td>{{ $ver['scoreSegmento'] ?? '' }}</td>
+                                        <td>{{ $ver['scoreTexto'] ?? '' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        @endif
 
                         @php $monos = $data['datosLaborales']['monotributista']['datos'] ?? []; @endphp
                         @if (count($monos) > 0)
@@ -149,19 +186,19 @@
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Titular</th>
-                                        <th>Sueldo Bruto</th>
-                                        <th>Sueldo Neto</th>
-                                        <th>Periodo</th>
-                                        <th>Rango</th>
+                                        <th style="width: 30%;">Titular</th>
+                                        <th style="width: 15%;">Sueldo Bruto</th>
+                                        <th style="width: 15%;">Sueldo Neto</th>
+                                        <th style="width: 15%;">Periodo</th>
+                                        <th style="width: 10%;">Rango</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($jubs as $jub)
                                         <tr>
                                             <td>{{ $jub['titular'] ?? '' }}</td>
-                                            <td>{{ $jub['sueldoBruto'] ?? '' }}</td>
-                                            <td>{{ $jub['sueldoNeto'] ?? '' }}</td>
+                                            <td>{{ isset($jub['sueldoBruto']) ? number_format($jub['sueldoBruto'], 2, ',', '.') : '' }}</td>
+                                            <td>{{ isset($jub['sueldoNeto']) ? number_format($jub['sueldoNeto'], 2, ',', '.') : '' }}</td>
                                             <td>{{ isset($jub['periodo']) ? \Carbon\Carbon::parse($jub['periodo'])->format('d-m-Y') : '' }}</td>
                                             <td>{{ $jub['rango'] ?? '' }}</td>
                                         </tr>
@@ -239,84 +276,6 @@
         </div>
     </div>
 </div>
-
-<script>
-
-    var options = {
-      series: [{
-      data: [800, 700, 600, 500, 400, 300, 200, 100]
-    }],
-      chart: {
-      type: 'bar',
-      height: 300
-    },
-    plotOptions: {
-      bar: {
-        barHeight: '100%',
-        distributed: true,
-        horizontal: true,
-        // dataLabels: {
-        //   position: 'bottom'
-        // },
-      }
-    },
-    colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#90ee7e', '#69d2e7'],
-    dataLabels: {
-      enabled: true,
-      textAnchor: 'start',
-      style: {
-        colors: ['#fff']
-      },
-      formatter: function (val, opt) {
-        return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
-      },
-      offsetX: 0,
-      dropShadow: {
-        enabled: true
-      }
-    },
-    stroke: {
-      width: 1,
-      colors: ['#fff']
-    },
-    xaxis: {
-      categories: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8'
-      ],
-    },
-    yaxis: {
-      labels: {
-        show: false
-      }
-    },
-    title: {
-        text: 'Nivel de Ingresos',
-        align: 'center',
-        floating: true
-    },
-    subtitle: {
-        text: '',
-        align: 'center',
-    },
-    tooltip: {
-      theme: 'dark',
-      x: {
-        show: false
-      },
-      y: {
-        title: {
-          formatter: function () {
-            return ''
-          }
-        }
-      }
-    }
-    };
-    var chart = new ApexCharts(document.querySelector("#chart"), options);
-    chart.render();
-
-</script>
-
-
 
 @endsection
  

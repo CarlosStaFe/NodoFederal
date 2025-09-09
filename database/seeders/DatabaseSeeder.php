@@ -119,6 +119,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             LocalidadesSeeder::class,
             NodosSeeder::class,
+            SociosSeeder::class,
         ]);
 
     }
