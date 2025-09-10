@@ -4,20 +4,38 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UsuarioController extends Controller
 {
     public function index()
     {
-        $usuarios = User::with(['nodo', 'socio'])->get();
-        //return response()->json($usuarios);
+        $user = Auth::user();
+        $roles = $user->roles->pluck('name');
+        if ($roles->contains('admin') || $roles->contains('secretaria')) {
+            $usuarios = User::with(['nodo', 'socio'])->get();
+        } elseif ($roles->contains('nodo')) {
+            $usuarios = User::with(['nodo', 'socio'])->where('nodo_id', $user->nodo_id)->get();
+        } else {
+            $usuarios = collect();
+        }
+        if ($usuarios->isEmpty()) {
+            return view('admin.usuarios.index', compact('usuarios'))->with('mensaje', 'No hay usuarios para mostrar según su rol.');
+        }
         return view('admin.usuarios.index', compact('usuarios'));
     }
 
     public function create()
     {
-        $nodos = \App\Models\Nodo::all();
-        $socios = \App\Models\Socio::all();
+        $user = Auth::user();
+        $roles = $user->roles->pluck('name');
+        if ($roles->contains('nodo')) {
+            $nodos = \App\Models\Nodo::where('id', $user->nodo_id)->get();
+            $socios = \App\Models\Socio::where('nodo_id', $user->nodo_id)->get();
+        } else {
+            $nodos = \App\Models\Nodo::all();
+            $socios = \App\Models\Socio::all();
+        }
         return view('admin.usuarios.create', compact('nodos', 'socios'));
     }
 

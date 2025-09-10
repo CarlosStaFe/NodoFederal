@@ -82,16 +82,33 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="password">Contraseña</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="generarPassword()">Generar</button>
+                                </div>
+                            </div>
                             @error('password')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
+                            <script>
+                                function generarPassword() {
+                                    const longitud = 10;
+                                    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+                                    let password = '';
+                                    for (let i = 0; i < longitud; i++) {
+                                        password += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+                                    }
+                                    document.getElementById('password').value = password;
+                                    document.getElementById('password_confirmation').value = password;
+                                }
+                            </script>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="password_confirmation">Verificar Contraseña</label>
-                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required>
+                            <input type="text" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required>
                             @error('password_confirmation')
                                     <small style="color: red">{{$message}}</small>
                             @enderror

@@ -47,9 +47,11 @@
                             <td>{{ $socio->telefono }}</td>
                             <td>{{ $socio->estado }}</td>
                             <td>
-                                <a href="{{url('admin/socios/'.$socio->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
-                                <a href="{{url('admin/socios/'.$socio->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
-                                <a href="{{url('admin/socios/'.$socio->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
+                                <a href="{{url('admin/socios/'.$socio->id)}}" type="button" class="btn btn-success btn-sm" title="Ver socio"><i class="bi bi-eye"></i></a>
+                                <a href="{{url('admin/socios/'.$socio->id.'/edit')}}" type="button" class="btn btn-info btn-sm" title="Editar socio"><i class="bi bi-pencil"></i></a>
+                                @if(auth()->user()->roles->first()->name === 'admin')
+                                    <a href="{{url('admin/socios/'.$socio->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm" title="Eliminar socio"><i class="bi bi-trash"></i></a>
+                                @endif
                             </td>
                         </tr>
                         @endforeach

@@ -224,13 +224,35 @@ class OperacionController extends Controller
         $cliente = null;
         $operaciones = collect();
         $operacionesComoGarante = collect();
+        $user = Auth::user();
         if ($cuit) {
             $cliente = \App\Models\Cliente::where('cuit', $cuit)->first();
             if ($cliente) {
                 // Operaciones donde es titular
-                $operaciones = \App\Models\Operacion::where('id_cliente', $cliente->id)->get();
+                $query = \App\Models\Operacion::where('id_cliente', $cliente->id);
+                if ($user->role == 'socio') {
+                    // Solo operaciones del socio
+                    $query->where('id_socio', $user->socio_id);
+                } elseif ($user->role == 'nodo') {
+                    // Solo operaciones de socios de su nodo
+                    $query->whereHas('socio', function($q) use ($user) {
+                        $q->where('nodo_id', $user->nodo_id);
+                    });
+                }
+                $operaciones = $query->get();
                 // Operaciones donde es garante
-                $operacionesComoGarante = \App\Models\Garante::where('cliente_id', $cliente->id)->with('operacion')->get();
+                $operacionesComoGarante = \App\Models\Garante::where('cliente_id', $cliente->id)
+                    ->whereHas('operacion', function($q) use ($user) {
+                        if ($user->role == 'socio') {
+                            $q->where('id_socio', $user->socio_id);
+                        } elseif ($user->role == 'nodo') {
+                            $q->whereHas('socio', function($qq) use ($user) {
+                                $qq->where('nodo_id', $user->nodo_id);
+                            });
+                        }
+                    })
+                    ->with('operacion')
+                    ->get();
             }
         }
         return view('admin.operaciones.show', compact('cliente', 'operaciones', 'operacionesComoGarante', 'cuit'));

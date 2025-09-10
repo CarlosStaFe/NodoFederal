@@ -65,14 +65,14 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'admin.index']);
 
         //RUTA PARA EL ADMIN - USUARIOS
-        Permission::create(['name' => 'admin.usuarios.index'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.usuarios.create'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.usuarios.store'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.usuarios.show'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.usuarios.edit'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.usuarios.update'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.usuarios.confirm-delete'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.usuarios.destroy'])->syncRoles([$admin, $secretaria]);
+        Permission::create(['name' => 'admin.usuarios.index'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::create(['name' => 'admin.usuarios.create'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::create(['name' => 'admin.usuarios.store'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::create(['name' => 'admin.usuarios.show'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::create(['name' => 'admin.usuarios.edit'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::create(['name' => 'admin.usuarios.update'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::create(['name' => 'admin.usuarios.confirm-delete'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::create(['name' => 'admin.usuarios.destroy'])->syncRoles([$admin, $secretaria, $nodo]);
 
         //RUTA PARA EL ADMIN - NODOS
         Permission::create(['name' => 'admin.nodos.index'])->syncRoles([$admin, $secretaria]);

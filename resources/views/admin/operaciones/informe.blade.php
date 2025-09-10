@@ -46,6 +46,12 @@
                 @php $p = $data['datosParticulares'] ?? null; @endphp
                 @if ($p)
                     <form class="row g-3 mt-4">
+                        
+                        <div class="col-12 mb-3">
+                            @if(isset($data['idLog']))
+                                <div><strong>ID Log:</strong> {{ $data['idLog'] }}</div>
+                            @endif
+                        </div>
 
                         <table class="table table-bordered">
                             <div class="col-12 mt-3">
@@ -100,6 +106,182 @@
                             <div class="col-12 mt-3">
                                 <h3>Datos Veraz</h3>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-6 d-flex align-items-center">
+                                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                                        <div style="display: flex; min-width: 170px;">
+                                            @if(($ver['scoreRango'] ?? '') === 1)
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 38, 42); color: rgb(255, 255, 255); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;">MUY BAJO</strong>
+                                                </div>
+                                            @else
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 38, 42); color: rgb(255, 255, 255); opacity: 0.5; z-index: 1;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;" hidden>MUY BAJO</strong>
+                                                </div>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 2)
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 182, 7); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;">BAJO</strong>
+                                                </div>
+                                            @else
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 182, 7); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;" hidden>BAJO</strong>
+                                                </div>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 3)
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 255, 47); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;">MEDIO</strong>
+                                                </div>
+                                            @else
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 255, 47); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;" hidden>MEDIO</strong>
+                                                </div>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 4)
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 255, 85); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;">ALTO</strong>
+                                                </div>
+                                            @else
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 255, 85); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;" hidden>ALTO</strong>
+                                                </div>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 5)
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 188, 42); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;">MUY ALTO</strong>
+                                                </div>
+                                            @else
+                                                <div
+                                                    style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 188, 42); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
+                                                    <strong style="padding: 1rem; font-size: 7px; text-align: center;" hidden>MUY ALTO</strong>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            @if(($ver['scoreRango'] ?? '') === 5)
+                                                <span><b>MUY ALTA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 4)
+                                                <span><b>ALTA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 3)
+                                                <span><b>MEDIA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 2)
+                                                <span><b>BAJA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                            @endif
+                                            @if(($ver['scoreRango'] ?? '') === 1)
+                                                <span><b>MUY BAJA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 d-flex align-items-center">
+                                    <div class="income-indicator w-100">
+                                        <div class="pull-right" style="min-width: 170px;">
+                                            <div style="display: flex; height: 24px; width: 100%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(130, 166, 82); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
+                                                    <strong>R1</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R1')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(130, 166, 82);"></div>
+                                            </div>
+                                            <div style="display: flex; height: 24px; width: 88.8889%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(211, 214, 83); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
+                                                    <strong>R2</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R2')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(211, 214, 83);"></div>
+                                            </div>
+                                            <div style="display: flex; height: 24px; width: 77.7778%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(243, 236, 58); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
+                                                    <strong>R3</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R3')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(243, 236, 58);"></div>
+                                            </div>
+                                            <div style="display: flex; height: 24px; width: 66.6667%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(238, 189, 94); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
+                                                    <strong>R4</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R4')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(238, 189, 94);"></div>
+                                            </div>
+                                            <div style="display: flex; height: 24px; width: 55.5556%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(226, 165, 74); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
+                                                    <strong>R5</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R5')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(226, 165, 74);"></div>
+                                            </div>
+                                            <div style="display: flex; height: 24px; width: 44.4444%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(215, 112, 61); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
+                                                    <strong>R6</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R6')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(215, 112, 61);"></div>
+                                            </div>
+                                            <div style="display: flex; height: 24px; width: 33.3333%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(210, 85, 55); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
+                                                    <strong>R7</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R7')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(210, 85, 55);"></div>
+                                            </div>
+                                            <div style="display: flex; height: 24px; width: 22.2222%; position: relative; margin: 2px 0px;">
+                                                <div style="width: 80%; height: 100%; background-color: rgb(182, 57, 81); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
+                                                    <strong>R8</strong>
+                                                    @if(($ver['incomePredictor'] ?? '') === 'R8')
+                                                        <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                            <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(182, 57, 81);"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>

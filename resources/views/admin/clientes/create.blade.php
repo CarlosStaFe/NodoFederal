@@ -246,6 +246,9 @@
     </div>
 </div>
 
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     // Calcular edad automáticamente al ingresar la fecha de nacimiento
     document.addEventListener('DOMContentLoaded', function() {
@@ -327,11 +330,9 @@
         function actualizarCuit() {
             const dni = document.getElementById('documento').value;
             let sexo = '';
-            // Puedes tener un select o radio para sexo/tipo
             if(document.getElementById('sexo')) {
                 sexo = document.getElementById('sexo').value;
             } else if(document.getElementById('tipopersona')) {
-                // Si tienes un select para tipo de persona (M/F/S)
                 sexo = document.getElementById('tipopersona').value;
             }
             if(dni && sexo) {
@@ -346,6 +347,28 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('cuit').value = data.cuit || '';
+                    // Buscar el cliente por CUIT
+                    if(data.cuit) {
+                        fetch(`/admin/clientes/buscar-por-cuit/${data.cuit}`)
+                            .then(response => response.json())
+                            .then(res => {
+                                let infoDiv = document.getElementById('cliente-info');
+                                console.log('Respuesta buscarPorCuit:', res); // Depuración
+                                if(res.success && res.cliente) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Cliente existente',
+                                        text: 'El cliente ya existe en la base de datos.',
+                                        confirmButtonText: 'Aceptar'
+                                    }).then(() => {
+                                        window.location.href = "{{ route('admin.clientes.index') }}";
+                                    });
+                                    infoDiv.innerHTML = '';
+                                } else {
+                                    infoDiv.innerHTML = '';
+                                }
+                            });
+                    }
                 });
             }
         }

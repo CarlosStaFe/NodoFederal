@@ -3,12 +3,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Socio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SocioController extends Controller
 {
     public function index()
     {
-        $socios = Socio::with('nodo')->get();
+        $user = Auth::user();
+        $roles = $user->roles->pluck('name');
+        if ($roles->contains('admin') || $roles->contains('secretaria')) {
+            $socios = Socio::with('nodo')->get();
+        } elseif ($roles->contains('nodo')) {
+            $socios = Socio::with('nodo')->where('nodo_id', $user->nodo_id)->get();
+        } else {
+            $socios = collect();
+        }
         return view('admin.socios.index', compact('socios'));
     }
 
