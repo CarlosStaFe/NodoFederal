@@ -97,7 +97,7 @@ class OperacionController extends Controller
                     \App\Models\Consulta::create([
                         'numero' => $idLog,
                         'tipo' => 'Consulta',
-                        'cuit' => $p['cuit'] ?? ($p['CUIT'] ?? ''),
+                        'cuit' => $p['cuil'] ?? ($p['CUIL'] ?? ''),
                         'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? null),
                         'fecha' => now(),
                         'nodo_id' => $user->nodo_id ?? 24,
@@ -277,20 +277,35 @@ class OperacionController extends Controller
     {
         $operacion = Operacion::findOrFail($id);
         $fechaAfectacion = $request->input('fecha_afectacion') ?? now();
+        $nuevoEstado = $request->input('estado_nuevo');
         // Actualizar operación
         $operacion->fecha_estado = $fechaAfectacion;
-        $operacion->estado_actual = 'Afectado';
+        $operacion->estado_actual = $nuevoEstado;
         $operacion->save();
 
         // Actualizar garantes
         foreach ($operacion->garantes as $garante) {
             $garante->fecha_estado = $fechaAfectacion;
-            $garante->estado = 'Afectado';
+            $garante->estado = $nuevoEstado;
             $garante->save();
+            // Actualizar estado en la tabla clientes para el garante
+            if ($garante->cliente) {
+                $garante->cliente->estado = $nuevoEstado;
+                $garante->cliente->fechaestado = $fechaAfectacion;
+                $garante->cliente->save();
+            }
+        }
+
+        // Actualizar estado en el cliente relacionado
+        $cliente = $operacion->cliente;
+        if ($cliente) {
+            $cliente->estado = $nuevoEstado;
+            $cliente->fechaestado = $fechaAfectacion;
+            $cliente->save();
         }
 
         return redirect()->route('admin.operaciones.show', ['id' => $operacion->id])
-            ->with('mensaje', 'Operación y garantes afectados correctamente.')
+            ->with('mensaje', 'Operación, garantes y cliente afectados correctamente.')
             ->with('icono', 'success')
             ->with('showConfirmButton', false);
     }

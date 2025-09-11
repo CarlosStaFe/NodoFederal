@@ -34,13 +34,30 @@
                         <?php $linea = 1; ?>
                         @foreach($clientes as $cliente)
                         <tr>
+                            @php
+                            $estado = strtoupper($cliente->estado);
+                                if ($estado == 'ACTIVO') {
+                                    $color = 'white';
+                                    $bg = 'green';
+                                } elseif ($estado == 'ATRASADO') {
+                                    $color = 'black';
+                                    $bg = 'yellow';
+                                } elseif (in_array($estado, ['REGULARIZADO', 'CANCELADO', 'EN CONVENIO'])) {
+                                    $color = 'white';
+                                    $bg = 'orange';
+                                } elseif ($estado == 'CANCELADO CON ATRASO') {
+                                    $color = 'white';
+                                    $bg = 'red';
+                                }
+                            @endphp
+
                             <td style="text-align: right;">{{ $linea++ }}</td>
                             <td>{{ $cliente->tipodoc }}</td>
                             <td>{{ $cliente->documento }}</td>
                             <td style="text-align: center;">{{ $cliente->sexo }}</td>
                             <td>{{ $cliente->apelnombres }}</td>
                             <td>{{ $cliente->cuit }}</td>
-                            <td>{{ $cliente->estado }}</td>
+                            <td class="text-center" style="color: {{ $color }};@if(isset($bg)) background-color: {{ $bg }};@endif">{{ $cliente->estado }}</td>
                             <td>{{ \Carbon\Carbon::parse($cliente->fechaestado)->format('d-m-Y') }}</td>
                             <td>
                                 <a href="{{url('admin/clientes/'.$cliente->id)}}" type="button" class="btn btn-success btn-sm" title="Ver cliente"><i class="bi bi-eye"></i></a>

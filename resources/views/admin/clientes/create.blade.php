@@ -210,13 +210,12 @@
                             <label for="estado">Estado</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('estado')}}" id="estado" name="estado" placeholder="Estado">
                                 <option selected disabled>Elige estado...</option>
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
-                                <option value="Atrasado">Atrasado</option>
-                                <option value="Cancelado">Cancelado</option>
-                                <option value="Cancelado con atraso">Cancelado con atraso</option>
-                                <option value="Afectado">Afectado</option>
-                                <option value="En Convenio">En Convenio</option>
+                                <option value="ACTIVO">ACTIVO</option>
+                                <option value="ATRASADO">ATRASADO</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                                <option value="CANCELADO CON ATRASO">CANCELADO CON ATRASO</option>
+                                <option value="EN CONVENIO">EN CONVENIO</option>
+                                <option value="REGULARIZADO">REGULARIZADO</option>
                             </select>
                             @error('estado')
                                 <small style="color: red">{{$message}}</small>

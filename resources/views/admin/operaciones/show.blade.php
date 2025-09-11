@@ -90,21 +90,41 @@
                         </thead>
                         <tbody>
                             @forelse($operaciones as $op)
+                                @php
+                                $estado = strtoupper($op->estado_actual);
+                                    if ($estado == 'ACTIVO') {
+                                        $color = 'white';
+                                        $bg = 'green';
+                                    } elseif ($estado == 'ATRASADO') {
+                                        $color = 'black';
+                                        $bg = 'yellow';
+                                    } elseif (in_array($estado, ['REGULARIZADO', 'CANCELADO', 'EN CONVENIO'])) {
+                                        $color = 'white';
+                                        $bg = 'orange';
+                                    } elseif ($estado == 'CANCELADO CON ATRASO') {
+                                        $color = 'white';
+                                        $bg = 'red';
+                                    }
+                                @endphp
                                 <tr>
-                                    <td class="text-right">{{ $op->numero }}</td>
-                                    <td class="text-center">{{ \Carbon\Carbon::parse($op->fecha_operacion)->format('d-m-Y') }}</td>
-                                    <td>{{ $op->clase }}</td>
-                                    <td class="text-right">{{ $op->valor_cuota }}</td>
-                                    <td class="text-right">{{ $op->cant_cuotas }}</td>
-                                    <td class="text-right">{{ $op->total }}</td>
-                                    <td class="text-center" style="color: {{ $op->estado_actual == 'Afectado' ? 'red' : 'black' }};">{{ $op->estado_actual ?? '' }}</td>
-                                    <td class="text-center">{{ $op->fecha_estado ? \Carbon\Carbon::parse($op->fecha_estado)->format('d-m-Y') : '' }}</td>
+                                    <td class="text-right">{{ $op->numero ?? '' }}</td>
+                                    <td class="text-center">{{ isset($op->fecha_operacion) ? \Carbon\Carbon::parse($op->fecha_operacion)->format('d-m-Y') : '' }}</td>
+                                    <td>{{ $op->clase ?? '' }}</td>
+                                    <td class="text-right">{{ $op->valor_cuota ?? '' }}</td>
+                                    <td class="text-right">{{ $op->cant_cuotas ?? '' }}</td>
+                                    <td class="text-right">{{ $op->total ?? '' }}</td>
+                                    <td class="text-center" style="color: {{ $color }};@if(isset($bg)) background-color: {{ $bg }};@endif">
+                                        {{ $op->estado_actual ?? '' }}
+                                    </td>
+                                    <td class="text-center">{{ isset($op->fecha_estado) ? \Carbon\Carbon::parse($op->fecha_estado)->format('d-m-Y') : '' }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('admin.operaciones.afectar', ['id' => $op->id]) }}" class="btn btn-sm btn-danger bi bi-fire"></a>
+                                        @if(isset($op->id))
+                                            <a href="{{ route('admin.operaciones.afectar', ['id' => $op->id]) }}" class="btn btn-sm btn-danger bi bi-fire"></a>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6">No tiene operaciones como titular.</td></tr>
+                                <tr><td colspan="9">No tiene operaciones como titular.</td></tr>
                             @endforelse
                         </tbody>
                     </table>                
@@ -127,20 +147,36 @@
                         </thead>
                         <tbody>
                             @forelse($operacionesComoGarante as $g)
-                                @if($g->operacion)
-                                    <tr @if(($g->operacion->estado_actual ?? '') == 'Afectado') style="background-color: #ffcc80 !important;" @endif>
-                                        <td class="text-right">{{ $g->operacion->numero }}</td>
-                                        <td class="text-center">{{ \Carbon\Carbon::parse($g->operacion->fecha_operacion)->format('d-m-Y') }}</td>
-                                        <td>{{ $g->operacion->clase }}</td>
-                                        <td class="text-right">{{ $g->operacion->valor_cuota }}</td>
-                                        <td class="text-right">{{ $g->operacion->cant_cuotas }}</td>
-                                        <td class="text-right">{{ $g->operacion->total }}</td>
-                                        <td class="text-center" style="color: {{ $g->operacion->estado_actual == 'Afectado' ? 'red' : 'black' }};">{{ $g->operacion->estado_actual ?? '' }}</td>
-                                        <td class="text-center">{{ $g->operacion->fecha_estado ? \Carbon\Carbon::parse($g->operacion->fecha_estado)->format('d-m-Y') : '' }}</td>
-                                    </tr>
-                                @endif
+                                @php
+                                $estado = strtoupper($op->estado_actual);
+                                    if ($estado == 'ACTIVO') {
+                                        $color = 'white';
+                                        $bg = 'green';
+                                    } elseif ($estado == 'ATRASADO') {
+                                        $color = 'black';
+                                        $bg = 'yellow';
+                                    } elseif (in_array($estado, ['REGULARIZADO', 'CANCELADO', 'EN CONVENIO'])) {
+                                        $color = 'white';
+                                        $bg = 'orange';
+                                    } elseif ($estado == 'CANCELADO CON ATRASO') {
+                                        $color = 'white';
+                                        $bg = 'red';
+                                    }
+                                @endphp
+                                <tr @if(($g->operacion->estado_actual ?? '') == 'Afectado') style="background-color: #ffcc80 !important;" @endif>
+                                    <td class="text-right">{{ $g->operacion->numero ?? '' }}</td>
+                                    <td class="text-center">{{ isset($g->operacion->fecha_operacion) ? \Carbon\Carbon::parse($g->operacion->fecha_operacion)->format('d-m-Y') : '' }}</td>
+                                    <td>{{ $g->operacion->clase ?? '' }}</td>
+                                    <td class="text-right">{{ $g->operacion->valor_cuota ?? '' }}</td>
+                                    <td class="text-right">{{ $g->operacion->cant_cuotas ?? '' }}</td>
+                                    <td class="text-right">{{ $g->operacion->total ?? '' }}</td>
+                                    <td class="text-center" style="color: {{ $color }};@if(isset($bg)) background-color: {{ $bg }};@endif">
+                                        {{ $g->operacion->estado_actual ?? '' }}
+                                    </td>
+                                    <td class="text-center">{{ isset($g->operacion->fecha_estado) ? \Carbon\Carbon::parse($g->operacion->fecha_estado)->format('d-m-Y') : '' }}</td>
+                                </tr>
                             @empty
-                                <tr><td colspan="7">No figura como garante en ninguna operación.</td></tr>
+                                <tr><td colspan="8">No figura como garante en ninguna operación.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -238,7 +274,7 @@
                 },
             },
             "columnDefs": [
-                { "orderable": false, "targets": [7] }
+                { "orderable": false, "targets": [8] }
             ]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });

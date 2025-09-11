@@ -90,7 +90,6 @@
                         </div>
                     </div>
                 </div>
-                <br>
                 <div class="row">
                     <div class="col-md-3 col-sm-6 position-relative">
                         <div class="form-group">
@@ -181,8 +180,9 @@
                     </div>
 
                     <div class="col-lg-2 p-4 col-md-12">
-                        <button type="button" class="btn btn-success btn-sm" id="agregarGarante">Agregar Garante</button>
+                        <button type="button" class="btn btn-success btn-sm" id="agregarGarante" style="width: 80%; font-size: 1rem;">Agregar Garante</button>
                     </div>
+
                     <div class="col-lg-12 mt-4">
                         <h5 class="text-primary">Lista de Garantes</h5>
                         <table class="table table-bordered table-striped">

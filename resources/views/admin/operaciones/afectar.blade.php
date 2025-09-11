@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="row">
-    <h1>Afectar Operación</h1>
+    <h1>Afectar/Desafectar Operación</h1>
 </div>
 <div class="col-md-12">
     <div class="card card-outline card-danger">
@@ -108,19 +108,54 @@
                 <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="estado_actual">Estado</label>
-                            <input type="text" class="form-control" id="estado_actual" value="{{ $operacion->estado_actual }}" readonly>
+                            <label for="estado_actual">Estado Actual</label>
+                            @php
+                                $estado = strtoupper($operacion->estado_actual);
+                                if ($estado == 'ACTIVO') {
+                                    $color = 'white';
+                                    $bg = 'green';
+                                } elseif ($estado == 'ATRASADO') {
+                                    $color = 'black';
+                                    $bg = 'yellow';
+                                } elseif (in_array($estado, ['REGULARIZADO', 'CANCELADO', 'EN CONVENIO'])) {
+                                    $color = 'white';
+                                    $bg = 'orange';
+                                } elseif ($estado == 'CANCELADO CON ATRASO') {
+                                    $color = 'white';
+                                    $bg = 'red';
+                                }
+                            @endphp
+                            <input type="text" class="form-control" id="estado_actual" value="{{ $operacion->estado_actual }}" readonly style="color: {{ $color }};@if(isset($bg)) background-color: {{ $bg }};@endif">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="fecha_afectacion">Fecha de Afectación</label>
-                            <input type="date" class="form-control" id="fecha_afectacion" name="fecha_afectacion" value="{{ old('fecha_afectacion', isset($operacion->fecha_afectacion) ? \Carbon\Carbon::parse($operacion->fecha_afectacion)->format('Y-m-d') : \Carbon\Carbon::now()->format('Y-m-d')) }}">
+                            <input type="date" class="form-control" id="fecha_afectacion" name="fecha_afectacion"
+                                value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" readonly style="background-color: rgb(255, 0, 0); color: white;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="estado_nuevo" style="color: red;">CAMBIAR EL ESTADO A...</label>
+                            <select type="text" class="form-control" style="background-color: rgb(255, 0, 0); color: white;" value="{{old('estado')}}" id="estado_nuevo" name="estado_nuevo" placeholder="Estado">
+                                <option selected disabled>Elige estado...</option>
+                                @if(strtoupper($operacion->estado_actual) == 'ACTIVO')
+                                    <option value="ATRASADO">ATRASADO</option>
+                                @elseif(strtoupper($operacion->estado_actual) == 'ATRASADO')
+                                    <option value="CANCELADO">CANCELADO</option>
+                                    <option value="REGULARIZADO">REGULARIZADO</option>
+                                    <option value="EN CONVENIO">EN CONVENIO</option>
+                                @endif
+                            </select>
+                            @error('estado_nuevo')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group mt-4 ml-50">
-                            <button type="submit" class="btn btn-sm btn-danger bi bi-fire">AFECTAR</button>
+                        <div class="form-group mt-4 ml-100">
+                            <button type="submit" class="btn btn-lg btn-warning bi bi-fire" style="width: 60%; font-size: 1.25rem;">GRABAR ESTADO</button>
                         </div>
                     </div>
                 </div>
