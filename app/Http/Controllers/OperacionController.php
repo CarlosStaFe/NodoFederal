@@ -49,7 +49,7 @@ class OperacionController extends Controller
     /**
      * Consulta la API externa por documento y muestra los datos en la vista.
      */
-    public function consultarApiPorDocumento(Request $request)
+    public function consultarApiPorCuil(Request $request)
     {
         $dni = $request->input('documento');
         $cuit = $request->input('cuit');
@@ -98,7 +98,7 @@ class OperacionController extends Controller
                         'numero' => $idLog,
                         'tipo' => 'Consulta',
                         'cuit' => $p['cuil'] ?? ($p['CUIL'] ?? ''),
-                        'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? null),
+                        'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? 'SIN NOMBRE'),
                         'fecha' => now(),
                         'nodo_id' => $user->nodo_id ?? 24,
                         'socio_id' => $user->socio_id ?? 1,
@@ -106,6 +106,10 @@ class OperacionController extends Controller
                         // Puedes agregar más campos si el JSON tiene otros datos relevantes
                     ]);
                 }
+            //$datosBcra = $this->leerBCRA($cuit);
+            //$datos['bcra'] = $datosBcra;
+            //dd($datos);
+
             $request->session()->put('datos_api', $datos);
             // Redirigir al informe después de consultar
             return redirect()->route('admin.operaciones.informe');
@@ -175,37 +179,6 @@ class OperacionController extends Controller
         $numero = 1;
         while (Operacion::where('numero', $numero)->exists()) {
             $numero++;
-        }
-        $operacion->numero = $numero;
-        $operacion->id_cliente = $cliente->id;
-        $operacion->estado_actual = $cliente->estado;
-        $operacion->fecha_estado = $cliente->fechaestado ?? now();
-        $operacion->id_socio = $socio->id;
-        $operacion->tipo = 'Solicitante';
-        $operacion->fecha_operacion = now();
-        $operacion->valor_cuota = $request->valor;
-        $operacion->cant_cuotas = $request->cuotas;
-        $operacion->total = $request->total;
-        $operacion->fecha_cuota = $request->vencimiento;
-        $operacion->clase = $request->operacion;
-        $operacion->id_usuario = $user->id;
-        $operacion->save();
-
-        // Guardar garantes si existen
-        if ($request->filled('garantes_json')) {
-            $garantes = json_decode($request->garantes_json, true);
-            if (is_array($garantes)) {
-                foreach ($garantes as $garante) {
-                    // Buscar el cliente por cuit del garante
-                    $clienteGarante = \App\Models\Cliente::where('cuit', $garante['cuit'] ?? '')->first();
-                    \App\Models\Garante::create([
-                        'cliente_id' => $clienteGarante ? $clienteGarante->id : null,
-                        'operacion_id' => $operacion->id,
-                        'estado' => 'Activo',
-                        'fecha_estado' => now(),
-                    ]);
-                }
-            }
         }
 
         return redirect()->route('admin.operaciones.cargar', ['id' => $operacion->id])
@@ -308,6 +281,37 @@ class OperacionController extends Controller
             ->with('mensaje', 'Operación, garantes y cliente afectados correctamente.')
             ->with('icono', 'success')
             ->with('showConfirmButton', false);
+    }
+
+    /**
+     * Consulta las APIs de BCRA usando el CUIT y retorna los resultados combinados.
+     */
+    public function leerBCRA($cuit)
+    {
+        if (!$cuit) {
+            // Intentar obtener el cuil de la sesión de la última consulta
+            $datos = session('datos_api');
+            $cuit = $datos['data']['datosParticulares']['cuil'] ?? $datos['data']['datosParticulares']['CUIL'] ?? null;
+        }
+        if (!$cuit) return null;
+
+        $resultados = [];
+        $apis = [
+            'deudas' => env('API_DEUDAS_BCRA'),
+            'cheques' => env('API_CHEQUES_BCRA'),
+            'historico' => env('API_HISTORICO_BCRA'),
+        ];
+        foreach ($apis as $key => $url) {
+            if ($url) {
+                $apiUrl = preg_replace('/\?/', $cuit, $url, 1);
+                $response = Http::withoutVerifying()->get($apiUrl);
+                $resultados[$key] = $response->successful() ? $response->json() : null;
+            } else {
+                $resultados[$key] = null;
+            }
+        }
+        //dd($resultados);
+        return $resultados;
     }
 
 }

@@ -12,20 +12,6 @@
 
             @php $p = $data['datosParticulares'] ?? []; @endphp
             <style>
-                body,
-                table,
-                th,
-                td,
-                h2,
-                h3 {
-                    font-size: 11px !important;
-                }
-
-                .table {
-                    width: 100% !important;
-                    table-layout: fixed;
-                }
-
                 .table thead th {
                     background-color: #37a395;
                     color: #fff;
@@ -40,7 +26,7 @@
 
                 .section-title {
                     color: #0d6efd;
-                    font-size: 1.1rem;
+                    font-size: 1.3rem;
                     font-weight: bold;
                     margin-bottom: 0.5em;
                 }
@@ -63,6 +49,7 @@
 
             <div class="watermark">Nodo Federal - Tel. 0342 156267364</div>
 
+            {{-- DATOS VERAZ --}}
             @if ($p)
                 <table class="table table-bordered">
                     <div class="col-12 mb-3">
@@ -153,9 +140,100 @@
                 </table>
             @endif
 
+            {{-- DATOS INFORMACION DEL BCRA DEUDORES CENTRO COMERCIAL --}}
+            @php $nodo = $data['morosidad']['deudoresCentroComercial']['datos'] ?? []; @endphp
+            @if (!empty($nodo) && is_array($nodo))
+                <div class="col-12 mt-3">
+                    <h3>Deudores Nodo Federal</h3>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Nodo</th>
+                            <th>Socio</th>
+                            <th>Tipo</th>
+                            <th>Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($nodo as $item)
+                            <tr>
+                                <td>{{ $item['codDeEstado'] ?? '' }}</td>
+                                <td>{{ isset($item['fechaDeAtraso']) ? \Carbon\Carbon::parse($item['fechaDeAtraso'])->format('d-m-Y') : '' }}
+                                </td>
+                                <td>{{ $item['nombreInstituto'] ?? '' }}</td>
+                                <td>{{ $item['nombreSocio'] ?? '' }}</td>
+                                <td>{{ $item['tipoDeudor'] ?? '' }}</td>
+                                <td>{{ isset($item['deudaTotal']) ? number_format($item['deudaTotal'], 2, ',', '.') : '' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de deudores Nodo Federal.
+                </div>
+            @endif
+
+            {{-- DATOS LABORALES --}}
+            @php $datosLaborales = $data['datosLaborales'] ?? []; @endphp
+            @if (isset($datosLaborales['datoLaboral']['datos']) && is_array($datosLaborales['datoLaboral']['datos']))
+                <h3>Relaciones de Dependencia</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Razón Social</th>
+                            <th>CUIT</th>
+                            <th style="width: 8%;">Alta</th>
+                            <th style="width: 8%;">Baja</th>
+                            <th>Actividad Empleador</th>
+                            <th>Cant. Empl.</th>
+                            <th>Domicilio</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.50em;">
+                        @foreach ($datosLaborales['datoLaboral']['datos'] as $laboral)
+                            <tr>
+                                <td>{{ $laboral['relacionDependencia']['estado'] ?? '' }}</td>
+                                <td>{{ $laboral['relacionDependencia']['razonSocial'] ?? '' }}</td>
+                                <td>{{ $laboral['relacionDependencia']['cuit'] ?? '' }}</td>
+                                <td>{{ isset($laboral['relacionDependencia']['alta']) ? \Carbon\Carbon::parse($laboral['relacionDependencia']['alta'])->format('d-m-Y') : '' }}
+                                </td>
+                                <td>{{ isset($laboral['relacionDependencia']['baja']) ? \Carbon\Carbon::parse($laboral['relacionDependencia']['baja'])->format('d-m-Y') : '' }}
+                                </td>
+                                <td>{{ $laboral['historialSueldo']['infoAdicionalEmpleador']['actividadempleador'] ?? '' }}
+                                </td>
+                                <td>{{ $laboral['historialSueldo']['infoAdicionalEmpleador']['cantidadempleados'] ?? '' }}
+                                </td>
+                                <td>
+                                    {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['domicilio']['direccion'] ?? '' }},
+                                    {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['domicilio']['localidad'] ?? '' }},
+                                    {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['domicilio']['provincia'] ?? '' }},
+                                    {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['domicilio']['partido'] ?? '' }},
+                                    CP:
+                                    {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['domicilio']['cp'] ?? '' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos Laborales.
+                </div>
+            @endif
+
+
+            {{-- DATOS MONOTRIBUTISTA --}}
             @php $monos = $data['datosLaborales']['monotributista']['datos'] ?? []; @endphp
             @if (count($monos) > 0)
-                <h3>Monotributo</h3>
+                <div class="col-12 mt-3">
+                    <h3>Monotributo</h3>
+                </div>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -172,17 +250,26 @@
                                 <td>{{ $mono['tipo'] ?? '' }}</td>
                                 <td>{{ $mono['categoria'] ?? '' }}</td>
                                 <td>{{ $mono['estado'] ?? '' }}</td>
-                                <td>{{ $mono['fechaInicio'] ?? '' }}</td>
-                                <td>{{ $mono['fechaHasta'] ?? '' }}</td>
+                                <td>{{ isset($mono['fechaInicio']) ? \Carbon\Carbon::parse($mono['fechaInicio'])->format('d-m-Y') : '' }}
+                                </td>
+                                <td>{{ isset($mono['fechaHasta']) ? \Carbon\Carbon::parse($mono['fechaHasta'])->format('d-m-Y') : '' }}
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de Monotributistas.
+                </div>
             @endif
 
+            {{-- DATOS ACTIVIDAD --}}
             @php $acts = $data['datosLaborales']['actividad']['datos'] ?? []; @endphp
             @if (count($acts) > 0)
-                <h3>Actividad</h3>
+                <div class="col-12 mt-3">
+                    <h3>Actividad</h3>
+                </div>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -199,19 +286,62 @@
                         @endforeach
                     </tbody>
                 </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de actividad laboral.
+                </div>
             @endif
 
-            @php $jubs = $data['datosLaborales']['jubilacion']['datos'] ?? []; @endphp
-            @if (count($jubs) > 0)
-                <h3>Jubilación</h3>
+            {{-- DATOS OBRA SOCIAL --}}
+            @php $os = $data['datosLaborales']['obraSocial']['datos'] ?? []; @endphp
+            @if (count($os) > 0)
+                <div class="col-12 mt-3">
+                    <h3>Obra Social</h3>
+                </div>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Titular</th>
-                            <th>Sueldo Bruto</th>
-                            <th>Sueldo Neto</th>
-                            <th>Periodo</th>
-                            <th>Rango</th>
+                            <th>CUIT</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($os as $obra)
+                            <tr>
+                                <td>{{ $obra['cuit'] ?? '' }}</td>
+                                <td>{{ $obra['nombre'] ?? '' }}</td>
+                                <td>{{ $obra['estado'] ?? '' }}</td>
+                                <td>{{ isset($obra['fechaInicio']) ? \Carbon\Carbon::parse($obra['fechaInicio'])->format('d-m-Y') : '' }}
+                                </td>
+                                <td>{{ isset($obra['fechaFin']) ? \Carbon\Carbon::parse($obra['fechaFin'])->format('d-m-Y') : '' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de Obra Social.
+                </div>
+            @endif
+
+            {{-- DATOS JUBILACION --}}
+            @php $jubs = $data['datosLaborales']['jubilacion']['datos'] ?? []; @endphp
+            @if (count($jubs) > 0)
+                <div class="col-12 mt-3">
+                    <h3>Jubilación</h3>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Titular</th>
+                            <th style="width: 15%;">Sueldo Bruto</th>
+                            <th style="width: 15%;">Sueldo Neto</th>
+                            <th style="width: 15%;">Periodo</th>
+                            <th style="width: 10%;">Rango</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -229,11 +359,18 @@
                         @endforeach
                     </tbody>
                 </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de Jubilación.
+                </div>
             @endif
 
-            @php $autos = $data['bienesPersonales']['automotores_historial']['datos'] ?? []; @endphp
-            @if (count($autos) > 0)
-                <h3>Automotores Historial</h3>
+            {{-- DATOS AUTOMOTORES --}}
+            @php $bo = $data['bienesPersonales']['automotores']['datos'] ?? []; @endphp
+            @if (count($bo) > 0)
+                <div class="col-12 mt-3">
+                    <h3>Automotores</h3>
+                </div>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -254,36 +391,132 @@
                         @endforeach
                     </tbody>
                 </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de Automotores.
+                </div>
             @endif
 
-            @php $bcra = $data['situacionFinanciera']['informacionBcra']['datos'] ?? []; @endphp
-            @if (count($bcra) > 0)
-                <h3>Situación Financiera (BCRA)</h3>
+            {{-- DATOS INFORMACION DEL BCRA --}}
+            @php
+                $morosidad = $data['morosidad']['informacionBcra']['datos'] ?? [];
+                // Agrupar primero por tipo y dentro de cada tipo por entidad
+                $agrupados = collect($morosidad)
+                    ->sortBy([
+                        fn($item) => $item['entidad']['tipo'] ?? '',
+                        fn($item) => $item['entidad']['entidad'] ?? '',
+                    ])
+                    ->groupBy(fn($item) => $item['entidad']['tipo'] ?? '')
+                    ->map(function ($items) {
+                        return collect($items)->groupBy(fn($item) => $item['entidad']['entidad'] ?? '');
+                    });
+            @endphp
+            @if (!empty($agrupados) && $agrupados->count())
+                <div class="col-12 mt-3">
+                    <h3>BCRA Morosidad (Agrupado por Tipo y Entidad)</h3>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Entidad</th>
+                            <th>Período</th>
+                            <th>Situación</th>
+                            <th>Préstamo</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.70em;">
+                        @foreach ($agrupados as $tipo => $entidades)
+                            @foreach ($entidades as $entidad => $registros)
+                                @foreach ($registros as $moras)
+                                    <tr>
+                                        <td>{{ $tipo }}</td>
+                                        <td>{{ $entidad }}</td>
+                                        <td>{{ isset($moras['periodo']) ? \Carbon\Carbon::parse($moras['periodo'])->format('m-Y') : '' }}
+                                        </td>
+                                        <td>{{ $moras['situacion'] ?? '' }}</td>
+                                        <td>{{ isset($moras['prestamo']) ? number_format($moras['prestamo'], 2, ',', '.') : '' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endforeach
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de Morosidad.
+                </div>
+            @endif
+
+            {{-- DATOS INFORMACION DEL BCRA CHEQUES RECHAZADOS --}}
+            @php $chqrs = $data['morosidad']['chequesRechazados']['datos'] ?? []; @endphp
+            @if (!empty($chqrs) && is_array($chqrs))
+                <div class="col-12 mt-3">
+                    <h3>BCRA Cheques Rechazados</h3>
+                </div>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Entidad</th>
-                            <th>Tipo</th>
-                            <th>Situación</th>
-                            <th>Periodo</th>
-                            <th>Préstamo</th>
+                            <th>Fecha Rechazo</th>
+                            <th>Importe</th>
+                            <th>Motivo</th>
+                            <th>Cantidad</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($bcra as $b)
+                        @foreach ($chqrs as $chq)
                             <tr>
-                                <td>{{ $b['entidad']['entidad'] ?? '' }}</td>
-                                <td>{{ $b['entidad']['tipo'] ?? '' }}</td>
-                                <td>{{ $b['situacion'] ?? '' }}</td>
-                                <td>{{ $b['periodo'] ?? '' }}</td>
-                                <td>{{ $b['prestamo'] ?? '' }}</td>
+                                <td>{{ $chq['entidad'] ?? '' }}</td>
+                                <td>{{ isset($chq['fechaRechazo']) ? \Carbon\Carbon::parse($chq['fechaRechazo'])->format('d-m-Y') : '' }}
+                                </td>
+                                <td>{{ isset($chq['importe']) ? number_format($chq['importe'], 2, ',', '.') : '' }}
+                                </td>
+                                <td>{{ $chq['motivo'] ?? '' }}</td>
+                                <td>{{ $chq['cantidad'] ?? '' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info">No hay datos de situación financiera BCRA.</div>
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de Cheques Rechazados.
+                </div>
             @endif
+
+            {{-- DATOS INFORMACION DEL BCRA DEUDORES BANCO CENTRAL --}}
+            @php $deudores = $data['morosidad']['deudoresBancoCentral']['datos'] ?? []; @endphp
+            @if (!empty($deudores) && is_array($deudores))
+                <div class="col-12 mt-3">
+                    <h3>BCRA Deudores Banco Central</h3>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Entidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($deudores as $deudor)
+                            <tr>
+                                <td>{{ $deudor['entidad'] ?? '' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="alert alert-info mt-2">
+                    No se encontraron datos de deudores BCRA.
+                </div>
+            @endif
+
+            <p><strong>La información suministrada en el presente informe, extraída de bases públicas, privadas y
+                    propias, es confidencial y
+                    reservada.<br>El cliente es el único habilitado a consultar la información, estando
+                    expresamente prohibida la divulgación de la misma a
+                    terceros —total o parcialmente— observando el deber de confidencialidad y uso permitido,
+                    según Ley 25.236.</strong></p>
         </div>
     </div>
 </div>

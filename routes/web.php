@@ -156,7 +156,7 @@ Route::get('/admin/operaciones/informe', [OperacionController::class, 'informe']
 Route::get('/admin/operaciones/pdf', [OperacionController::class, 'pdf'])
     ->name('admin.operaciones.pdf')
     ->middleware(['auth', 'can:admin.operaciones.pdf']);
-Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consultarApiPorDocumento'])
+Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consultarApiPorCuil'])
     ->name('admin.operaciones.consultar.api')
     ->middleware(['auth', 'can:admin.operaciones.consultar']);
 Route::get('/admin/operaciones/cargar', [OperacionController::class, 'cargar'])
