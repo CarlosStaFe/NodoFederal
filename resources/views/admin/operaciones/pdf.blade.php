@@ -12,10 +12,20 @@
 
             @php $p = $data['datosParticulares'] ?? []; @endphp
             <style>
+                .table {
+                    width: 100% !important;
+                }
+                
                 .table thead th {
                     background-color: #37a395;
                     color: #fff;
                     font-weight: bold;
+                    font-size: 0.85em;
+                }
+
+                .table tbody td {
+                    font-size: 0.60em;
+                    border: 1px solid #b5b5b5;
                 }
 
                 #datos-personales th {
@@ -173,7 +183,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de deudores Nodo Federal.
                 </div>
             @endif
@@ -195,7 +206,8 @@
                             <th>Domicilio</th>
                         </tr>
                     </thead>
-                    <tbody style="font-size: 0.50em;">
+                    <tbody style="font-size: 0.70em; important;">
+                        {{-- <tbody style="font-size: 0.70em;"> --- IGNORE --- --}}
                         @foreach ($datosLaborales['datoLaboral']['datos'] as $laboral)
                             <tr>
                                 <td>{{ $laboral['relacionDependencia']['estado'] ?? '' }}</td>
@@ -222,7 +234,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos Laborales.
                 </div>
             @endif
@@ -259,7 +272,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de Monotributistas.
                 </div>
             @endif
@@ -287,7 +301,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de actividad laboral.
                 </div>
             @endif
@@ -323,7 +338,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de Obra Social.
                 </div>
             @endif
@@ -360,7 +376,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de Jubilación.
                 </div>
             @endif
@@ -392,7 +409,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de Automotores.
                 </div>
             @endif
@@ -444,7 +462,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de Morosidad.
                 </div>
             @endif
@@ -480,7 +499,8 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de Cheques Rechazados.
                 </div>
             @endif
@@ -506,12 +526,13 @@
                     </tbody>
                 </table>
             @else
-                <div class="alert alert-info mt-2">
+                <br>
+                <div class="alert alert-info mt-2" style="border: 1px solid #769cc2; background-color: #3374b6; color: #fff; width: 100%;">
                     No se encontraron datos de deudores BCRA.
                 </div>
             @endif
 
-            <p><strong>La información suministrada en el presente informe, extraída de bases públicas, privadas y
+            <p style="font-size: 0.75em;"><strong>La información suministrada en el presente informe, extraída de bases públicas, privadas y
                     propias, es confidencial y
                     reservada.<br>El cliente es el único habilitado a consultar la información, estando
                     expresamente prohibida la divulgación de la misma a

@@ -125,4 +125,5 @@ class NodoController extends Controller
             ->with('mensaje', 'Nodo eliminado con éxito.')
             ->with('icono', 'success');
     }
+
 }

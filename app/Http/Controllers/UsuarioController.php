@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class UsuarioController extends Controller
 {
@@ -56,8 +57,8 @@ class UsuarioController extends Controller
         $usuario->email = $request->email;
         $usuario->password = bcrypt($request->password);
         if (in_array($request->rol, ['admin', 'secretaria'])) {
-            $usuario->nodo_id = null;
-            $usuario->socio_id = null;
+            $usuario->nodo_id = 24;
+            $usuario->socio_id = 1;
         } else {
             $usuario->nodo_id = $request->nodo_id;
             $usuario->socio_id = $request->socio_id;
@@ -66,6 +67,13 @@ class UsuarioController extends Controller
 
         // Asignar el rol seleccionado
         $usuario->assignRole($request->rol);
+
+        // Enviar email con usuario y contraseña
+        Mail::send([], [], function ($message) use ($usuario, $request) {
+            $message->to($usuario->email)
+                ->subject('Usuario creado en Nodo Federal-NO CONTESTAR ESTE MENSAJE')
+                ->html('<p>Su usuario ha sido creado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><br><p><b>Contraseña:</b> ' . $request->password . '</p><br><p>Link de la aplicación: <a href="' . env('APP_URL') . '">' . env('APP_URL') . '</a></p>');
+        });
 
         return redirect()->route('admin.usuarios.index')
             ->with('mensaje', 'Usuario creado con éxito.')
@@ -112,6 +120,15 @@ class UsuarioController extends Controller
 
         // Quitar roles anteriores y asignar el nuevo
         $usuario->syncRoles([$request->rol]);
+
+        // Enviar email con usuario y contraseña si se actualizó la contraseña
+        if ($request->password) {
+            Mail::send([], [], function ($message) use ($usuario, $request) {
+                $message->to($usuario->email)
+                    ->subject('Usuario actualizado en Nodo Federal-NO CONTESTAR ESTE MENSAJE')
+                    ->html('<p>Su usuario ha sido actualizado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><br><p><b>Contraseña:</b> ' . $request->password . '</p><br><p>Link de la aplicación: <a href="' . env('APP_URL') . '">' . env('APP_URL') . '</a></p>');
+            });
+        }
 
         return redirect()->route('admin.usuarios.index')
             ->with('mensaje', 'Usuario actualizado con éxito.')

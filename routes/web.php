@@ -10,6 +10,7 @@ use App\Http\Controllers\NodoController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\OperacionController;
+use App\Http\Controllers\ConsultaController;
 
 Route::get('/', function () {
     return redirect()->route('admin.index');
@@ -26,15 +27,9 @@ Route::get('/admin', [AdminController::class, 'index'])
     ->middleware('auth');
 
 // RUTAS PARA EL ADMIN - ADMINISTRACION
-Route::get('/admin/administracion', [UsuarioController::class, 'index'])
-    ->name('admin.administracion.index')
-    ->middleware(['auth', 'can:admin.administracion.index']);
-Route::get('/admin/administracion/consultar', [UsuarioController::class, 'consultar'])
+Route::get('/admin/administracion/consultar', [ConsultaController::class, 'consultar'])
     ->name('admin.administracion.consultar')
     ->middleware(['auth', 'can:admin.administracion.consultar']);
-Route::get('/admin/administracion/liquidar', [UsuarioController::class, 'liquidar'])
-    ->name('admin.administracion.liquidar')
-    ->middleware(['auth', 'can:admin.administracion.liquidar']);
 
 // RUTAS PARA EL ADMIN - USUARIOS
 Route::get('/admin/usuarios', [UsuarioController::class, 'index'])

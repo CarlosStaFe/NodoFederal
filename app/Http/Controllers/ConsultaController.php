@@ -7,6 +7,36 @@ use Illuminate\Http\Request;
 
 class ConsultaController extends Controller
 {
+    public function consultar()
+    {
+        $user = auth()->user();
+        $roles = $user->roles->pluck('name');
+        if ($roles->contains('nodo')) {
+            $nodos = \App\Models\Nodo::where('id', $user->nodo_id)->get();
+            $socios = \App\Models\Socio::where('nodo_id', $user->nodo_id)->get();
+        } elseif ($roles->contains('admin') || $roles->contains('secretaria')) {
+            $nodos = \App\Models\Nodo::all();
+            $socios = \App\Models\Socio::all();
+        } else {
+            $nodos = collect();
+            $socios = collect();
+        }
+
+        // Filtrar consultas si hay parámetros
+        $consulta = collect();
+        $nodo_id = request('nodo_id');
+        $socio_id = request('socio_id');
+        $desde_fecha = request('desde_fecha');
+        $hasta_fecha = request('hasta_fecha');
+        if ($nodo_id && $socio_id && $desde_fecha && $hasta_fecha) {
+            $consulta = \App\Models\Consulta::where('nodo_id', $nodo_id)
+                ->where('socio_id', $socio_id)
+                ->whereBetween('fecha', [$desde_fecha, $hasta_fecha])
+                ->get();
+        }
+        return view('admin.administracion.consultar', compact('nodos', 'socios', 'consulta'));
+    }
+
     /**
      * Display a listing of the resource.
      */

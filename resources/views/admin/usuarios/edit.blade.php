@@ -108,7 +108,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="password_confirmation">Verificar Contraseña</label>
-                            <input type="text" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required>
                             @error('password_confirmation')
                                     <small style="color: red">{{$message}}</small>
                             @enderror
