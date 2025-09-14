@@ -14,7 +14,7 @@ class Operacion extends Model
 
     public function socio()
     {
-        return $this->belongsTo(Socio::class, 'id_socio');
+        return $this->belongsTo(Socio::class, 'socio_id');
     }
 
     public function usuario()

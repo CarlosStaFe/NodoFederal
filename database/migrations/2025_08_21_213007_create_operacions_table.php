@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('estado_actual', 20);
             $table->date('fecha_estado');
 
-            $table->foreignId('id_socio')->constrained('socios')->onDelete('cascade');
+            $table->foreignId('nodo_id')->constrained('nodos')->onDelete('cascade');
+            $table->foreignId('socio_id')->constrained('socios')->onDelete('cascade');
 
             $table->string('tipo', 20)->default('Solicitante');
             $table->date('fecha_operacion');

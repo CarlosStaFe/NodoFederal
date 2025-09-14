@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class SociosSeeder extends Seeder
 {
@@ -12,20 +13,17 @@ class SociosSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('socios')->insert([
-            'numero' => 1,
-            'nodo_id' => 24, // Nodo General
-            'clase' => 'SIMPLE',
-            'razon_social' => 'SOCIO GENERAL',
-            'domicilio' => '-',
-            'cod_postal_id' => '1',
-            'telefono' => '9',
-            'email' => 'sociogeneral@mail.com',
-            'cuit' => '20000000000',
-            'tipo' => 'Exento',
-            'observacion' => '',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // Ruta del archivo JSON
+        $json = File::get(storage_path('app/socios.json'));
+
+        // Decodificar el JSON a un array
+        $socios = json_decode($json, true);
+
+        // Dividir los datos en lotes de 500 registros
+        $chunks = array_chunk($socios, 500);
+
+        foreach ($chunks as $chunk) {
+            DB::table('socios')->insert($chunk);
+        }
     }
 }

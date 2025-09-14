@@ -205,7 +205,7 @@ class OperacionController extends Controller
                 $query = \App\Models\Operacion::where('id_cliente', $cliente->id);
                 if ($user->role == 'socio') {
                     // Solo operaciones del socio
-                    $query->where('id_socio', $user->socio_id);
+                    $query->where('socio_id', $user->socio_id);
                 } elseif ($user->role == 'nodo') {
                     // Solo operaciones de socios de su nodo
                     $query->whereHas('socio', function($q) use ($user) {
@@ -217,7 +217,7 @@ class OperacionController extends Controller
                 $operacionesComoGarante = \App\Models\Garante::where('cliente_id', $cliente->id)
                     ->whereHas('operacion', function($q) use ($user) {
                         if ($user->role == 'socio') {
-                            $q->where('id_socio', $user->socio_id);
+                            $q->where('socio_id', $user->socio_id);
                         } elseif ($user->role == 'nodo') {
                             $q->whereHas('socio', function($qq) use ($user) {
                                 $qq->where('nodo_id', $user->nodo_id);

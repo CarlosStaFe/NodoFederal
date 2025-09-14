@@ -24,7 +24,7 @@
             </div>
         @endcan
 
-        @canany(['admin', 'secretaria'])
+    @role('admin|secretaria')
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-primary">
                     <div class="inner">
@@ -37,7 +37,7 @@
                     <a href="{{url('admin/nodos')}}" class="small-box-footer">Más información <i class="fas bi bi-diagram-3-fill"></i></a>
                 </div>
             </div>
-        @endcanany
+    @endrole
 
         @can('admin.nodos.index')
             <div class="col-lg-3 col-6">

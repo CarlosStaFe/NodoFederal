@@ -14,9 +14,10 @@ class AdminController extends Controller
     {
         //Contador de usuarios
         $user = Auth::user();
-        if ($user->rol === 'admin' || $user->rol === 'secretaria') {
+        $roles = $user->roles->pluck('name');
+        if ($roles->contains('admin') || $roles->contains('secretaria')) {
             $total_usuarios = User::count();
-        } elseif ($user->rol === 'nodo') {
+        } elseif ($roles->contains('nodo')) {
             $total_usuarios = User::where('nodo_id', $user->nodo_id)->count();
         } else {
             $total_usuarios = 0;
@@ -26,9 +27,9 @@ class AdminController extends Controller
         $total_nodos = Nodo::count();
 
         //Contador de socios
-        if ($user->rol === 'admin' || $user->rol === 'secretaria') {
+        if ($roles->contains('admin') || $roles->contains('secretaria')) {
             $total_socios = Socio::count();
-        } elseif ($user->rol === 'nodo') {
+        } elseif ($roles->contains('nodo')) {
             $total_socios = Socio::where('nodo_id', $user->nodo_id)->count();
         } else {
             $total_socios = 0;
@@ -38,25 +39,23 @@ class AdminController extends Controller
         $total_clientes = Cliente::count();
 
         //Contador de operaciones
-        $user = Auth::user();
-        if ($user->rol === 'admin' || $user->rol === 'secretaria') {
+        if ($roles->contains('admin') || $roles->contains('secretaria')) {
             $total_operaciones = Operacion::count();
-        } elseif ($user->rol === 'nodo') {
+        } elseif ($roles->contains('nodo')) {
             $total_operaciones = Operacion::where('nodo_id', $user->nodo_id)->count();
-        } elseif ($user->rol === 'socio') {
-            $total_operaciones = Operacion::where('socio_id', $user->id_socio)->count();
+        } elseif ($roles->contains('socio')) {
+            $total_operaciones = Operacion::where('socio_id', $user->socio_id)->count();
         } else {
             $total_operaciones = 0;
         }
 
         //Contador de consultas
-        $user = Auth::user();
-        if ($user->rol === 'admin' || $user->rol === 'secretaria') {
+        if ($roles->contains('admin') || $roles->contains('secretaria')) {
             $total_consultas = Operacion::count();
-        } elseif ($user->rol === 'nodo') {
+        } elseif ($roles->contains('nodo')) {
             $total_consultas = Operacion::where('nodo_id', $user->nodo_id)->count();
-        } elseif ($user->rol === 'socio') {
-            $total_consultas = Operacion::where('socio_id', $user->id_socio)->count();
+        } elseif ($roles->contains('socio')) {
+            $total_consultas = Operacion::where('socio_id', $user->socio_id)->count();
         } else {
             $total_consultas = 0;
         }
