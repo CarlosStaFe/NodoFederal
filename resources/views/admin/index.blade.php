@@ -85,7 +85,7 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-secondary">
                 <div class="inner">
-                    <h3>{{$total_operaciones}}</h3>
+                    <h3>{{$total_consultas}}</h3>
                     <p>Consultas</p>
                 </div>
                 <div class="icon">

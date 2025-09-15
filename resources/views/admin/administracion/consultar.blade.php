@@ -76,8 +76,8 @@
                             <tr>
                                 <th class="text-center" style="width: 50px;">NRO.</th>
                                 <th class="text-center" style="width: 50px;">FECHA</th>
-                                <th class="text-center" style="width: 100px;">TIPO</th>
-                                <th class="text-center" style="width: 100px;">CUIT</th>
+                                <th class="text-center" style="width: 50px;">TIPO</th>
+                                <th class="text-center" style="width: 80px;">CUIT</th>
                                 <th class="text-center" style="width: 150px;">APELLIDO</th>
                                 <th class="text-center" style="width: 150px;">NODO</th>
                                 <th class="text-center" style="width: 150px;">SOCIO</th>
@@ -88,7 +88,7 @@
                                 <tr>
                                     <td class="text-center">{{ $item->numero }}</td>
                                     <td class="text-center">
-                                        {{ isset($item->fecha) ? \Carbon\Carbon::parse($item->fecha)->format('d-m-Y') : '' }}
+                                        {{ isset($item->fecha) ? \Carbon\Carbon::parse($item->fecha)->format('d-m-Y H:i') : '' }}
                                     </td>
                                     <td>{{ $item->tipo ?? '' }}</td>
                                     <td>{{ $item->cuit ?? '' }}</td>

@@ -340,9 +340,7 @@
             }
         });
     });
-</script>
 
-<script>
     // Referencias a los elementos del formulario
     const idInput = document.getElementById('id_cliente_garante');
     const cuitInput = document.getElementById('cuit_garante');

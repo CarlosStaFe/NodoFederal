@@ -6,15 +6,17 @@ use App\Models\Nodo;
 use App\Models\Socio;
 use App\Models\Cliente;
 use App\Models\Operacion;
+use App\Models\Consulta;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        //Contador de usuarios
         $user = Auth::user();
         $roles = $user->roles->pluck('name');
+
+        //Contador de usuarios
         if ($roles->contains('admin') || $roles->contains('secretaria')) {
             $total_usuarios = User::count();
         } elseif ($roles->contains('nodo')) {
@@ -40,22 +42,26 @@ class AdminController extends Controller
 
         //Contador de operaciones
         if ($roles->contains('admin') || $roles->contains('secretaria')) {
-            $total_operaciones = Operacion::count();
+            $total_operaciones = Operacion::where('tipo', 'Solicitante')->count();
         } elseif ($roles->contains('nodo')) {
-            $total_operaciones = Operacion::where('nodo_id', $user->nodo_id)->count();
+            $total_operaciones = Operacion::where('nodo_id', $user->nodo_id)
+            ->where('tipo', 'Solicitante')
+            ->count();
         } elseif ($roles->contains('socio')) {
-            $total_operaciones = Operacion::where('socio_id', $user->socio_id)->count();
+            $total_operaciones = Operacion::where('socio_id', $user->socio_id)
+            ->where('tipo', 'Solicitante')
+            ->count();
         } else {
             $total_operaciones = 0;
         }
 
         //Contador de consultas
         if ($roles->contains('admin') || $roles->contains('secretaria')) {
-            $total_consultas = Operacion::count();
+            $total_consultas = Consulta::count();
         } elseif ($roles->contains('nodo')) {
-            $total_consultas = Operacion::where('nodo_id', $user->nodo_id)->count();
+            $total_consultas = Consulta::where('nodo_id', $user->nodo_id)->count();
         } elseif ($roles->contains('socio')) {
-            $total_consultas = Operacion::where('socio_id', $user->socio_id)->count();
+            $total_consultas = Consulta::where('socio_id', $user->socio_id)->count();
         } else {
             $total_consultas = 0;
         }

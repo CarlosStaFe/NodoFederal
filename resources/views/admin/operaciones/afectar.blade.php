@@ -153,9 +153,10 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group mt-4 ml-100">
-                            <button type="submit" class="btn btn-lg btn-warning bi bi-fire" style="width: 60%; font-size: 1.25rem;">GRABAR ESTADO</button>
+                    <div class="col-md-5">
+                        <div class="form-group mt-4 ml-100 d-flex gap-2">
+                            <button type="submit" class="ml-3 btn btn-lg btn-warning bi bi-fire" style="width: 60%; font-size: 1.25rem;">GRABAR ESTADO</button>
+                            <a href="{{ route('admin.operaciones.show', ['id' => $operacion->id]) }}" class="ml-5 btn btn-lg btn-success">Volver</a>
                         </div>
                     </div>
                 </div>
@@ -172,12 +173,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse(($operacion->garantes ?? collect()) as $garante)
-                            @if($garante->cliente)
+                        @php
+                            $garantes = \App\Models\Operacion::where('numero', $operacion->numero)
+                                ->where('tipo', 'Garante')
+                                ->get() ?? collect();
+                        @endphp
+                        @forelse($garantes as $garante)
+                            @php $clienteG = $garante->cliente; @endphp
+                            @if($clienteG)
                             <tr>
-                                <td class="text-center">{{ $garante->cliente->cuit }}</td>
-                                <td>{{ $garante->cliente->apelnombres }}</td>
-                                <td class="text-center">{{ $garante->cliente->documento }}</td>
+                                <td class="text-center">{{ $clienteG->cuit }}</td>
+                                <td>{{ $clienteG->apelnombres }}</td>
+                                <td class="text-center">{{ $clienteG->documento }}</td>
                                 <td class="text-center">{{ $garante->fecha_estado ? \Carbon\Carbon::parse($garante->fecha_estado)->format('d-m-Y') : '' }}</td>
                             </tr>
                             @endif

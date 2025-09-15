@@ -148,7 +148,7 @@
                         <tbody>
                             @forelse($operacionesComoGarante as $g)
                                 @php
-                                $estado = strtoupper($op->estado_actual);
+                                $estado = strtoupper($g->estado_actual);
                                     if ($estado == 'ACTIVO') {
                                         $color = 'white';
                                         $bg = 'green';
@@ -163,17 +163,17 @@
                                         $bg = 'red';
                                     }
                                 @endphp
-                                <tr @if(($g->operacion->estado_actual ?? '') == 'Afectado') style="background-color: #ffcc80 !important;" @endif>
-                                    <td class="text-right">{{ $g->operacion->numero ?? '' }}</td>
-                                    <td class="text-center">{{ isset($g->operacion->fecha_operacion) ? \Carbon\Carbon::parse($g->operacion->fecha_operacion)->format('d-m-Y') : '' }}</td>
-                                    <td>{{ $g->operacion->clase ?? '' }}</td>
-                                    <td class="text-right">{{ $g->operacion->valor_cuota ?? '' }}</td>
-                                    <td class="text-right">{{ $g->operacion->cant_cuotas ?? '' }}</td>
-                                    <td class="text-right">{{ $g->operacion->total ?? '' }}</td>
+                                <tr>
+                                    <td class="text-right">{{ $g->numero ?? '' }}</td>
+                                    <td class="text-center">{{ isset($g->fecha_operacion) ? \Carbon\Carbon::parse($g->fecha_operacion)->format('d-m-Y') : '' }}</td>
+                                    <td>{{ $g->clase ?? '' }}</td>
+                                    <td class="text-right">{{ $g->valor_cuota ?? '' }}</td>
+                                    <td class="text-right">{{ $g->cant_cuotas ?? '' }}</td>
+                                    <td class="text-right">{{ $g->total ?? '' }}</td>
                                     <td class="text-center" style="color: {{ $color }};@if(isset($bg)) background-color: {{ $bg }};@endif">
-                                        {{ $g->operacion->estado_actual ?? '' }}
+                                        {{ $g->estado_actual ?? '' }}
                                     </td>
-                                    <td class="text-center">{{ isset($g->operacion->fecha_estado) ? \Carbon\Carbon::parse($g->operacion->fecha_estado)->format('d-m-Y') : '' }}</td>
+                                    <td class="text-center">{{ isset($g->fecha_estado) ? \Carbon\Carbon::parse($g->fecha_estado)->format('d-m-Y') : '' }}</td>
                                 </tr>
                             @empty
                                 <tr><td colspan="8">No figura como garante en ninguna operación.</td></tr>

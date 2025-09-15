@@ -11,6 +11,7 @@ class ConsultaController extends Controller
     {
         $user = auth()->user();
         $roles = $user->roles->pluck('name');
+        
         if ($roles->contains('nodo')) {
             $nodos = \App\Models\Nodo::where('id', $user->nodo_id)->get();
             $socios = \App\Models\Socio::where('nodo_id', $user->nodo_id)->get();

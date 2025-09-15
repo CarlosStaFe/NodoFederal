@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->integer('numero');
 
-            $table->foreignId('id_cliente')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
 
             $table->string('estado_actual', 20);
             $table->date('fecha_estado');
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->date('fecha_cuota');
             $table->string('clase', 20)->default('Comercial');
 
-            $table->foreignId('id_usuario')->constrained('users')->onDelete('cascade');
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
 
             $table->timestamps();
         });

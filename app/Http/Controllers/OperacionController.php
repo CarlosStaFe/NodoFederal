@@ -26,12 +26,18 @@ class OperacionController extends Controller
         $url = env('API_TOKEN');
         $user = env('API_USER');
         $password = env('API_PASSWORD');
-
+        //dd($url, $user, $password);
+        
+        if (empty($url)) {
+            Log::error('API_TOKEN no está definido en el .env');
+            return null;
+        }
+    
         $response = Http::post($url, [
             'username' => $user,
             'password' => $password,
         ]);
-
+    
         // dd($response->json());
 
         if ($response && $response->successful()) {
@@ -54,9 +60,7 @@ class OperacionController extends Controller
         $dni = $request->input('documento');
         $cuit = $request->input('cuit');
         $apiUrl = env('API_CUIL');
-        //$apiUrl = preg_replace('/=(\?)/', '='.$dni, $apiUrl, 1);
-        // Construir la URL de consulta agregando el cuil/dni como parámetro
-        // Reemplazar el primer signo de pregunta (?) por el valor de cuit o dni
+
         if ($cuit) {
             $apiUrl = preg_replace('/\?/', $cuit, $apiUrl, 1);
         } elseif ($dni) {
@@ -180,6 +184,49 @@ class OperacionController extends Controller
         while (Operacion::where('numero', $numero)->exists()) {
             $numero++;
         }
+        $operacion->numero = $numero;
+        $operacion->cliente_id = $cliente->id;
+        $operacion->estado_actual = $cliente->estado;
+        $operacion->fecha_estado = $cliente->fechaestado ?? now();
+        $operacion->nodo_id = $socio->nodo_id;
+        $operacion->socio_id = $socio->id;
+        $operacion->tipo = "Solicitante";
+        $operacion->fecha_operacion = now();
+        $operacion->valor_cuota = $request->valor;
+        $operacion->cant_cuotas = $request->cuotas;
+        $operacion->total = $request->total;
+        $operacion->fecha_cuota = $request->vencimiento;
+        $operacion->clase = $request->operacion;
+        $operacion->usuario_id = $user->id;
+
+        $operacion->save();
+
+        // Guardar garantes si existen en el request
+        if ($request->filled('garantes_json')) {
+            $garantes = json_decode($request->garantes_json, true);
+            //dd($garantes);
+            if (is_array($garantes)) {
+                foreach ($garantes as $garante) {
+                    // Crear operación tipo "Garante" para el garante
+                    Operacion::create([
+                        'numero' => $numero, // puedes ajustar si necesitas otro número
+                        'cliente_id' => $garante['id'] ?? null,
+                        'estado_actual' => 'ACTIVO',
+                        'fecha_estado' => now(),
+                        'nodo_id' => $operacion->nodo_id,
+                        'socio_id' => $operacion->socio_id,
+                        'tipo' => 'Garante',
+                        'fecha_operacion' => now(),
+                        'valor_cuota' => $operacion->valor_cuota,
+                        'cant_cuotas' => $operacion->cant_cuotas,
+                        'total' => $operacion->total,
+                        'fecha_cuota' => $operacion->fecha_cuota,
+                        'clase' => $operacion->clase,
+                        'usuario_id' => $operacion->usuario_id,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.operaciones.cargar', ['id' => $operacion->id])
             ->with('mensaje', "Operación registrada ->>> NÚMERO: " . $numero)
@@ -202,7 +249,7 @@ class OperacionController extends Controller
             $cliente = \App\Models\Cliente::where('cuit', $cuit)->first();
             if ($cliente) {
                 // Operaciones donde es titular
-                $query = \App\Models\Operacion::where('id_cliente', $cliente->id);
+                $query = Operacion::where('cliente_id', $cliente->id)->where('tipo', 'Solicitante');
                 if ($user->role == 'socio') {
                     // Solo operaciones del socio
                     $query->where('socio_id', $user->socio_id);
@@ -213,19 +260,19 @@ class OperacionController extends Controller
                     });
                 }
                 $operaciones = $query->get();
+
                 // Operaciones donde es garante
-                $operacionesComoGarante = \App\Models\Garante::where('cliente_id', $cliente->id)
-                    ->whereHas('operacion', function($q) use ($user) {
-                        if ($user->role == 'socio') {
-                            $q->where('socio_id', $user->socio_id);
-                        } elseif ($user->role == 'nodo') {
-                            $q->whereHas('socio', function($qq) use ($user) {
-                                $qq->where('nodo_id', $user->nodo_id);
-                            });
-                        }
-                    })
-                    ->with('operacion')
-                    ->get();
+                $comoGarante = Operacion::where('cliente_id', $cliente->id)->where('tipo', 'Garante');
+                if ($user->role == 'socio') {
+                    // Solo operaciones del socio
+                    $comoGarante->where('socio_id', $user->socio_id);
+                } elseif ($user->role == 'nodo') {
+                    // Solo operaciones de socios de su nodo
+                    $comoGarante->whereHas('socio', function($q) use ($user) {
+                        $q->where('nodo_id', $user->nodo_id);
+                    });
+                }
+                $operacionesComoGarante = $comoGarante->get();
             }
         }
         return view('admin.operaciones.show', compact('cliente', 'operaciones', 'operacionesComoGarante', 'cuit'));
@@ -239,6 +286,7 @@ class OperacionController extends Controller
         $operacion = Operacion::findOrFail($id);
         $cliente = $operacion->cliente;
         $socio = $operacion->socio;
+        //dd($operacion, $cliente, $socio);
         // Puedes agregar más datos si lo necesitas
         return view('admin.operaciones.afectar', compact('operacion', 'cliente', 'socio'));
     }
@@ -251,21 +299,26 @@ class OperacionController extends Controller
         $operacion = Operacion::findOrFail($id);
         $fechaAfectacion = $request->input('fecha_afectacion') ?? now();
         $nuevoEstado = $request->input('estado_nuevo');
+        
         // Actualizar operación
         $operacion->fecha_estado = $fechaAfectacion;
         $operacion->estado_actual = $nuevoEstado;
         $operacion->save();
 
-        // Actualizar garantes
-        foreach ($operacion->garantes as $garante) {
+        // Actualizar garantes (tipo 'Garante')
+        $garantes = Operacion::where('numero', $operacion->numero)
+            ->where('tipo', 'Garante')
+            ->get();
+        foreach ($garantes as $garante) {
             $garante->fecha_estado = $fechaAfectacion;
-            $garante->estado = $nuevoEstado;
+            $garante->estado_actual = $nuevoEstado;
             $garante->save();
             // Actualizar estado en la tabla clientes para el garante
-            if ($garante->cliente) {
-                $garante->cliente->estado = $nuevoEstado;
-                $garante->cliente->fechaestado = $fechaAfectacion;
-                $garante->cliente->save();
+            $clienteG = $garante->cliente;
+            if ($clienteG) {
+                $clienteG->estado = $nuevoEstado;
+                $clienteG->fechaestado = $fechaAfectacion;
+                $clienteG->save();
             }
         }
 
