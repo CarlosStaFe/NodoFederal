@@ -23,7 +23,7 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="numero">Número</label><b>*</b>
-                            <input type="number" class="form-control" value="{{ old('numero', isset($numero) ? $numero : '') }}" id="numero" name="numero" placeholder="Número del Socio" required>
+                            <input type="number" class="form-control" value="{{ old('numero', isset($numero) ? $numero : '') }}" id="numero" name="numero" placeholder="Número del Socio" readonly>
                             @error('numero')
                                 <small style="color: red">{{$message}}</small>
                             @enderror

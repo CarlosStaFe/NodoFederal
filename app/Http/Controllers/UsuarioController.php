@@ -70,9 +70,10 @@ class UsuarioController extends Controller
 
         // Enviar email con usuario y contraseña
         Mail::send([], [], function ($message) use ($usuario, $request) {
+            $appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
             $message->to($usuario->email)
                 ->subject('Usuario creado en Nodo Federal-NO CONTESTAR ESTE MENSAJE')
-                ->html('<p>Su usuario ha sido creado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><br><p><b>Contraseña:</b> ' . $request->password . '</p><br><p>Link de la aplicación: <a href="' . env('APP_URL') . '">' . env('APP_URL') . '</a></p>');
+                ->html('<p>Su usuario ha sido creado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><p><b>Contraseña:</b> ' . $request->password . '</p><br><p>Link de la aplicación: <a href="https://' . $appUrl . '">' . $appUrl . '</a></p>');
         });
 
         return redirect()->route('admin.usuarios.index')
