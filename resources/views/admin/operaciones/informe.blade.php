@@ -67,7 +67,8 @@
                                             <th>CUIL</th>
                                             <th>DNI</th>
                                             <th>Tipo</th>
-                                            <th>Fecha Nacimiento</th>
+                                            <th>Nacimiento</th>
+                                            <th>Deceso</th>
                                             <th>Edad</th>
                                             <th>Sexo</th>
                                         </tr>
@@ -78,6 +79,8 @@
                                         <td>{{ $p['dni'] ?? '' }}</td>
                                         <td>{{ $p['tipo'] ?? '' }}</td>
                                         <td>{{ isset($p['fechaNacimiento']) ? \Carbon\Carbon::parse($p['fechaNacimiento'])->format('d-m-Y') : '' }}
+                                        </td>
+                                        <td>{{ isset($p['fechaFallecimiento']) ? \Carbon\Carbon::parse($p['fechaFallecimiento'])->format('d-m-Y') : '' }}
                                         </td>
                                         <td>{{ $p['edad'] ?? '' }}</td>
                                         <td>{{ $p['sexo'] ?? '' }}</td>
@@ -111,251 +114,120 @@
                                 <div class="col-12 mt-3">
                                     <h3>Datos Equifax Veraz</h3>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-4 d-flex align-items-center flex-column">
+                                        <p>
+                                            <div class="w-100 text-center">
+                                                <strong class="section-title">Score de riesgo crediticio</strong><br>
+                                            </div>
+                                            Este predictor representa la probabilidad que tiene una persona de cumplir con sus obligaciones crediticias en los próximos 12 meses.
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-center flex-column">
+                                        <div class="w-100 text-center">
+                                            <strong class="section-title">Predictor de Ingresos</strong><br>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-center flex-column">
+                                        <p>
+                                            <div class="w-100 text-center">
+                                                <strong class="section-title">Denuncias de Morosidad Vigentes</strong><br>
+                                            </div>
+                                            Monto adeudado de la persona en concepto de préstamos y créditos otorgados.</p>
+                                        </p>
+                                    </div>
+                                </div>
 
                                 <div class="row">
-                                    <div class="col-md-6 d-flex align-items-center">
-                                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                                    <div class="col-md-4 d-flex align-items-center justify-content-center">
+                                        <div style="display: flex; flex-direction: column; align-items: center;">
                                             <div style="display: flex; min-width: 170px;">
-                                                @if (($ver['scoreRango'] ?? '') === 1)
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 38, 42); color: rgb(255, 255, 255); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
-                                                        <strong
-                                                            style="padding: 1rem; font-size: 7px; text-align: center;">MUY
-                                                            BAJO</strong>
-                                                    </div>
-                                                @else
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 38, 42); color: rgb(255, 255, 255); opacity: 0.5; z-index: 1;">
-                                                        <strong style="padding: 1rem; font-size: 7px; text-align: center;"
-                                                            hidden>MUY BAJO</strong>
-                                                    </div>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 2)
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 182, 7); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
-                                                        <strong
-                                                            style="padding: 1rem; font-size: 7px; text-align: center;">BAJO</strong>
-                                                    </div>
-                                                @else
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 182, 7); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
-                                                        <strong style="padding: 1rem; font-size: 7px; text-align: center;"
-                                                            hidden>BAJO</strong>
-                                                    </div>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 3)
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 255, 47); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
-                                                        <strong
-                                                            style="padding: 1rem; font-size: 7px; text-align: center;">MEDIO</strong>
-                                                    </div>
-                                                @else
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(255, 255, 47); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
-                                                        <strong style="padding: 1rem; font-size: 7px; text-align: center;"
-                                                            hidden>MEDIO</strong>
-                                                    </div>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 4)
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 255, 85); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
-                                                        <strong
-                                                            style="padding: 1rem; font-size: 7px; text-align: center;">ALTO</strong>
-                                                    </div>
-                                                @else
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 255, 85); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
-                                                        <strong style="padding: 1rem; font-size: 7px; text-align: center;"
-                                                            hidden>ALTO</strong>
-                                                    </div>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 5)
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 188, 42); color: rgb(0, 0, 0); transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
-                                                        <strong
-                                                            style="padding: 1rem; font-size: 7px; text-align: center;">MUY
-                                                            ALTO</strong>
-                                                    </div>
-                                                @else
-                                                    <div
-                                                        style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: rgb(0, 188, 42); color: rgb(0, 0, 0); opacity: 0.5; z-index: 1;">
-                                                        <strong style="padding: 1rem; font-size: 7px; text-align: center;"
-                                                            hidden>MUY ALTO</strong>
-                                                    </div>
-                                                @endif
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    @php
+                                                        $labels = ['MUY BAJO', 'BAJO', 'MEDIO', 'ALTO', 'MUY ALTO'];
+                                                        $colors = [
+                                                            'rgb(255, 38, 42)',
+                                                            'rgb(255, 182, 7)',
+                                                            'rgb(255, 255, 47)',
+                                                            'rgb(0, 255, 85)',
+                                                            'rgb(0, 188, 42)'
+                                                        ];
+                                                        $textColors = [
+                                                            'rgb(255,255,255)',
+                                                            'rgb(0,0,0)',
+                                                            'rgb(0,0,0)',
+                                                            'rgb(0,0,0)',
+                                                            'rgb(0,0,0)'
+                                                        ];
+                                                    @endphp
+                                                    @if (($ver['scoreRango'] ?? '') == $i)
+                                                        <div style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: {{ $colors[$i-1] }}; color: {{ $textColors[$i-1] }}; transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
+                                                            <strong style="padding: 1rem; font-size: 7px; text-align: center;">{{ $labels[$i-1] }}</strong>
+                                                        </div>
+                                                    @else
+                                                        <div style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: {{ $colors[$i-1] }}; color: {{ $textColors[$i-1] }}; opacity: 0.5; z-index: 1;">
+                                                            <strong style="padding: 1rem; font-size: 7px; text-align: center;" hidden>{{ $labels[$i-1] }}</strong>
+                                                        </div>
+                                                    @endif
+                                                @endfor
                                             </div>
-                                            <div>
+                                            <div style="margin-top: 1rem;">
                                                 @if (($ver['scoreRango'] ?? '') === 5)
-                                                    <span><b>MUY ALTA</b> probabilidad de cumplir con obligaciones
-                                                        crediticias</span>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 4)
-                                                    <span><b>ALTA</b> probabilidad de cumplir con obligaciones
-                                                        crediticias</span>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 3)
-                                                    <span><b>MEDIA</b> probabilidad de cumplir con obligaciones
-                                                        crediticias</span>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 2)
-                                                    <span><b>BAJA</b> probabilidad de cumplir con obligaciones
-                                                        crediticias</span>
-                                                @endif
-                                                @if (($ver['scoreRango'] ?? '') === 1)
-                                                    <span><b>MUY BAJA</b> probabilidad de cumplir con obligaciones
-                                                        crediticias</span>
+                                                    <span><b>MUY ALTA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                @elseif (($ver['scoreRango'] ?? '') === 4)
+                                                    <span><b>ALTA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                @elseif (($ver['scoreRango'] ?? '') === 3)
+                                                    <span><b>MEDIA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                @elseif (($ver['scoreRango'] ?? '') === 2)
+                                                    <span><b>BAJA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                @elseif (($ver['scoreRango'] ?? '') === 1)
+                                                    <span><b>MUY BAJA</b> probabilidad de cumplir con obligaciones crediticias</span>
                                                 @endif
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 d-flex align-items-center">
-                                        <div class="income-indicator w-100">
-                                            <div class="pull-right" style="min-width: 170px;">
-                                                <div
-                                                    style="display: flex; height: 24px; width: 100%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(130, 166, 82); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
-                                                        <strong>R1</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R1')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
+                                    <div class="col-md-4 d-flex align-items-center justify-content-center">
+                                        <div class="income-indicator w-100" style="margin-top: 0;">
+                                            @php
+                                                $incomeLabels = ['R1','R2','R3','R4','R5','R6','R7','R8'];
+                                                $incomeColors = [
+                                                    'rgb(130, 166, 82)',
+                                                    'rgb(211, 214, 83)',
+                                                    'rgb(243, 236, 58)',
+                                                    'rgb(238, 189, 94)',
+                                                    'rgb(226, 165, 74)',
+                                                    'rgb(215, 112, 61)',
+                                                    'rgb(210, 85, 55)',
+                                                    'rgb(182, 57, 81)'
+                                                ];
+                                                $incomeWidths = [
+                                                    '100%', '88.8889%', '77.7778%', '66.6667%', '55.5556%', '44.4444%', '33.3333%', '22.2222%'
+                                                ];
+                                                $incomeTextColors = [
+                                                    'rgb(255,255,255)', 'rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(255,255,255)', 'rgb(255,255,255)', 'rgb(255,255,255)'
+                                                ];
+                                            @endphp
+                                            @foreach ($incomeLabels as $idx => $lbl)
+                                                <div style="display: flex; height: 24px; width: {{ $incomeWidths[$idx] }}; position: relative; margin: 2px 0px;">
+                                                    <div style="width: 80%; height: 100%; background-color: {{ $incomeColors[$idx] }}; padding-left: 1rem; line-height: 24px; color: {{ $incomeTextColors[$idx] }};">
+                                                        <strong>{{ $lbl }}</strong>
+                                                        @if (($ver['incomePredictor'] ?? '') === $lbl)
+                                                            <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                                <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
                                                             </div>
                                                         @endif
                                                     </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(130, 166, 82);">
-                                                    </div>
+                                                    <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent {{ $incomeColors[$idx] }};"></div>
                                                 </div>
-                                                <div
-                                                    style="display: flex; height: 24px; width: 88.8889%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(211, 214, 83); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
-                                                        <strong>R2</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R2')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(211, 214, 83);">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    style="display: flex; height: 24px; width: 77.7778%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(243, 236, 58); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
-                                                        <strong>R3</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R3')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(243, 236, 58);">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    style="display: flex; height: 24px; width: 66.6667%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(238, 189, 94); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
-                                                        <strong>R4</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R4')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(238, 189, 94);">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    style="display: flex; height: 24px; width: 55.5556%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(226, 165, 74); padding-left: 1rem; line-height: 24px; color: rgb(0, 0, 0);">
-                                                        <strong>R5</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R5')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(226, 165, 74);">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    style="display: flex; height: 24px; width: 44.4444%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(215, 112, 61); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
-                                                        <strong>R6</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R6')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(215, 112, 61);">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    style="display: flex; height: 24px; width: 33.3333%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(210, 85, 55); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
-                                                        <strong>R7</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R7')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(210, 85, 55);">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    style="display: flex; height: 24px; width: 22.2222%; position: relative; margin: 2px 0px;">
-                                                    <div
-                                                        style="width: 80%; height: 100%; background-color: rgb(182, 57, 81); padding-left: 1rem; line-height: 24px; color: rgb(255, 255, 255);">
-                                                        <strong>R8</strong>
-                                                        @if (($ver['incomePredictor'] ?? '') === 'R8')
-                                                            <div
-                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div
-                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div
-                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent rgb(182, 57, 81);">
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-center justify-content-center">
+                                        <div class="w-100 text-center">
+                                            <strong>Cantidad de Denuncias:</strong>
+                                            <span>{{ $ver['cantObsVigBa24m'] ?? 0 }}</span><br>
+                                            <strong>Total:</strong>
+                                            <span>${{ isset($ver['montoObsVigBa24m']) ? number_format($ver['montoObsVigBa24m'], 2, ',', '.') : '0,00' }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -392,7 +264,7 @@
                                 <h3>Deudores Nodo Federal</h3>
                             </div>
                             @if (!empty($nodo) && is_array($nodo))
-                                @if (count($nodo) > 0)
+                                @if (count($nodo ?? []) > 0)
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
@@ -413,17 +285,17 @@
                                                     <td>{{ $item['nombreInstituto'] ?? '' }}</td>
                                                     <td>{{ $item['nombreSocio'] ?? '' }}</td>
                                                     <td>{{ $item['tipoDeudor'] ?? '' }}</td>
-                                                    <td>{{ isset($item['deudaTotal']) ? number_format($item['deudaTotal'], 2, ',', '.') : '' }}
+                                                    <td class="text-end">{{ isset($item['deudaTotal']) ? number_format($item['deudaTotal'], 2, ',', '.') : '' }}
                                                     </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
-                                @else
-                                    <div class="alert alert-info mt-2">
-                                        No se encontraron datos de deudores Nodo Federal.
-                                    </div>
                                 @endif
+                            @else
+                                <div class="alert alert-info mt-2">
+                                    No se encontraron datos de deudores Nodo Federal.
+                                </div>
                             @endif
 
                             {{-- DATOS LABORALES --}}
@@ -431,7 +303,7 @@
                             <div class="col-12 mt-3">
                                 <h3>Antecedentes Laborales</h3>
                             </div>
-                            @if (isset($datosLaborales['datoLaboral']['datos']) && is_array($datosLaborales['datoLaboral']['datos']))
+                            @if (isset($datosLaborales['datoLaboral']['datos']) && is_array($datosLaborales['datoLaboral']['datos']) && count($datosLaborales['datoLaboral']['datos']) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -453,11 +325,17 @@
                                                 <td>{{ $laboral['relacionDependencia']['cuit'] ?? '' }}</td>
                                                 <td>{{ isset($laboral['relacionDependencia']['alta']) ? \Carbon\Carbon::parse($laboral['relacionDependencia']['alta'])->format('d-m-Y') : '' }}
                                                 </td>
-                                                <td>{{ isset($laboral['relacionDependencia']['baja']) ? \Carbon\Carbon::parse($laboral['relacionDependencia']['baja'])->format('d-m-Y') : '' }}
+                                                <td>
+                                                    @if (($laboral['relacionDependencia']['estado'] ?? '') === 'Activo')
+                                                        {{-- Si está activo, no mostrar fecha de baja --}}
+                                                    @else
+                                                        {{ isset($laboral['relacionDependencia']['baja']) ? \Carbon\Carbon::parse($laboral['relacionDependencia']['baja'])->format('d-m-Y') : '' }}
+                                                    @endif
+                                                </td>
                                                 </td>
                                                 <td>{{ $laboral['historialSueldo']['infoAdicionalEmpleador']['actividadempleador'] ?? '' }}
                                                 </td>
-                                                <td>{{ $laboral['historialSueldo']['infoAdicionalEmpleador']['cantidadempleados'] ?? '' }}
+                                                <td class="text-end">{{ $laboral['historialSueldo']['infoAdicionalEmpleador']['cantidadempleados'] ?? '' }}
                                                 </td>
                                                 <td>
                                                     {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['domicilio']['direccion'] ?? '' }},
@@ -477,57 +355,23 @@
                                 </div>
                             @endif
 
-                            {{-- JUBILACION --}}
-                            @php $jubilacion = $data['datosLaborales']['jubilacion']['datos'] ?? []; @endphp
-                            <div class="col-12 mt-3">
-                                <h3>Jubilación</h3>
-                            </div>
-                            @if (count($jubilacion) > 0)
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Titular</th>
-                                            <th>Sueldo Bruto</th>
-                                            <th>Sueldo Neto</th>
-                                            <th>Periodo</th>
-                                            <th>Rango</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($jubilacion as $jub)
-                                            <tr>
-                                                <td>{{ $jub['titular'] ?? '' }}</td>
-                                                <td>{{ isset($jub['sueldoBruto']) ? number_format($jub['sueldoBruto'], 2, ',', '.') : '' }}
-                                                </td>
-                                                <td>{{ isset($jub['sueldoNeto']) ? number_format($jub['sueldoNeto'], 2, ',', '.') : '' }}
-                                                </td>
-                                                <td>{{ isset($jub['periodo']) ? \Carbon\Carbon::parse($jub['periodo'])->format('d-m-Y') : '' }}
-                                                </td>
-                                                <td>{{ $jub['rango'] ?? '' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            @else
-                                <div class="alert alert-info mt-2">
-                                    No se encontraron datos de Jubilación.
-                                </div>
-                            @endif
-
                             {{-- DATOS MONOTRIBUTISTA --}}
                             @php $monos = $data['datosLaborales']['monotributista']['datos'] ?? []; @endphp
                             <div class="col-12 mt-3">
                                 <h3>Autónomo o Monotributo</h3>
                             </div>
-                            @if (count($monos) > 0)
+                            @if (count($monos ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>Tipo</th>
                                             <th>Categoría</th>
-                                            <th>Estado</th>
+                                            <th>Ganancias</th>
+                                            <th>IVA</th>
                                             <th>Inicio</th>
                                             <th>Hasta</th>
+                                            <th>Código</th>
+                                            <th>Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -535,11 +379,14 @@
                                             <tr>
                                                 <td>{{ $mono['tipo'] ?? '' }}</td>
                                                 <td>{{ $mono['categoria'] ?? '' }}</td>
-                                                <td>{{ $mono['estado'] ?? '' }}</td>
+                                                <td>{{ $mono['ganancias'] ?? '' }}</td>
+                                                <td>{{ $mono['iva'] ?? '' }}</td>
                                                 <td>{{ isset($mono['fechaInicio']) ? \Carbon\Carbon::parse($mono['fechaInicio'])->format('d-m-Y') : '' }}
                                                 </td>
                                                 <td>{{ isset($mono['fechaHasta']) ? \Carbon\Carbon::parse($mono['fechaHasta'])->format('d-m-Y') : '' }}
                                                 </td>
+                                                <td>{{ $mono['codigo'] ?? '' }}</td>
+                                                <td>{{ $mono['estado'] ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -555,10 +402,11 @@
                             <div class="col-12 mt-3">
                                 <h3>Actividad</h3>
                             </div>
-                            @if (count($acts) > 0)
+                            @if (count($acts ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
+                                            <th>CUIL</th>
                                             <th>Descripción</th>
                                             <th>CIIU</th>
                                         </tr>
@@ -566,6 +414,7 @@
                                     <tbody>
                                         @foreach ($acts as $act)
                                             <tr>
+                                                <td>{{ $act['cuil'] ?? '' }}</td>
                                                 <td>{{ $act['descripcion'] ?? '' }}</td>
                                                 <td>{{ $act['ciiu'] ?? '' }}</td>
                                             </tr>
@@ -583,27 +432,19 @@
                             <div class="col-12 mt-3">
                                 <h3>Obra Social</h3>
                             </div>
-                            @if (count($os) > 0)
+                            @if (count($os ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>CUIT</th>
-                                            <th>Nombre</th>
-                                            <th>Estado</th>
-                                            <th>Fecha Inicio</th>
-                                            <th>Fecha Fin</th>
+                                            <th>Descripción</th>
+                                            <th>Código</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($os as $obra)
                                             <tr>
-                                                <td>{{ $obra['cuit'] ?? '' }}</td>
-                                                <td>{{ $obra['nombre'] ?? '' }}</td>
-                                                <td>{{ $obra['estado'] ?? '' }}</td>
-                                                <td>{{ isset($obra['fechaInicio']) ? \Carbon\Carbon::parse($obra['fechaInicio'])->format('d-m-Y') : '' }}
-                                                </td>
-                                                <td>{{ isset($obra['fechaFin']) ? \Carbon\Carbon::parse($obra['fechaFin'])->format('d-m-Y') : '' }}
-                                                </td>
+                                                <td>{{ $obra['descripcion'] ?? '' }}</td>
+                                                <td>{{ $obra['codigo'] ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -614,19 +455,168 @@
                                 </div>
                             @endif
 
+                            {{-- JUBILACION --}}
+                            @php $jubilacion = $data['datosLaborales']['jubilacion']['datos'] ?? []; @endphp
+                            <div class="col-12 mt-3">
+                                <h3>Jubilación</h3>
+                            </div>
+                            @if (count($jubilacion ?? []) > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>CUIL</th>
+                                            <th>Titular</th>
+                                            <th>CUIL Apod.</th>
+                                            <th>Apoderado</th>
+                                            <th>Sueldo Bruto</th>
+                                            <th>Sueldo Neto</th>
+                                            <th>Periodo</th>
+                                            <th>Rango</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($jubilacion as $jub)
+                                            <tr>
+                                                <td>{{ $jub['cuil'] ?? '' }}</td>
+                                                <td>{{ $jub['titular'] ?? '' }}</td>
+                                                <td>{{ $jub['cuilApo'] ?? '' }}</td>
+                                                <td>{{ $jub['apoderado'] ?? '' }}</td>
+                                                <td class="text-end">{{ isset($jub['sueldoBruto']) ? number_format($jub['sueldoBruto'], 2, ',', '.') : '' }}
+                                                </td>
+                                                <td class="text-end">{{ isset($jub['sueldoNeto']) ? number_format($jub['sueldoNeto'], 2, ',', '.') : '' }}
+                                                </td>
+                                                <td>{{ isset($jub['periodo']) ? \Carbon\Carbon::parse($jub['periodo'])->format('d-m-Y') : '' }}
+                                                </td>
+                                                <td>{{ $jub['rango'] ?? '' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info mt-2">
+                                    No se encontraron datos de Jubilación.
+                                </div>
+                            @endif
+
+                            {{-- TELEFONOS --}}
+                            @php $telefonos = $data['telefonos']['datos'] ?? []; @endphp
+                            <div class="col-12 mt-3">
+                                <h3>Teléfonos</h3>
+                            </div>
+                            @if (count($telefonos ?? []) > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo</th>
+                                            <th>Número</th>
+                                            <th>Operador</th>
+                                            <th>Teléfono</th>
+                                            <th>Localidad</th>
+                                            <th>Área</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($telefonos as $tel)
+                                            <tr>
+                                                <td>{{ $tel['tipo'] ?? '' }}</td>
+                                                <td>{{ $tel['nro'] ?? '' }}</td>
+                                                <td>{{ $tel['operador'] ?? '' }}</td>
+                                                <td>{{ $tel['tel'] ?? '' }}</td>
+                                                <td>{{ $tel['localidad'] ?? '' }}</td>
+                                                <td>{{ $tel['area'] ?? '' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info mt-2">
+                                    No se encontraron datos de Teléfonos Fijos.
+                                </div>
+                            @endif
+
+                            {{-- CELULARES --}}
+                            @php $celulares = $data['telefonosCelulares']['datos'] ?? []; @endphp
+                            <div class="col-12 mt-3">
+                                <h3>Celulares</h3>
+                            </div>
+                            @if (count($celulares ?? []) > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo</th>
+                                            <th>Número</th>
+                                            <th>Operador</th>
+                                            <th>Teléfono</th>
+                                            <th>Localidad</th>
+                                            <th>Área</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($celulares as $cel)
+                                            <tr>
+                                                <td>{{ $cel['tipo'] ?? '' }}</td>
+                                                <td>{{ $cel['nro'] ?? '' }}</td>
+                                                <td>{{ $cel['operador'] ?? '' }}</td>
+                                                <td>{{ $cel['tel'] ?? '' }}</td>
+                                                <td>{{ $cel['localidad'] ?? '' }}</td>
+                                                <td>{{ $cel['area'] ?? '' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info mt-2">
+                                    No se encontraron datos de Teléfonos Celulares.
+                                </div>
+                            @endif
+
+                            {{-- ADICIONALES --}}
+                            @php $adicionales = $data['telefonosAdicionales']['datos'] ?? []; @endphp
+                            <div class="col-12 mt-3">
+                                <h3>Teléfonos Adicionales</h3>
+                            </div>
+                            @if (count($adicionales ?? []) > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo</th>
+                                            <th>Teléfono</th>
+                                            <th>Localidad</th>
+                                            <th>Domicilio</th>
+                                            <th>CP</th>
+                                            <th>Provincia</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($adicionales as $adi)
+                                            <tr>
+                                                <td>{{ $cel['tipo'] ?? '' }}</td>
+                                                <td>{{ $cel['tel'] ?? '' }}</td>
+                                                <td>{{ $adi['localidad'] ?? '' }}</td>
+                                                <td>{{ $adi['domicilio'] ?? '' }}</td>
+                                                <td>{{ $adi['cp'] ?? '' }}</td>
+                                                <td>{{ $adi['provincia'] ?? '' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info mt-2">
+                                    No se encontraron datos de Teléfonos Adicionales.
+                                </div>
+                            @endif
+
+
                             {{-- DATOS AUTOMOTORES --}}
                             @php
                                 $automotores = $data['bienesPersonales']['automotores']['datos'] ?? [];
-                                $automotoresTotal = $data['bienesPersonales']['automotores']['cantTotal'] ?? 0;
                                 $automotoresHistorial = $data['bienesPersonales']['automotores_historial']['datos'] ?? [];
-                                $automotoresHistorialTotal = $data['bienesPersonales']['automotores_historial']['cantTotal'] ?? 0;
                                 $autosembargos = $data['bienesPersonales']['autosembargos']['datos'] ?? [];
-                                $autosembargosTotal = $data['bienesPersonales']['autosembargos']['cantTotal'] ?? 0;
                             @endphp
                             <div class="col-12 mt-3">
                                 <h3>Automotores</h3>
                             </div>
-                            @if (count($automotores) > 0)
+                            @if (count($automotores ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -637,8 +627,6 @@
                                             <th>Tipo</th>
                                             <th>Origen</th>
                                             <th>Porcentaje</th>
-                                            <th>CUIL</th>
-                                            <th>DNI</th>
                                             <th>Compra</th>
                                             <th>Trámite</th>
                                         </tr>
@@ -653,8 +641,6 @@
                                                 <td>{{ $auto['tipo'] ?? '' }}</td>
                                                 <td>{{ $auto['origen'] ?? '' }}</td>
                                                 <td>{{ $auto['porcentaje'] ?? '' }}</td>
-                                                <td>{{ $auto['cuil'] ?? '' }}</td>
-                                                <td>{{ $auto['dni'] ?? '' }}</td>
                                                 <td>{{ isset($auto['compra']) ? \Carbon\Carbon::parse($auto['compra'])->format('d-m-Y') : '' }}</td>
                                                 <td>{{ isset($auto['tramite']) ? \Carbon\Carbon::parse($auto['tramite'])->format('d-m-Y') : '' }}</td>
                                             </tr>
@@ -670,7 +656,7 @@
                             <div class="col-12 mt-3">
                                 <h3>Historial de Automotores</h3>
                             </div>
-                            @if (count($automotoresHistorial) > 0)
+                            @if (count($automotoresHistorial ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -681,26 +667,24 @@
                                             <th>Tipo</th>
                                             <th>Origen</th>
                                             <th>Porcentaje</th>
-                                            <th>CUIL</th>
                                             <th>DNI</th>
                                             <th>Compra</th>
                                             <th>Trámite</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($automotoresHistorial as $auto)
+                                        @foreach ($automotoresHistorial as $autoh)
                                             <tr>
-                                                <td>{{ $auto['dominio'] ?? '' }}</td>
-                                                <td>{{ $auto['marca'] ?? '' }}</td>
-                                                <td>{{ $auto['modelo'] ?? '' }}</td>
-                                                <td>{{ $auto['anioModelo'] ?? '' }}</td>
-                                                <td>{{ $auto['tipo'] ?? '' }}</td>
-                                                <td>{{ $auto['origen'] ?? '' }}</td>
-                                                <td>{{ $auto['porcentaje'] ?? '' }}</td>
-                                                <td>{{ $auto['cuil'] ?? '' }}</td>
-                                                <td>{{ $auto['dni'] ?? '' }}</td>
-                                                <td>{{ isset($auto['compra']) ? \Carbon\Carbon::parse($auto['compra'])->format('d-m-Y') : '' }}</td>
-                                                <td>{{ isset($auto['tramite']) ? \Carbon\Carbon::parse($auto['tramite'])->format('d-m-Y') : '' }}</td>
+                                                <td>{{ $autoh['dominio'] ?? '' }}</td>
+                                                <td>{{ $autoh['marca'] ?? '' }}</td>
+                                                <td>{{ $autoh['modelo'] ?? '' }}</td>
+                                                <td>{{ $autoh['anioModelo'] ?? '' }}</td>
+                                                <td>{{ $autoh['tipo'] ?? '' }}</td>
+                                                <td>{{ $autoh['origen'] ?? '' }}</td>
+                                                <td>{{ $autoh['porcentaje'] ?? '' }}</td>
+                                                <td>{{ $autoh['dni'] ?? '' }}</td>
+                                                <td>{{ isset($autoh['compra']) ? \Carbon\Carbon::parse($autoh['compra'])->format('d-m-Y') : '' }}</td>
+                                                <td>{{ isset($autoh['tramite']) ? \Carbon\Carbon::parse($autoh['tramite'])->format('d-m-Y') : '' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -714,17 +698,25 @@
                             <div class="col-12 mt-3">
                                 <h3>Autos embargados</h3>
                             </div>
-                            @if (count($autosembargos) > 0)
+                            @if (count($autosEmbargos ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Datos</th>
+                                            <th>Dominio</th>
+                                            <th>Deuda</th>
+                                            <th>Valuación</th>
+                                            <th>Marca</th>
+                                            <th>Localidad</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($autosembargos as $embargo)
+                                        @foreach ($autosEmbargos as $autoe)
                                             <tr>
-                                                <td>{{ json_encode($embargo) }}</td>
+                                                <td>{{ $autoe['dominio'] ?? '' }}</td>
+                                                <td class="text-end">{{ isset($autoe['deuda']) ? number_format($autoe['deuda'], 2, ',', '.') : '' }}</td>
+                                                <td class="text-end">{{ isset($autoe['valuacion']) ? number_format($autoe['valuacion'], 2, ',', '.') : '' }}</td>
+                                                <td>{{ $autoe['marca'] ?? '' }}</td>
+                                                <td>{{ $autoe['localidad'] ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -771,11 +763,9 @@
                                                     <tr>
                                                         <td>{{ $tipo }}</td>
                                                         <td>{{ $entidad }}</td>
-                                                        <td>{{ isset($moras['periodo']) ? \Carbon\Carbon::parse($moras['periodo'])->format('m-Y') : '' }}
-                                                        </td>
-                                                        <td>{{ $moras['situacion'] ?? '' }}</td>
-                                                        <td>{{ isset($moras['prestamo']) ? number_format($moras['prestamo'], 2, ',', '.') : '' }}
-                                                        </td>
+                                                        <td class="text-center">{{ isset($moras['periodo']) ? \Carbon\Carbon::parse($moras['periodo'])->format('m-Y') : '' }}</td>
+                                                        <td class="text-center">{{ $moras['situacion'] ?? '' }}</td>
+                                                        <td class="text-end">{{ isset($moras['prestamo']) ? number_format($moras['prestamo'], 2, ',', '.') : '' }}</td>
                                                     </tr>
                                                 @endforeach
                                             @endforeach
@@ -808,23 +798,30 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Entidad</th>
+                                            <th>Número</th>
                                             <th>Fecha Rechazo</th>
                                             <th>Importe</th>
                                             <th>Motivo</th>
-                                            <th>Cantidad</th>
+                                            <th>Fecha Pago</th>
+                                            <th>Levantado</th>
+                                            <th>Multa</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($chqrs as $chq)
                                             <tr>
-                                                <td>{{ $chq['entidad'] ?? '' }}</td>
+                                                <td>{{ $chq['nroCheque'] ?? '' }}</td>
                                                 <td>{{ isset($chq['fechaRechazo']) ? \Carbon\Carbon::parse($chq['fechaRechazo'])->format('d-m-Y') : '' }}
                                                 </td>
-                                                <td>{{ isset($chq['importe']) ? number_format($chq['importe'], 2, ',', '.') : '' }}
+                                                <td class="text-end">{{ isset($chq['monto']) ? number_format($chq['monto'], 2, ',', '.') : '' }}
                                                 </td>
-                                                <td>{{ $chq['motivo'] ?? '' }}</td>
-                                                <td>{{ $chq['cantidad'] ?? '' }}</td>
+                                                <td>{{ $chq['causal'] ?? '' }}</td>
+                                                <td>{{ isset($chq['fechaPago']) ? \Carbon\Carbon::parse($chq['fechaPago'])->format('d-m-Y') : '' }}
+                                                </td>
+                                                <td>{{ isset($chq['fechaLevantamiento']) ? \Carbon\Carbon::parse($chq['fechaLevantamiento'])->format('d-m-Y') : '' }}
+                                                </td>
+                                                <td>{{ isset($chq['multa']) ? \Carbon\Carbon::parse($chq['multa'])->format('d-m-Y') : '' }}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -867,7 +864,7 @@
                                 <h3>* Boletín Oficial</h3>
                                 <h4>Sociedades Comerciales</h4>
                             </div>
-                            @if (count($boletin) > 0)
+                            @if (count($boletin ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -896,7 +893,7 @@
                             <div class="col-12 mt-3">
                                 <h3>Menciones en Boletín Oficial</h3>
                             </div>
-                            @if (count($menciones) > 0)
+                            @if (count($menciones ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>                

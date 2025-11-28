@@ -13,6 +13,20 @@
         </div>
 
         <div class="card-body">
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <form action="{{ route('admin.operaciones.store') }}" method="POST" id="formOperacion">
                 @csrf
                 <input type="hidden" id="garantes_json" name="garantes_json" value="[]">
@@ -77,7 +91,10 @@
                     <div class="col-md-2 col-sm-2 position-relative">
                         <div class="form-group">
                             <label for="numero_socio">Nro. Socio</label><b>*</b>
-                            <input type="number" class="form-control" id="numero_socio" name="numero_socio" value="{{ old('numero_socio', isset($socio) ? $socio->numero : '') }}" placeholder="Ingrese número" required autofocus>
+                            @if(isset($socio) && $socio)
+                                <small class="text-muted"></small>
+                            @endif
+                            <input type="number" class="form-control" id="numero_socio" name="numero_socio" value="{{ old('numero_socio', isset($socio) ? $socio->numero : '') }}" placeholder="Ingrese número" required {{ isset($socio) && $socio ? 'readonly' : '' }}>
                             @error('numero_socio')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -86,7 +103,7 @@
                     <div class="col-md-5 col-sm-6 position-relative">
                         <div class="form-group">
                             <label for="nombre_socio">Nombre del Socio</label>
-                            <input type="text" class="form-control" id="nombre_socio" name="nombre_socio" value="{{ old('nombre_socio', isset($socio) ? $socio->nombre : '') }}" readonly>
+                            <input type="text" class="form-control" id="nombre_socio" name="nombre_socio" value="{{ old('nombre_socio', isset($socio) ? $socio->razon_social : '') }}" readonly>
                         </div>
                     </div>
                 </div>
@@ -325,20 +342,24 @@
     document.addEventListener('DOMContentLoaded', function() {
         // ...existing code...
         const numeroSocioInput = document.getElementById('numero_socio');
-        numeroSocioInput.addEventListener('blur', function() {
-            const numero = numeroSocioInput.value.trim();
-            if (numero.length > 0) {
-                fetch(`/admin/socios/buscar-por-numero/${numero}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById('nombre_socio').value = data.socio.razon_social || '';
-                        } else {
-                            document.getElementById('nombre_socio').value = '';
-                        }
-                    });
-            }
-        });
+        
+        // Solo agregar el evento si el campo no es readonly (no está precargado)
+        if (!numeroSocioInput.hasAttribute('readonly')) {
+            numeroSocioInput.addEventListener('blur', function() {
+                const numero = numeroSocioInput.value.trim();
+                if (numero.length > 0) {
+                    fetch(`/admin/socios/buscar-por-numero/${numero}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById('nombre_socio').value = data.socio.razon_social || '';
+                            } else {
+                                document.getElementById('nombre_socio').value = '';
+                            }
+                        });
+                }
+            });
+        }
     });
 
     // Referencias a los elementos del formulario
@@ -435,10 +456,13 @@
 
 <script>
 // Serializar garantes antes de enviar el formulario
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('formOperacion');
-        const tablaGarantes = document.getElementById('tablaGarantes');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formOperacion');
+    const tablaGarantes = document.getElementById('tablaGarantes');
+    
+    if (form) {
         form.addEventListener('submit', function(e) {
+            // Serializar garantes
             const filas = tablaGarantes.querySelectorAll('tr');
             const garantes = [];
             filas.forEach(fila => {
@@ -456,8 +480,22 @@
                 }
             });
             document.getElementById('garantes_json').value = JSON.stringify(garantes);
+
+            // Deshabilitar el botón de submit para evitar doble envío
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.disabled) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Procesando...';
+                
+                // Re-habilitar el botón después de 5 segundos por si hay error
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Registrar Operación';
+                }, 5000);
+            }
         });
-    });
+    }
+});
 </script>
 
 @endsection

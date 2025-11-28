@@ -153,7 +153,15 @@ class OperacionController extends Controller
      */
     public function cargar()
     {
-        return view('admin.operaciones.cargar');
+        $user = Auth::user();
+        $socio = null;
+        
+        // Si el usuario tiene un socio asignado, obtener sus datos
+        if ($user && $user->socio_id) {
+            $socio = \App\Models\Socio::find($user->socio_id);
+        }
+        
+        return view('admin.operaciones.cargar', compact('socio'));
     }
 
     /**

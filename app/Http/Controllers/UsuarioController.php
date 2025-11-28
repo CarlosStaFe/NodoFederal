@@ -32,10 +32,10 @@ class UsuarioController extends Controller
         $roles = $user->roles->pluck('name');
         if ($roles->contains('nodo')) {
             $nodos = \App\Models\Nodo::where('id', $user->nodo_id)->get();
-            $socios = \App\Models\Socio::where('nodo_id', $user->nodo_id)->get();
+            $socios = \App\Models\Socio::where('nodo_id', $user->nodo_id)->orderBy('razon_social', 'asc')->get();
         } else {
-            $nodos = \App\Models\Nodo::all();
-            $socios = \App\Models\Socio::all();
+            $nodos = \App\Models\Nodo::orderBy('nombre', 'asc')->get();
+            $socios = \App\Models\Socio::orderBy('razon_social', 'asc')->get();
         }
         return view('admin.usuarios.create', compact('nodos', 'socios'));
     }

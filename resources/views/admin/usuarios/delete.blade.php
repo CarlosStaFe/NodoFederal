@@ -17,6 +17,14 @@
                 @csrf
                 @method('DELETE')
                 <div class="form group">
+                    <label for="name">Nodo</label>
+                    <p>{{$usuario->nodo->nombre ?? ''}}</p>
+                </div>
+                <div class="form group">
+                    <label for="name">Socio</label>
+                    <p>{{ optional($usuario->socio)->nombre ?? 'Sin socio asignado' }}</p>
+                </div>
+                <div class="form group">
                     <label for="name">Nombre del Usuario</label>
                     <p>{{$usuario->name}}</p>
                 </div>
@@ -29,11 +37,6 @@
                 <div class="form group">
                     <label for="rol">Rol</label>
                     <p>{{$usuario->roles->first()->name ?? ''}}</p>
-                </div>
-                <br>
-                <div class="form group">
-                    <label for="rol">Rol</label>
-                    <p>{{ $usuario->getRoleNames()->first() ?? 'Sin asignar' }}</p>
                 </div>
                 <br>
                 <div class="form group">

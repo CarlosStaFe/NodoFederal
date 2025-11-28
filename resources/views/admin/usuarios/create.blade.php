@@ -19,7 +19,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="nodo_id">Nodo</label><b>*</b>
-                            <select class="form-control" id="nodo_id" name="nodo_id">
+                            <select class="form-control" id="nodo_id" name="nodo_id" onchange="filtrarSocios()">
                                 <option selected disabled>Seleccione un Nodo</option>
                                 @foreach($nodos as $nodo)
                                     <option value="{{$nodo->id}}" {{old('nodo_id') == $nodo->id ? 'selected' : ''}}>{{$nodo->nombre}}</option>
@@ -33,7 +33,7 @@
                             <select class="form-control" id="socio_id" name="socio_id">
                                 <option selected disabled>Seleccione un Socio</option>
                                 @foreach($socios as $socio)
-                                    <option value="{{$socio->id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
+                                    <option value="{{$socio->id}}" data-nodo-id="{{$socio->nodo_id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -117,5 +117,53 @@
         </div>
     </div>
 </div>
+
+<script>
+// Almacenar todas las opciones originales al cargar la página
+let todasLasOpciones = [];
+
+function filtrarSocios() {
+    const nodoSelect = document.getElementById('nodo_id');
+    const socioSelect = document.getElementById('socio_id');
+    const nodoId = nodoSelect.value;
+    
+    // Limpiar el select de socios
+    socioSelect.innerHTML = '<option selected disabled>Seleccione un Socio</option>';
+    
+    // Si no hay nodo seleccionado, no mostrar socios
+    if (!nodoId) {
+        return;
+    }
+    
+    // Filtrar y mostrar solo socios del nodo seleccionado
+    todasLasOpciones.forEach(opcion => {
+        if (opcion.getAttribute('data-nodo-id') === nodoId) {
+            socioSelect.appendChild(opcion.cloneNode(true));
+        }
+    });
+}
+
+// Ejecutar cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    const socioSelect = document.getElementById('socio_id');
+    const nodoSelect = document.getElementById('nodo_id');
+    
+    // Guardar todas las opciones originales (excepto la primera que es el placeholder)
+    const opciones = socioSelect.querySelectorAll('option[data-nodo-id]');
+    todasLasOpciones = Array.from(opciones);
+    
+    // Si hay un nodo preseleccionado, filtrar
+    if (nodoSelect.value && nodoSelect.value !== '') {
+        filtrarSocios();
+    }
+    
+    // Si solo hay un nodo disponible, seleccionarlo automáticamente
+    const nodoOpciones = nodoSelect.querySelectorAll('option[value]');
+    if (nodoOpciones.length === 1) {
+        nodoSelect.value = nodoOpciones[0].value;
+        filtrarSocios();
+    }
+});
+</script>
 
 @endsection
