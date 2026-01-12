@@ -50,8 +50,17 @@ class SocioController extends Controller
             'cod_postal' => 'required',
         ]);
 
+        // Buscar un número disponible comenzando desde el número proporcionado
+        $numeroOriginal = intval($request->numero);
+        $numeroDisponible = $numeroOriginal;
+        
+        // Incrementar el número hasta encontrar uno disponible
+        while (Socio::where('numero', $numeroDisponible)->exists()) {
+            $numeroDisponible++;
+        }
+
         $socio = new Socio();
-        $socio->numero = $request->numero;
+        $socio->numero = $numeroDisponible;
         $socio->nodo_id = $request->nodo_id;
         $socio->clase = $request->clase;
         $socio->razon_social = strtoupper($request->razon_social);
@@ -65,8 +74,13 @@ class SocioController extends Controller
         $socio->observacion = $request->observacion;
         $socio->save();
 
+        $mensaje = 'Socio creado con éxito.';
+        if ($numeroDisponible != $numeroOriginal) {
+            $mensaje .= " El número se ajustó automáticamente de $numeroOriginal a $numeroDisponible.";
+        }
+
         return redirect()->route('admin.socios.index')
-            ->with('mensaje', 'Socio creado con éxito.')
+            ->with('mensaje', $mensaje)
             ->with('icono', 'success');
     }
 

@@ -69,7 +69,6 @@
                 "autoWidth": false,
                 "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
                 "pageLength": 10,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
                 "language": {
                     "lengthMenu": "Mostrar _MENU_ registros por página",
                     "zeroRecords": "No se encontraron resultados",

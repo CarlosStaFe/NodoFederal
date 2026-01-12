@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="row">
-    <h1>Consulta de antecedentes: {{ auth()->user()->name }}</h1>
+    <h1>Consulta de antecedentes</h1>
 </div>
 
 <div class="col-md-12">
@@ -40,7 +40,7 @@
                     </div>
                     <div class="col-lg-2 col-md-2 position-relative">
                         <label for="documento" class="form-label">Número</label>
-                        <input id="documento" name="documento" type="text" value="" class="form-control" placeholder="Ingrese un número">
+                        <input id="documento" name="documento" type="text" value="" class="form-control" placeholder="Ingrese un número" minlength="7" maxlength="8" pattern="\d{7,8}" title="El documento debe tener entre 7 y 8 dígitos">
                         @error('documento')
                             <small style="color: red">{{$message}}</small>
                         @enderror
@@ -65,17 +65,6 @@
         </div>
     </div>
 </div>
-
-{{-- @isset($datos) --}}
-    {{-- @php $data = $datos['data'] ?? null; @endphp --}}
-    {{-- @php $p = $datos['data'][0] ?? null; @endphp --}}
-    {{-- @if($p) --}}
-        {{-- <div class="alert alert-info mt-4"> --}}
-            {{-- <h5>Datos obtenidos de la API:</h5> --}}
-            {{-- <a href="{{ url('admin/operaciones/pdf') }}" class="btn btn-danger"><i class="bi bi-printer-fill"></i> Imprimir</a> --}}
-        {{-- </div> --}}
-    {{-- @endif --}}
-{{-- @endisset --}}
 
 <script>
     function calcularCuit(dni, sexo) {
@@ -113,13 +102,34 @@
             if(tipo.value === 'DNI') {
                 documento.disabled = false;
                 documento.setAttribute('required', 'required');
-                if(documento.value.length >= 7 && (sexo.value === 'M' || sexo.value === 'F')) {
-                    cuit.value = calcularCuit(documento.value.padStart(8, '0'), sexo.value);
+                
+                // Validar que tenga al menos 7 dígitos antes de calcular CUIT
+                if(documento.value.length >= 7 && documento.value.length <= 8 && (sexo.value === 'M' || sexo.value === 'F')) {
+                    // Solo permitir números
+                    if(/^\d+$/.test(documento.value)) {
+                        cuit.value = calcularCuit(documento.value.padStart(8, '0'), sexo.value);
+                    } else {
+                        cuit.value = '';
+                    }
+                } else {
+                    cuit.value = '';
+                }
+                
+                // Mostrar mensaje de error si no cumple con la longitud mínima
+                if(documento.value.length > 0 && documento.value.length < 7) {
+                    documento.setCustomValidity('El documento debe tener al menos 7 dígitos');
+                } else if(documento.value.length > 8) {
+                    documento.setCustomValidity('El documento no puede tener más de 8 dígitos');
+                } else if(documento.value.length > 0 && !/^\d+$/.test(documento.value)) {
+                    documento.setCustomValidity('El documento solo puede contener números');
+                } else {
+                    documento.setCustomValidity('');
                 }
             } else if(tipo.value === 'CUIT') {
                 documento.value = '';
                 documento.disabled = true;
                 documento.removeAttribute('required');
+                documento.setCustomValidity('');
                 cuit.value = '';
             }
         }

@@ -32,12 +32,17 @@
                     <div class="col-md-5">
                         <div class="form-group">
                             <label for="nodo_id">Nombre del Nodo</label><b>*</b>
-                            <select class="form-control" id="nodo_id" name="nodo_id" required>
-                                <option value="" disabled selected>Seleccione un nodo...</option>
-                                @foreach($nodos as $nodo)
-                                    <option value="{{$nodo->id}}" {{ old('nodo_id') == $nodo->id ? 'selected' : '' }}>{{$nodo->numero}} - {{$nodo->nombre}}</option>
-                                @endforeach
-                            </select>
+                            @if(auth()->user()->hasRole('nodo'))
+                                <input type="text" class="form-control" value="{{auth()->user()->nodo->numero ?? ''}} - {{auth()->user()->nodo->nombre ?? 'Sin asignar'}}" readonly>
+                                <input type="hidden" name="nodo_id" value="{{auth()->user()->nodo_id}}">
+                            @else
+                                <select class="form-control" id="nodo_id" name="nodo_id" required>
+                                    <option value="" disabled selected>Seleccione un nodo...</option>
+                                    @foreach($nodos as $nodo)
+                                        <option value="{{$nodo->id}}" {{ old('nodo_id') == $nodo->id ? 'selected' : '' }}>{{$nodo->numero}} - {{$nodo->nombre}}</option>
+                                    @endforeach
+                                </select>
+                            @endif
                             @error('nodo_id')
                                 <small style="color: red">{{$message}}</small>
                             @enderror

@@ -176,7 +176,16 @@
                                     <td class="text-center">{{ isset($g->fecha_estado) ? \Carbon\Carbon::parse($g->fecha_estado)->format('d-m-Y') : '' }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="8">No figura como garante en ninguna operación.</td></tr>
+                                <tr>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -258,7 +267,6 @@
             "autoWidth": false,
             "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
             "pageLength": 10,
-            //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
             "language": {
                 "lengthMenu": "Mostrar _MENU_ registros por página",
                 "zeroRecords": "No se encontraron resultados",
@@ -291,9 +299,9 @@
             //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
             "language": {
                 "lengthMenu": "Mostrar _MENU_ registros por página",
-                "zeroRecords": "No se encontraron resultados",
+                "zeroRecords": "No figura como garante en ninguna operación",
                 "info": "Mostrando página _PAGE_ de _PAGES_",
-                "infoEmpty": "No hay registros disponibles",
+                "infoEmpty": "No figura como garante en ninguna operación",
                 "infoFiltered": "(filtrado de _MAX_ registros totales)",
                 "search": "Buscar:",
                 "paginate": {
@@ -301,7 +309,7 @@
                     "last": "Último",
                     "next": "Siguiente",
                     "previous": "Anterior"
-                },
+                }
             },
             "columnDefs": [
                 { "orderable": false, "targets": [] }

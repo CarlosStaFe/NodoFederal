@@ -20,15 +20,20 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="nodo_id">Nodo</label>
-                            <select class="form-control" id="nodo_id" name="nodo_id" required>
-                                <option value="">Seleccione un Nodo</option>
-                                @foreach($nodos as $nodo)
-                                    <option value="{{$nodo->id}}" 
-                                        {{ (old('nodo_id', $usuario->nodo_id) == $nodo->id) ? 'selected' : '' }}>
-                                        {{$nodo->nombre}}
-                                    </option>
-                                @endforeach
-                            </select>
+                            @if(auth()->user()->hasRole('nodo'))
+                                <input type="text" class="form-control" value="{{auth()->user()->nodo->nombre ?? 'Sin asignar'}}" readonly>
+                                <input type="hidden" name="nodo_id" value="{{auth()->user()->nodo_id}}">
+                            @else
+                                <select class="form-control" id="nodo_id" name="nodo_id" required>
+                                    <option value="">Seleccione un Nodo</option>
+                                    @foreach($nodos as $nodo)
+                                        <option value="{{$nodo->id}}" 
+                                            {{ (old('nodo_id', $usuario->nodo_id) == $nodo->id) ? 'selected' : '' }}>
+                                            {{$nodo->nombre}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @endif
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -36,12 +41,22 @@
                             <label for="socio_id">Socio</label>
                             <select class="form-control" id="socio_id" name="socio_id" required>
                                 <option value="">Seleccione un Socio</option>
-                                @foreach($socios as $socio)
-                                    <option value="{{$socio->id}}" 
-                                        {{ (old('socio_id', $usuario->socio_id) == $socio->id) ? 'selected' : '' }}>
-                                        {{$socio->razon_social}}
-                                    </option>
-                                @endforeach
+                                @if(auth()->user()->hasRole('nodo'))
+                                    @foreach($socios->where('nodo_id', auth()->user()->nodo_id)->sortBy('razon_social') as $socio)
+                                        <option value="{{$socio->id}}" 
+                                            {{ (old('socio_id', $usuario->socio_id) == $socio->id) ? 'selected' : '' }}>
+                                            {{$socio->razon_social}}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    @foreach($socios->sortBy('razon_social') as $socio)
+                                        <option value="{{$socio->id}}" 
+                                            data-nodo="{{$socio->nodo_id}}"
+                                            {{ (old('socio_id', $usuario->socio_id) == $socio->id) ? 'selected' : '' }}>
+                                            {{$socio->razon_social}}
+                                        </option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                     </div>
@@ -102,6 +117,36 @@
                                     document.getElementById('password').value = password;
                                     document.getElementById('password_confirmation').value = password;
                                 }
+
+                                // Filtrar socios por nodo seleccionado
+                                @if(!auth()->user()->hasRole('nodo'))
+                                document.getElementById('nodo_id').addEventListener('change', function() {
+                                    const nodoId = this.value;
+                                    const socioSelect = document.getElementById('socio_id');
+                                    const opciones = socioSelect.querySelectorAll('option');
+                                    
+                                    // Limpiar selección actual
+                                    socioSelect.value = '';
+                                    
+                                    opciones.forEach(function(opcion) {
+                                        if (opcion.value === '') {
+                                            opcion.style.display = 'block';
+                                        } else if (opcion.getAttribute('data-nodo') === nodoId) {
+                                            opcion.style.display = 'block';
+                                        } else {
+                                            opcion.style.display = 'none';
+                                        }
+                                    });
+                                });
+
+                                // Ejecutar el filtro al cargar la página si ya hay un nodo seleccionado
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const nodoSelect = document.getElementById('nodo_id');
+                                    if (nodoSelect.value) {
+                                        nodoSelect.dispatchEvent(new Event('change'));
+                                    }
+                                });
+                                @endif
                             </script>
                         </div>
                     </div>

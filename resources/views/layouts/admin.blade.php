@@ -294,7 +294,7 @@
                 Sistema Nodo Federal
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2025 - <a href="#">OM Computación</a>.</strong> Todos los derechos reservados.
+            <strong>Copyright &copy; 2026 - <a href="#">OM Computación</a>.</strong> Todos los derechos reservados.
         </footer>
     </div>
 
