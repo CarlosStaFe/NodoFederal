@@ -132,7 +132,114 @@ class OperacionController extends Controller
         if (!$datos && request()->hasSession()) {
             $datos = request()->session()->get('datos_api');
         }
+        
+        // Si hay datos, verificar y actualizar tabla clientes
+        if (isset($datos) && isset($datos['data'])) {
+            $this->actualizarClientes($datos);
+        }
+        
         return view('admin.operaciones.informe', compact('datos'));
+    }
+    
+    /**
+     * Actualiza la tabla clientes con datos del informe si no existe el CUIL
+     */
+    private function actualizarClientes($datos)
+    {
+        $p = $datos['data']['datosParticulares'] ?? null;
+        
+        if (!$p || empty($p['cuil'])) {
+            return; // No hay datos suficientes
+        }
+        
+        $cuil = $p['cuil'];
+        
+        // Verificar si el cliente ya existe en la tabla
+        $clienteExistente = \App\Models\Cliente::where('cuit', $cuil)->first();
+        
+        if (!$clienteExistente) {
+            // El cliente no existe, crearlo con los datos del informe
+            try {
+                $cliente = new \App\Models\Cliente();
+                
+                // Datos básicos
+                $tipoDoc = $p['tipo'] ?? 'DNI';
+                // Simplificar tipo de documento si es muy largo
+                if (strlen($tipoDoc) > 5) {
+                    $tipoDoc = 'DNI'; // Valor por defecto si es muy largo
+                }
+                $cliente->tipodoc = $tipoDoc;
+                $cliente->documento = $p['dni'] ?? '';
+                $cliente->sexo = $p['sexo'] ?? 'M';
+                $cliente->cuit = $cuil;
+                $cliente->apelnombres = strtoupper($p['apellidoNombre'] ?? '');
+                
+                // Fecha de nacimiento
+                if (isset($p['fechaNacimiento'])) {
+                    try {
+                        $cliente->nacimiento = \Carbon\Carbon::parse($p['fechaNacimiento'])->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        $cliente->nacimiento = null;
+                    }
+                }
+                
+                // Datos de ubicación si están disponibles 
+                $cliente->nacionalidad = $p['nacionalidad'] ?? '';
+                $cliente->domicilio = $p['domicilio'] ?? '';
+                
+                // Buscar código postal por código postal si existe
+                if (isset($p['cp']) && !empty($p['cp'])) {
+                    $localidad = \App\Models\Localidad::where('cod_postal', $p['cp'])->first();
+                    if ($localidad) {
+                        $cliente->cod_postal_id = $localidad->id;
+                    } else {
+                        // Si no encuentra por código postal, intentar buscar por nombre de localidad
+                        if (isset($p['localidad']) && !empty($p['localidad'])) {
+                            $localidad = \App\Models\Localidad::where('localidad', 'LIKE', '%' . $p['localidad'] . '%')->first();
+                            if ($localidad) {
+                                $cliente->cod_postal_id = $localidad->id;
+                            } else {
+                                $cliente->cod_postal_id = 1; // Valor por defecto
+                            }
+                        } else {
+                            $cliente->cod_postal_id = 1; // Valor por defecto
+                        }
+                    }
+                } else if (isset($p['localidad']) && !empty($p['localidad'])) {
+                    // Si no hay código postal, buscar por nombre de localidad
+                    $localidad = \App\Models\Localidad::where('localidad', 'LIKE', '%' . $p['localidad'] . '%')->first();
+                    if ($localidad) {
+                        $cliente->cod_postal_id = $localidad->id;
+                    } else {
+                        $cliente->cod_postal_id = 1; // Valor por defecto
+                    }
+                } else {
+                    $cliente->cod_postal_id = 1; // Valor por defecto
+                }
+                
+                // Datos adicionales
+                $cliente->telefono = '';
+                $cliente->email = '';
+                $cliente->estado = 'Activo';
+                $cliente->fechaestado = now();
+                $cliente->observacion = 'Cliente creado automáticamente desde informe API';
+                
+                $cliente->save();
+                
+                \Log::info('Cliente creado automáticamente desde informe', [
+                    'cuil' => $cuil,
+                    'nombre' => $cliente->apelnombres,
+                    'id' => $cliente->id
+                ]);
+                
+            } catch (\Exception $e) {
+                \Log::error('Error creando cliente desde informe', [
+                    'cuil' => $cuil,
+                    'error' => $e->getMessage(),
+                    'datos' => $p
+                ]);
+            }
+        }
     }
 
     /**

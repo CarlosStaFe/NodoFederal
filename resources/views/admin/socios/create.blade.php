@@ -185,8 +185,7 @@
                         <div class="form group">
                             <label for="estado">Estado</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('estado')}}" id="estado" name="estado" placeholder="Estado">
-                                <option selected disabled>Elige estado...</option>
-                                <option value="Activo">Activo</option>
+                                <option value="Activo" selected>Activo</option>
                                 <option value="Inactivo">Inactivo</option>
                             </select>
                             @error('estado')

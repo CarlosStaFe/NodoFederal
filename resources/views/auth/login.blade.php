@@ -77,7 +77,7 @@
                 </form>
                 <br>
                 <p class="mb-0">
-                    <strong>Copyright &copy; 2025 </strong>- Derechos reservados.
+                    <strong>Copyright &copy; 2026 </strong>- Derechos reservados.
                 </p>
             </div>
         </div>
