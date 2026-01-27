@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Consulta;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ConsultaController extends Controller
 {
     public function consultar(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $roles = $user->roles->pluck('name');
         
         if ($roles->contains('nodo')) {
@@ -73,14 +75,14 @@ class ConsultaController extends Controller
                     ->values();
                 
                 // Debug: registrar la consulta SQL y parámetros para verificar ordenamiento
-                \Log::info('Consulta ejecutada con ordenamiento por nodo, socio, fecha y hora');
-                \Log::info('Parámetros de consulta: ', $request->all());
-                \Log::info('Cantidad de resultados: ' . $resultados->count());
+                Log::info('Consulta ejecutada con ordenamiento por nodo, socio, fecha y hora');
+                Log::info('Parámetros de consulta: ', $request->all());
+                Log::info('Cantidad de resultados: ' . $resultados->count());
                 if ($resultados->count() > 0) {
                     $primero = $resultados->first();
                     $ultimo = $resultados->last();
-                    \Log::info('Primer resultado - Nodo: ' . ($primero->nodo ? $primero->nodo->nombre : 'N/A') . ' - Socio: ' . ($primero->socio ? $primero->socio->razon_social : 'N/A') . ' - Fecha: ' . $primero->fecha);
-                    \Log::info('Último resultado - Nodo: ' . ($ultimo->nodo ? $ultimo->nodo->nombre : 'N/A') . ' - Socio: ' . ($ultimo->socio ? $ultimo->socio->razon_social : 'N/A') . ' - Fecha: ' . $ultimo->fecha);
+                    Log::info('Primer resultado - Nodo: ' . ($primero->nodo ? $primero->nodo->nombre : 'N/A') . ' - Socio: ' . ($primero->socio ? $primero->socio->razon_social : 'N/A') . ' - Fecha: ' . $primero->fecha);
+                    Log::info('Último resultado - Nodo: ' . ($ultimo->nodo ? $ultimo->nodo->nombre : 'N/A') . ' - Socio: ' . ($ultimo->socio ? $ultimo->socio->razon_social : 'N/A') . ' - Fecha: ' . $ultimo->fecha);
                 }
                 
                 return response()->json([
@@ -88,7 +90,7 @@ class ConsultaController extends Controller
                 ]);
                 
             } catch (\Exception $e) {
-                \Log::error('Error en consulta AJAX: ' . $e->getMessage());
+                Log::error('Error en consulta AJAX: ' . $e->getMessage());
                 return response()->json([
                     'error' => 'Error interno del servidor',
                     'message' => $e->getMessage(),
@@ -105,7 +107,7 @@ class ConsultaController extends Controller
 
     public function generarPdf(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $roles = $user->roles->pluck('name');
         
         try {
@@ -168,8 +170,8 @@ class ConsultaController extends Controller
             return $pdf->download($filename);
             
         } catch (\Exception $e) {
-            \Log::error('Error generando PDF: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('Error generando PDF: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'error' => 'Error al generar PDF',
                 'message' => $e->getMessage(),

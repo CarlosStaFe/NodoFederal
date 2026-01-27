@@ -83,10 +83,14 @@
                         <label for="rol">Rol</label><b>*</b>
                         <select class="form-control" id="rol" name="rol" required>
                             <option value="" disabled>Seleccione un Rol</option>
-                            <option value="admin" {{ (old('rol', $usuario->roles->first()?->name) == 'admin') ? 'selected' : '' }}>Administrador</option>
-                            <option value="secretaria" {{ (old('rol', $usuario->roles->first()?->name) == 'secretaria') ? 'selected' : '' }}>Secretaria</option>
-                            <option value="nodo" {{ (old('rol', $usuario->roles->first()?->name) == 'nodo') ? 'selected' : '' }}>Nodo</option>
-                            <option value="socio" {{ (old('rol', $usuario->roles->first()?->name) == 'socio') ? 'selected' : '' }}>Socio</option>
+                            @if(auth()->user()->hasRole('nodo'))
+                                <option value="socio" {{ (old('rol', $usuario->roles->first()?->name) == 'socio') ? 'selected' : '' }}>Socio</option>
+                            @else
+                                <option value="admin" {{ (old('rol', $usuario->roles->first()?->name) == 'admin') ? 'selected' : '' }}>Administrador</option>
+                                <option value="secretaria" {{ (old('rol', $usuario->roles->first()?->name) == 'secretaria') ? 'selected' : '' }}>Secretaria</option>
+                                <option value="nodo" {{ (old('rol', $usuario->roles->first()?->name) == 'nodo') ? 'selected' : '' }}>Nodo</option>
+                                <option value="socio" {{ (old('rol', $usuario->roles->first()?->name) == 'socio') ? 'selected' : '' }}>Socio</option>
+                            @endif
                         </select>
                         @error('rol')
                             <small style="color: red">{{$message}}</small>

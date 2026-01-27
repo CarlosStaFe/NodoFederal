@@ -226,14 +226,14 @@ class OperacionController extends Controller
                 
                 $cliente->save();
                 
-                \Log::info('Cliente creado automáticamente desde informe', [
+                Log::info('Cliente creado automáticamente desde informe', [
                     'cuil' => $cuil,
                     'nombre' => $cliente->apelnombres,
                     'id' => $cliente->id
                 ]);
                 
             } catch (\Exception $e) {
-                \Log::error('Error creando cliente desde informe', [
+                Log::error('Error creando cliente desde informe', [
                     'cuil' => $cuil,
                     'error' => $e->getMessage(),
                     'datos' => $p
