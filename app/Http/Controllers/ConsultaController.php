@@ -181,6 +181,118 @@ class ConsultaController extends Controller
     }
 
     /**
+     * Generar archivo Excel con los resultados de la consulta
+     */
+    public function generarExcel(Request $request)
+    {
+        try {
+            $nodo_id = $request->input('nodo_id');
+            $socio_id = $request->input('socio_id');
+            $desde_fecha = $request->input('desde_fecha');
+            $hasta_fecha = $request->input('hasta_fecha');
+
+            // Query base con joins
+            $query = Consulta::query()
+                ->leftJoin('nodos', 'consultas.nodo_id', '=', 'nodos.id')
+                ->leftJoin('socios', 'consultas.socio_id', '=', 'socios.id')
+                ->select(
+                    'consultas.*',
+                    'nodos.nombre as nodo_nombre',
+                    'socios.razon_social as socio_razon_social'
+                );
+
+            // Aplicar filtros
+            if ($nodo_id) {
+                $query->where('consultas.nodo_id', $nodo_id);
+            }
+
+            if ($socio_id) {
+                $query->where('consultas.socio_id', $socio_id);
+            }
+
+            if ($desde_fecha) {
+                $query->where('consultas.fecha', '>=', $desde_fecha);
+            }
+
+            if ($hasta_fecha) {
+                $query->where('consultas.fecha', '<=', $hasta_fecha . ' 23:59:59');
+            }
+
+            $resultados = $query->orderBy('nodos.nombre')
+                ->orderBy('socios.razon_social')
+                ->orderBy('consultas.fecha')
+                ->get();
+
+            // Crear el archivo Excel
+            $filename = 'Consulta_Consumos_' . date('Y-m-d_H-i-s') . '.xls';
+            
+            // Headers para XLS
+            $headers = [
+                'Content-Type' => 'application/vnd.ms-excel',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'max-age=0',
+                'Pragma' => 'public',
+            ];
+
+            // Crear contenido HTML que Excel interpretará como XLS
+            $htmlContent = '<!DOCTYPE html>';
+            $htmlContent .= '<html>';
+            $htmlContent .= '<head>';
+            $htmlContent .= '<meta charset="UTF-8">';
+            $htmlContent .= '<style>';
+            $htmlContent .= 'table { border-collapse: collapse; width: 100%; }';
+            $htmlContent .= 'th, td { border: 1px solid black; padding: 8px; text-align: left; }';
+            $htmlContent .= 'th { background-color: #4CAF50; color: white; font-weight: bold; }';
+            $htmlContent .= '</style>';
+            $htmlContent .= '</head>';
+            $htmlContent .= '<body>';
+            $htmlContent .= '<table>';
+            
+            // Headers de la tabla
+            $htmlContent .= '<tr>';
+            $htmlContent .= '<th>NRO.</th>';
+            $htmlContent .= '<th>FECHA</th>';
+            $htmlContent .= '<th>HORA</th>';
+            $htmlContent .= '<th>TIPO</th>';
+            $htmlContent .= '<th>CUIT</th>';
+            $htmlContent .= '<th>APELLIDO Y NOMBRES</th>';
+            $htmlContent .= '<th>NODO</th>';
+            $htmlContent .= '<th>SOCIO</th>';
+            $htmlContent .= '</tr>';
+
+            // Datos de la tabla
+            foreach ($resultados as $consulta) {
+                $fecha = $consulta->fecha ? \Carbon\Carbon::parse($consulta->fecha) : null;
+                $htmlContent .= '<tr>';
+                $htmlContent .= '<td>' . htmlspecialchars($consulta->numero ?? '') . '</td>';
+                $htmlContent .= '<td>' . ($fecha ? $fecha->format('d/m/Y') : '') . '</td>';
+                $htmlContent .= '<td>' . ($fecha ? $fecha->format('H:i') : '') . '</td>';
+                $htmlContent .= '<td>' . htmlspecialchars($consulta->tipo ?? '') . '</td>';
+                $htmlContent .= '<td>' . htmlspecialchars($consulta->cuit ?? '') . '</td>';
+                $htmlContent .= '<td>' . htmlspecialchars($consulta->apelynombres ?? '') . '</td>';
+                $htmlContent .= '<td>' . htmlspecialchars($consulta->nodo_nombre ?? '') . '</td>';
+                $htmlContent .= '<td>' . htmlspecialchars($consulta->socio_razon_social ?? '') . '</td>';
+                $htmlContent .= '</tr>';
+            }
+            
+            $htmlContent .= '</table>';
+            $htmlContent .= '</body>';
+            $htmlContent .= '</html>';
+
+            // Retornar como descarga
+            return response($htmlContent, 200, $headers);
+
+        } catch (\Exception $e) {
+            Log::error('Error generando Excel: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'error' => 'Error al generar Excel',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

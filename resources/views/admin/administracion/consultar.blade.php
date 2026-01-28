@@ -76,7 +76,8 @@
                     <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
                     <button type="submit" class="btn btn-success me-5">Consultar</button>
                     <button type="button" id="generarPdf" class="btn btn-secondary me-5" disabled><i class="bi bi-printer-fill"></i> Generar PDF</button>
-                    <a href="{{ url('admin') }}" class="btn btn-info me-5">Salir</a>
+                    <button type="button" id="generarExcel" class="btn btn-info me-5" disabled><i class="bi bi-file-earmark-excel-fill"></i> Generar Excel</button>
+                    <a href="{{ url('admin') }}" class="btn btn-warning me-5">Salir</a>
                 </div>
             </form>
             <br>
@@ -287,16 +288,25 @@
             dataTable.rows.add(rowsData);
             dataTable.draw();
             
-            // Activar botón PDF si hay datos
+            // Activar botones PDF y Excel si hay datos
             const generarPdfBtn = document.getElementById('generarPdf');
+            const generarExcelBtn = document.getElementById('generarExcel');
             if (rowsData.length > 0) {
                 generarPdfBtn.disabled = false;
                 generarPdfBtn.classList.remove('btn-secondary');
                 generarPdfBtn.classList.add('btn-danger');
+                
+                generarExcelBtn.disabled = false;
+                generarExcelBtn.classList.remove('btn-secondary');
+                generarExcelBtn.classList.add('btn-success');
             } else {
                 generarPdfBtn.disabled = true;
                 generarPdfBtn.classList.remove('btn-danger');
                 generarPdfBtn.classList.add('btn-secondary');
+                
+                generarExcelBtn.disabled = true;
+                generarExcelBtn.classList.remove('btn-success');
+                generarExcelBtn.classList.add('btn-secondary');
             }
         })
         .catch(error => {
@@ -305,11 +315,17 @@
             dataTable.clear();
             dataTable.draw();
             
-            // Desactivar botón PDF
+            // Desactivar botones PDF y Excel
             const generarPdfBtn = document.getElementById('generarPdf');
+            const generarExcelBtn = document.getElementById('generarExcel');
+            
             generarPdfBtn.disabled = true;
             generarPdfBtn.classList.remove('btn-danger');
             generarPdfBtn.classList.add('btn-secondary');
+            
+            generarExcelBtn.disabled = true;
+            generarExcelBtn.classList.remove('btn-success');
+            generarExcelBtn.classList.add('btn-secondary');
             
             alert('Error al consultar los datos: ' + error.message);
         });
@@ -370,6 +386,25 @@
         }
     });
 
+    // Event listener para el botón Generar Excel
+    document.getElementById('generarExcel').addEventListener('click', function() {
+        if (dataTable && dataTable.data().length > 0) {
+            // Obtener los parámetros de la consulta actual
+            const formData = new FormData(document.getElementById('consultaForm'));
+            const searchParams = new URLSearchParams(formData);
+            
+            // Crear enlace temporal para descargar el archivo XLS
+            const link = document.createElement('a');
+            link.href = '{{ route("admin.administracion.consultar.excel") }}?' + searchParams.toString();
+            link.download = 'consulta_consumos_' + new Date().toISOString().slice(0, 10) + '.xls';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            alert('No hay datos para generar el Excel. Realice primero una consulta.');
+        }
+    });
+
     // Event listener para el botón Limpiar
     document.getElementById('limpiar').addEventListener('click', function() {
         // Limpiar formulario
@@ -381,11 +416,17 @@
             dataTable.draw();
         }
         
-        // Desactivar botón PDF
+        // Desactivar botones PDF y Excel
         const generarPdfBtn = document.getElementById('generarPdf');
+        const generarExcelBtn = document.getElementById('generarExcel');
+        
         generarPdfBtn.disabled = true;
         generarPdfBtn.classList.remove('btn-danger');
         generarPdfBtn.classList.add('btn-secondary');
+        
+        generarExcelBtn.disabled = true;
+        generarExcelBtn.classList.remove('btn-success');
+        generarExcelBtn.classList.add('btn-secondary');
         
         // Restaurar opciones de socios si no es usuario con rol nodo
         @if(!auth()->user()->hasRole('nodo'))

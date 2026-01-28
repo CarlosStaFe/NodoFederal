@@ -40,24 +40,22 @@
                         <div class="form-group">
                             <label for="socio_id">Socio</label>
                             <select class="form-control" id="socio_id" name="socio_id" required>
-                                <option value="">Seleccione un Socio</option>
-                                @if(auth()->user()->hasRole('nodo'))
-                                    @foreach($socios->where('nodo_id', auth()->user()->nodo_id)->sortBy('razon_social') as $socio)
-                                        <option value="{{$socio->id}}" 
-                                            {{ (old('socio_id', $usuario->socio_id) == $socio->id) ? 'selected' : '' }}>
-                                            {{$socio->razon_social}}
-                                        </option>
-                                    @endforeach
-                                @else
-                                    @foreach($socios->sortBy('razon_social') as $socio)
-                                        <option value="{{$socio->id}}" 
-                                            data-nodo="{{$socio->nodo_id}}"
-                                            {{ (old('socio_id', $usuario->socio_id) == $socio->id) ? 'selected' : '' }}>
-                                            {{$socio->razon_social}}
-                                        </option>
-                                    @endforeach
-                                @endif
+                                @php
+                                    $selectedSocioId = old('socio_id', $usuario->socio_id);
+                                    $selectedSocio = $socios->firstWhere('id', $selectedSocioId);
+                                @endphp
+                                <option value="">{{ $selectedSocio?->razon_social ?? 'Seleccione un Socio' }}</option>
+                                @foreach($socios->sortBy('razon_social') as $socio)
+                                    <option value="{{$socio->id}}"
+                                        data-nodo="{{$socio->nodo_id}}"
+                                        {{ (old('socio_id', $usuario->socio_id) == $socio->id) ? 'selected' : '' }}>
+                                        {{$socio->razon_social}}
+                                    </option>
+                                @endforeach
                             </select>
+                            @error('socio_id')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
                         </div>
                     </div>
                     <br>

@@ -22,7 +22,7 @@
                 </div>
                 <div class="form group">
                     <label for="name">Socio</label>
-                    <p>{{ optional($usuario->socio)->nombre ?? 'Sin socio asignado' }}</p>
+                    <p>{{ optional($usuario->socio)->razon_social ?? 'Sin socio asignado' }}</p>
                 </div>
                 <div class="form group">
                     <label for="name">Nombre del Usuario</label>

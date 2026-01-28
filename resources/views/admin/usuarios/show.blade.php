@@ -23,7 +23,7 @@
                 <div class="col-md-6 col-sm-4 position-relative">
                     <div class="form group">
                         <label for="nacimiento">Socio</label>
-                        <p>{{ $usuario->socio ? $usuario->socio->nombre : 'Sin asignar' }}</p>
+                        <p>{{ $usuario->socio ? $usuario->socio->razon_social : 'Sin asignar' }}</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-4 position-relative">

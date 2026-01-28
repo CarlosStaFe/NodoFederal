@@ -33,6 +33,9 @@ Route::get('/admin/administracion/consultar', [ConsultaController::class, 'consu
 Route::get('/admin/administracion/consultar/pdf', [ConsultaController::class, 'generarPdf'])
     ->name('admin.administracion.consultar.pdf')
     ->middleware(['auth', 'can:admin.administracion.consultar']);
+Route::get('/admin/administracion/consultar/excel', [ConsultaController::class, 'generarExcel'])
+    ->name('admin.administracion.consultar.excel')
+    ->middleware(['auth', 'can:admin.administracion.consultar']);
 
 // RUTAS PARA EL ADMIN - USUARIOS
 Route::get('/admin/usuarios', [UsuarioController::class, 'index'])

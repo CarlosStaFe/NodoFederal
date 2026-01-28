@@ -152,6 +152,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const socioSelect = document.getElementById('socio_id');
     const nodoSelect = document.getElementById('nodo_id');
     
+    // Limpiar los campos al cargar la página
+    document.getElementById('email').value = '';
+    document.getElementById('name').value = '';
+    
     // Guardar todas las opciones originales (excepto la primera que es el placeholder)
     const opciones = socioSelect.querySelectorAll('option[data-nodo-id]');
     todasLasOpciones = Array.from(opciones);
