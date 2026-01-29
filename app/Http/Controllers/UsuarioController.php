@@ -71,9 +71,14 @@ class UsuarioController extends Controller
         // Enviar email con usuario y contraseña
         Mail::send([], [], function ($message) use ($usuario, $request) {
             $appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
+            
+            // Obtener datos del nodo y socio
+            $nodo = $usuario->nodo ? $usuario->nodo->nombre : 'No asignado';
+            $socio = $usuario->socio ? $usuario->socio->razon_social : 'No asignado';
+            
             $message->to($usuario->email)
                 ->subject('Usuario creado en Nodo Federal-NO CONTESTAR ESTE MENSAJE')
-                ->html('<p>Su usuario ha sido creado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><p><b>Contraseña:</b> ' . $request->password . '</p><br><p>Link de la aplicación: <a href="//' . $appUrl . '">' . $appUrl . '</a></p>');
+                ->html('<p>Su usuario ha sido creado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><p><b>Contraseña:</b> ' . $request->password . '</p><p><b>Nodo:</b> ' . $nodo . '</p><p><b>Socio:</b> ' . $socio . '</p><br><p>Link de la aplicación: <a href="//' . $appUrl . '">' . $appUrl . '</a></p>');
         });
 
         return redirect()->route('admin.usuarios.index')
@@ -126,9 +131,14 @@ class UsuarioController extends Controller
         if ($request->password) {
             Mail::send([], [], function ($message) use ($usuario, $request) {
                 $appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
+                
+                // Obtener datos del nodo y socio
+                $nodo = $usuario->nodo ? $usuario->nodo->nombre : 'No asignado';
+                $socio = $usuario->socio ? $usuario->socio->razon_social : 'No asignado';
+                
                 $message->to($usuario->email)
-                    ->subject('Usuario actualizado en Nodo Federal-NO CONTESTAR ESTE MENSAJE')
-                    ->html('<p>Su usuario ha sido actualizado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><br><p><b>Contraseña:</b> ' . $request->password . '</p><br><p>Link de la aplicación: <a href="//' . $appUrl . '">' . $appUrl . '</a></p>');
+                    ->subject('Usuario creado en Nodo Federal-NO CONTESTAR ESTE MENSAJE')
+                    ->html('<p>Su usuario ha sido creado.</p><br><p><b>Usuario:</b> ' . $usuario->email . '</p><p><b>Contraseña:</b> ' . $request->password . '</   p><p><b>Nodo:</b> ' . $nodo . '</p><p><b>Socio:</b> ' . $socio . '</p><br><p>Link de la aplicación: <a href="//' . $appUrl . '">' . $appUrl .  '</a></p>');
             });
         }
 

@@ -95,7 +95,7 @@ class OperacionController extends Controller
                 $idLog = $datos['data']['idLog'] ?? 0;
                 $p = $datos['data']['datosParticulares'] ?? null;
                 //dd($idLog, $result, $p);
-                if ((isset($result['code']) && $result['code'] == 200) && (isset($result['info']) && $result['info'] === 'OK')) {
+                if ((isset($result['code']) && $result['code'] == 200) && (isset($result['info']) && $result['info'] === 'OK') && !empty($idLog)) {
                     $user = Auth::user();
                     //dd($datos);
                     \App\Models\Consulta::create([
@@ -220,7 +220,7 @@ class OperacionController extends Controller
                 // Datos adicionales
                 $cliente->telefono = '';
                 $cliente->email = '';
-                $cliente->estado = 'Activo';
+                $cliente->estado = 'ACTIVO';
                 $cliente->fechaestado = now();
                 $cliente->observacion = 'Cliente creado automáticamente desde informe API';
                 
