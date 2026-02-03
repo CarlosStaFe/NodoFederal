@@ -20,13 +20,23 @@ class PermisosUsuariosSeeder extends Seeder
             'admin.nodos.confirm-delete',
             'admin.socios.confirm-delete',
             'admin.clientes.confirm-delete',
+            'admin.administracion.basedatos',
         ];
+        
+        // Asignar permisos al usuario admin (ID 1)
         $user = User::find(1);
         foreach ($permisos as $permiso) {
             $permisoObj = Permission::firstOrCreate(['name' => $permiso]);
             if ($user) {
                 $user->givePermissionTo($permisoObj);
             }
+        }
+        
+        // Asignar permiso de basedatos también a usuarios con rol secretaria
+        $permisoBaseDatos = Permission::firstOrCreate(['name' => 'admin.administracion.basedatos']);
+        $usuariosSecretaria = User::role('secretaria')->get();
+        foreach ($usuariosSecretaria as $secretaria) {
+            $secretaria->givePermissionTo($permisoBaseDatos);
         }
     }
 }

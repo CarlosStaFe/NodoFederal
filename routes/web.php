@@ -11,6 +11,7 @@ use App\Http\Controllers\SocioController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\OperacionController;
 use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\DatabaseController;
 
 Route::get('/', function () {
     return redirect()->route('admin.index');
@@ -36,6 +37,26 @@ Route::get('/admin/administracion/consultar/pdf', [ConsultaController::class, 'g
 Route::get('/admin/administracion/consultar/excel', [ConsultaController::class, 'generarExcel'])
     ->name('admin.administracion.consultar.excel')
     ->middleware(['auth', 'can:admin.administracion.consultar']);
+
+// RUTAS PARA EL ADMIN - BASE DE DATOS
+Route::get('/admin/administracion/basedatos', [DatabaseController::class, 'index'])
+    ->name('admin.administracion.basedatos')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::post('/admin/administracion/basedatos/backup', [DatabaseController::class, 'backup'])
+    ->name('admin.administracion.basedatos.backup')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::post('/admin/administracion/basedatos/restore', [DatabaseController::class, 'restore'])
+    ->name('admin.administracion.basedatos.restore')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::get('/admin/administracion/basedatos/backups', [DatabaseController::class, 'listBackups'])
+    ->name('admin.administracion.basedatos.list')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::get('/admin/administracion/basedatos/download/{filename}', [DatabaseController::class, 'downloadBackup'])
+    ->name('admin.administracion.basedatos.download')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::delete('/admin/administracion/basedatos/{filename}', [DatabaseController::class, 'deleteBackup'])
+    ->name('admin.administracion.basedatos.delete')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
 
 // RUTAS PARA EL ADMIN - USUARIOS
 Route::get('/admin/usuarios', [UsuarioController::class, 'index'])

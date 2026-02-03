@@ -34,17 +34,16 @@
                                     @endforeach
                                 </select>
                             @endif
+                            @error('nodo_id')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="socio_id">Socio</label>
                             <select class="form-control" id="socio_id" name="socio_id" required>
-                                @php
-                                    $selectedSocioId = old('socio_id', $usuario->socio_id);
-                                    $selectedSocio = $socios->firstWhere('id', $selectedSocioId);
-                                @endphp
-                                <option value="">{{ $selectedSocio?->razon_social ?? 'Seleccione un Socio' }}</option>
+                                <option value="">Seleccione un Socio</option>
                                 @foreach($socios->sortBy('razon_social') as $socio)
                                     <option value="{{$socio->id}}"
                                         data-nodo="{{$socio->nodo_id}}"
@@ -127,8 +126,11 @@
                                     const socioSelect = document.getElementById('socio_id');
                                     const opciones = socioSelect.querySelectorAll('option');
                                     
-                                    // Limpiar selección actual
-                                    socioSelect.value = '';
+                                    // Limpiar selección actual solo si no coincide con el nodo
+                                    const selectedOption = socioSelect.querySelector('option:checked');
+                                    if (selectedOption && selectedOption.getAttribute('data-nodo') !== nodoId && selectedOption.value !== '') {
+                                        socioSelect.value = '';
+                                    }
                                     
                                     opciones.forEach(function(opcion) {
                                         if (opcion.value === '') {

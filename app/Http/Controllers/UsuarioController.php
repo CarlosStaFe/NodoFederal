@@ -107,6 +107,8 @@ class UsuarioController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
             'rol' => 'required|in:admin,secretaria,nodo,socio',
+            'nodo_id' => 'required_if:rol,nodo,socio|nullable|exists:nodos,id',
+            'socio_id' => 'required_if:rol,socio|nullable|exists:socios,id',
         ]);
 
         $usuario = User::findOrFail($id);
