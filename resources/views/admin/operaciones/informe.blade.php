@@ -117,10 +117,11 @@
                                 <div class="row">
                                     <div class="col-md-4 d-flex align-items-center flex-column">
                                         <p>
-                                            <div class="w-100 text-center">
-                                                <strong class="section-title">Score de riesgo crediticio</strong><br>
-                                            </div>
-                                            Este predictor representa la probabilidad que tiene una persona de cumplir con sus obligaciones crediticias en los próximos 12 meses.
+                                        <div class="w-100 text-center">
+                                            <strong class="section-title">Score de riesgo crediticio</strong><br>
+                                        </div>
+                                        Este predictor representa la probabilidad que tiene una persona de cumplir con sus
+                                        obligaciones crediticias en los próximos 12 meses.
                                         </p>
                                     </div>
                                     <div class="col-md-4 d-flex align-items-center flex-column">
@@ -130,10 +131,10 @@
                                     </div>
                                     <div class="col-md-4 d-flex align-items-center flex-column">
                                         <p>
-                                            <div class="w-100 text-center">
-                                                <strong class="section-title">Denuncias de Morosidad Vigentes</strong><br>
-                                            </div>
-                                            Monto adeudado de la persona en concepto de préstamos y créditos otorgados.</p>
+                                        <div class="w-100 text-center">
+                                            <strong class="section-title">Denuncias de Morosidad Vigentes</strong><br>
+                                        </div>
+                                        Monto adeudado de la persona en concepto de préstamos y créditos otorgados.</p>
                                         </p>
                                     </div>
                                 </div>
@@ -150,38 +151,48 @@
                                                             'rgb(255, 182, 7)',
                                                             'rgb(255, 255, 47)',
                                                             'rgb(0, 255, 85)',
-                                                            'rgb(0, 188, 42)'
+                                                            'rgb(0, 188, 42)',
                                                         ];
                                                         $textColors = [
                                                             'rgb(255,255,255)',
                                                             'rgb(0,0,0)',
                                                             'rgb(0,0,0)',
                                                             'rgb(0,0,0)',
-                                                            'rgb(0,0,0)'
+                                                            'rgb(0,0,0)',
                                                         ];
                                                     @endphp
                                                     @if (($ver['scoreRango'] ?? '') == $i)
-                                                        <div style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: {{ $colors[$i-1] }}; color: {{ $textColors[$i-1] }}; transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
-                                                            <strong style="padding: 1rem; font-size: 7px; text-align: center;">{{ $labels[$i-1] }}</strong>
+                                                        <div
+                                                            style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: {{ $colors[$i - 1] }}; color: {{ $textColors[$i - 1] }}; transform: scale(1.6, 1.6); box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px; border-radius: 2px; opacity: 1; z-index: 2;">
+                                                            <strong
+                                                                style="padding: 1rem; font-size: 7px; text-align: center;">{{ $labels[$i - 1] }}</strong>
                                                         </div>
                                                     @else
-                                                        <div style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: {{ $colors[$i-1] }}; color: {{ $textColors[$i-1] }}; opacity: 0.5; z-index: 1;">
-                                                            <strong style="padding: 1rem; font-size: 7px; text-align: center;" hidden>{{ $labels[$i-1] }}</strong>
+                                                        <div
+                                                            style="position: relative; height: 20px; width: 20%; line-height: 1; display: flex; align-items: center; justify-content: center; background-color: {{ $colors[$i - 1] }}; color: {{ $textColors[$i - 1] }}; opacity: 0.5; z-index: 1;">
+                                                            <strong
+                                                                style="padding: 1rem; font-size: 7px; text-align: center;"
+                                                                hidden>{{ $labels[$i - 1] }}</strong>
                                                         </div>
                                                     @endif
                                                 @endfor
                                             </div>
                                             <div style="margin-top: 1rem;">
                                                 @if (($ver['scoreRango'] ?? '') === 5)
-                                                    <span><b>MUY ALTA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                    <span><b>MUY ALTA</b> probabilidad de cumplir con obligaciones
+                                                        crediticias</span>
                                                 @elseif (($ver['scoreRango'] ?? '') === 4)
-                                                    <span><b>ALTA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                    <span><b>ALTA</b> probabilidad de cumplir con obligaciones
+                                                        crediticias</span>
                                                 @elseif (($ver['scoreRango'] ?? '') === 3)
-                                                    <span><b>MEDIA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                    <span><b>MEDIA</b> probabilidad de cumplir con obligaciones
+                                                        crediticias</span>
                                                 @elseif (($ver['scoreRango'] ?? '') === 2)
-                                                    <span><b>BAJA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                    <span><b>BAJA</b> probabilidad de cumplir con obligaciones
+                                                        crediticias</span>
                                                 @elseif (($ver['scoreRango'] ?? '') === 1)
-                                                    <span><b>MUY BAJA</b> probabilidad de cumplir con obligaciones crediticias</span>
+                                                    <span><b>MUY BAJA</b> probabilidad de cumplir con obligaciones
+                                                        crediticias</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -189,7 +200,7 @@
                                     <div class="col-md-4 d-flex align-items-center justify-content-center">
                                         <div class="income-indicator w-100" style="margin-top: 0;">
                                             @php
-                                                $incomeLabels = ['R1','R2','R3','R4','R5','R6','R7','R8'];
+                                                $incomeLabels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8'];
                                                 $incomeColors = [
                                                     'rgb(130, 166, 82)',
                                                     'rgb(211, 214, 83)',
@@ -198,26 +209,47 @@
                                                     'rgb(226, 165, 74)',
                                                     'rgb(215, 112, 61)',
                                                     'rgb(210, 85, 55)',
-                                                    'rgb(182, 57, 81)'
+                                                    'rgb(182, 57, 81)',
                                                 ];
                                                 $incomeWidths = [
-                                                    '100%', '88.8889%', '77.7778%', '66.6667%', '55.5556%', '44.4444%', '33.3333%', '22.2222%'
+                                                    '100%',
+                                                    '88.8889%',
+                                                    '77.7778%',
+                                                    '66.6667%',
+                                                    '55.5556%',
+                                                    '44.4444%',
+                                                    '33.3333%',
+                                                    '22.2222%',
                                                 ];
                                                 $incomeTextColors = [
-                                                    'rgb(255,255,255)', 'rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(255,255,255)', 'rgb(255,255,255)', 'rgb(255,255,255)'
+                                                    'rgb(255,255,255)',
+                                                    'rgb(0,0,0)',
+                                                    'rgb(0,0,0)',
+                                                    'rgb(0,0,0)',
+                                                    'rgb(0,0,0)',
+                                                    'rgb(255,255,255)',
+                                                    'rgb(255,255,255)',
+                                                    'rgb(255,255,255)',
                                                 ];
                                             @endphp
                                             @foreach ($incomeLabels as $idx => $lbl)
-                                                <div style="display: flex; height: 24px; width: {{ $incomeWidths[$idx] }}; position: relative; margin: 2px 0px;">
-                                                    <div style="width: 80%; height: 100%; background-color: {{ $incomeColors[$idx] }}; padding-left: 1rem; line-height: 24px; color: {{ $incomeTextColors[$idx] }};">
+                                                <div
+                                                    style="display: flex; height: 24px; width: {{ $incomeWidths[$idx] }}; position: relative; margin: 2px 0px;">
+                                                    <div
+                                                        style="width: 80%; height: 100%; background-color: {{ $incomeColors[$idx] }}; padding-left: 1rem; line-height: 24px; color: {{ $incomeTextColors[$idx] }};">
                                                         <strong>{{ $lbl }}</strong>
                                                         @if (($ver['incomePredictor'] ?? '') === $lbl)
-                                                            <div style="position: absolute; right: calc(100% + 2px); top: 4px;">
-                                                                <div style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);"></div>
+                                                            <div
+                                                                style="position: absolute; right: calc(100% + 2px); top: 4px;">
+                                                                <div
+                                                                    style="width: 0px; height: 0px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid rgba(0, 0, 0, 0.8);">
+                                                                </div>
                                                             </div>
                                                         @endif
                                                     </div>
-                                                    <div style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent {{ $incomeColors[$idx] }};"></div>
+                                                    <div
+                                                        style="width: 0px; height: 0px; border-style: solid; border-width: 12px 0px 12px 24px; border-color: transparent transparent transparent {{ $incomeColors[$idx] }};">
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -259,38 +291,161 @@
                             @endif
 
                             {{-- DATOS INFORMACION DE AGILDATA --}}
-                            @php $nodo = $data['morosidad']['deudoresCentroComercial']['datos'] ?? []; @endphp
-                            <div class="col-12 mt-3">
-                                <h3>Deudores Nodo Federal</h3>
-                            </div>
-                            @if (!empty($nodo) && is_array($nodo))
-                                @if (count($nodo ?? []) > 0)
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Estado</th>
-                                                <th>Fecha</th>
-                                                <th>Nodo</th>
-                                                <th>Socio</th>
-                                                <th>Tipo</th>
-                                                <th>Importe</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($nodo as $item)
+                            {{-- OPERACIONES LOCALES --}}
+                            @if (isset($datos['operaciones']))
+                                @php $operaciones = $datos['operaciones']; @endphp
+                                <div class="col-12 mt-3">
+                                    <h3>Operaciones en Nodo Federal</h3>
+                                    <div class="row mb-2">
+                                        <div class="col-md-3">
+                                            <div class="alert alert-primary text-center">
+                                                <strong>Como Titular:</strong><br>
+                                                {{ $operaciones['total_como_titular'] ?? 0 }} operaciones
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="alert alert-secondary text-center">
+                                                <strong>Como Garante:</strong><br>
+                                                {{ $operaciones['total_como_garante'] ?? 0 }} operaciones
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="alert alert-success text-center">
+                                                <strong>Activas (Titular):</strong><br>
+                                                {{ $operaciones['resumen']['activas_titular'] ?? 0 }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="alert alert-warning text-center">
+                                                <strong>Afectadas (Titular):</strong><br>
+                                                {{ $operaciones['resumen']['afectadas_titular'] ?? 0 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (count($operaciones['como_titular'] ?? []) > 0)
+                                    <div class="col-12 mt-2">
+                                        <h4>Operaciones como Titular</h4>
+                                        <table class="table table-bordered">
+                                            <thead>
                                                 <tr>
-                                                    <td>{{ $item['codDeEstado'] ?? '' }}</td>
-                                                    <td>{{ isset($item['fechaDeAtraso']) ? \Carbon\Carbon::parse($item['fechaDeAtraso'])->format('d-m-Y') : '' }}
-                                                    </td>
-                                                    <td>{{ $item['nombreInstituto'] ?? '' }}</td>
-                                                    <td>{{ $item['nombreSocio'] ?? '' }}</td>
-                                                    <td>{{ $item['tipoDeudor'] ?? '' }}</td>
-                                                    <td class="text-end">{{ isset($item['deudaTotal']) ? number_format($item['deudaTotal'], 2, ',', '.') : '' }}
-                                                    </td>
+                                                    <th>N° Op.</th>
+                                                    <th>Estado</th>
+                                                    <th>Fecha Operación</th>
+                                                    <th>Fecha Estado</th>
+                                                    <th>Nodo</th>
+                                                    <th>Socio</th>
+                                                    <th>Clase</th>
+                                                    <th>Valor Cuota</th>
+                                                    <th>Cuotas</th>
+                                                    <th>Total</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody style="font-size: 0.80em;">
+                                                @foreach ($operaciones['como_titular'] as $op)
+                                                    <tr>
+                                                        <td>{{ $op['numero'] ?? '' }}</td>
+                                                        <td>
+                                                            <span
+                                                                class="badge {{ ($op['estado_actual'] ?? '') == 'ACTIVO' ? 'badge-success' : 'badge-danger' }}">
+                                                                {{ $op['estado_actual'] ?? '' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ isset($op['fecha_operacion']) ? \Carbon\Carbon::parse($op['fecha_operacion'])->format('d-m-Y') : '' }}
+                                                        </td>
+                                                        <td>{{ isset($op['fecha_estado']) ? \Carbon\Carbon::parse($op['fecha_estado'])->format('d-m-Y') : '' }}
+                                                        </td>
+                                                        <td>{{ $op['nodo_nombre'] ?? '' }}</td>
+                                                        <td>{{ $op['socio_razon_social'] ?? '' }}</td>
+                                                        <td>{{ $op['clase'] ?? '' }}</td>
+                                                        <td class="text-end">
+                                                            {{ isset($op['valor_cuota']) ? '$' . number_format($op['valor_cuota'], 2, ',', '.') : '' }}
+                                                        </td>
+                                                        <td class="text-center">{{ $op['cant_cuotas'] ?? '' }}</td>
+                                                        <td class="text-end">
+                                                            {{ isset($op['total']) ? '$' . number_format($op['total'], 2, ',', '.') : '' }}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+
+                                @if (count($operaciones['como_garante'] ?? []) > 0)
+                                    <div class="col-12 mt-2">
+                                        <h4>Operaciones como Garante</h4>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>N° Op.</th>
+                                                    <th>Estado</th>
+                                                    <th>Fecha Operación</th>
+                                                    <th>Fecha Estado</th>
+                                                    <th>Nodo</th>
+                                                    <th>Socio</th>
+                                                    <th>Clase</th>
+                                                    <th>Valor Cuota</th>
+                                                    <th>Cuotas</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody style="font-size: 0.80em;">
+                                                @foreach ($operaciones['como_garante'] as $op)
+                                                    <tr>
+                                                        <td>{{ $op['numero'] ?? '' }}</td>
+                                                        <td>
+                                                            <span
+                                                                class="badge {{ ($op['estado_actual'] ?? '') == 'ACTIVO' ? 'badge-success' : 'badge-danger' }}">
+                                                                {{ $op['estado_actual'] ?? '' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ isset($op['fecha_operacion']) ? \Carbon\Carbon::parse($op['fecha_operacion'])->format('d-m-Y') : '' }}
+                                                        </td>
+                                                        <td>{{ isset($op['fecha_estado']) ? \Carbon\Carbon::parse($op['fecha_estado'])->format('d-m-Y') : '' }}
+                                                        </td>
+                                                        <td>{{ $op['nodo_nombre'] ?? '' }}</td>
+                                                        <td>{{ $op['socio_razon_social'] ?? '' }}</td>
+                                                        <td>{{ $op['clase'] ?? '' }}</td>
+                                                        <td class="text-end">
+                                                            {{ isset($op['valor_cuota']) ? '$' . number_format($op['valor_cuota'], 2, ',', '.') : '' }}
+                                                        </td>
+                                                        <td class="text-center">{{ $op['cant_cuotas'] ?? '' }}</td>
+                                                        <td class="text-end">
+                                                            {{ isset($op['total']) ? '$' . number_format($op['total'], 2, ',', '.') : '' }}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+
+                                @if (count($operaciones['nodos_involucrados'] ?? []) > 0 || count($operaciones['socios_involucrados'] ?? []) > 0)
+                                    <div class="col-12 mt-2">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h5>Nodos Involucrados</h5>
+                                                <ul class="list-group">
+                                                    @foreach ($operaciones['nodos_involucrados'] ?? [] as $nodo)
+                                                        <li class="list-group-item">{{ $nodo }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5>Socios Involucrados</h5>
+                                                <ul class="list-group">
+                                                    @foreach ($operaciones['socios_involucrados'] ?? [] as $socio)
+                                                        <li class="list-group-item">
+                                                            <strong>N° {{ $socio['numero'] ?? '' }}:</strong>
+                                                            {{ $socio['razon_social'] ?? '' }}
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endif
                             @else
                                 <div class="alert alert-info mt-2">
@@ -303,7 +458,9 @@
                             <div class="col-12 mt-3">
                                 <h3>Antecedentes Laborales</h3>
                             </div>
-                            @if (isset($datosLaborales['datoLaboral']['datos']) && is_array($datosLaborales['datoLaboral']['datos']) && count($datosLaborales['datoLaboral']['datos']) > 0)
+                            @if (isset($datosLaborales['datoLaboral']['datos']) &&
+                                    is_array($datosLaborales['datoLaboral']['datos']) &&
+                                    count($datosLaborales['datoLaboral']['datos']) > 0)
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -335,7 +492,8 @@
                                                 </td>
                                                 <td>{{ $laboral['historialSueldo']['infoAdicionalEmpleador']['actividadempleador'] ?? '' }}
                                                 </td>
-                                                <td class="text-end">{{ $laboral['historialSueldo']['infoAdicionalEmpleador']['cantidadempleados'] ?? '' }}
+                                                <td class="text-end">
+                                                    {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['cantidadempleados'] ?? '' }}
                                                 </td>
                                                 <td>
                                                     {{ $laboral['historialSueldo']['infoAdicionalEmpleador']['domicilio']['direccion'] ?? '' }},
@@ -481,9 +639,11 @@
                                                 <td>{{ $jub['titular'] ?? '' }}</td>
                                                 <td>{{ $jub['cuilApo'] ?? '' }}</td>
                                                 <td>{{ $jub['apoderado'] ?? '' }}</td>
-                                                <td class="text-end">{{ isset($jub['sueldoBruto']) ? number_format($jub['sueldoBruto'], 2, ',', '.') : '' }}
+                                                <td class="text-end">
+                                                    {{ isset($jub['sueldoBruto']) ? number_format($jub['sueldoBruto'], 2, ',', '.') : '' }}
                                                 </td>
-                                                <td class="text-end">{{ isset($jub['sueldoNeto']) ? number_format($jub['sueldoNeto'], 2, ',', '.') : '' }}
+                                                <td class="text-end">
+                                                    {{ isset($jub['sueldoNeto']) ? number_format($jub['sueldoNeto'], 2, ',', '.') : '' }}
                                                 </td>
                                                 <td>{{ isset($jub['periodo']) ? \Carbon\Carbon::parse($jub['periodo'])->format('d-m-Y') : '' }}
                                                 </td>
@@ -610,7 +770,8 @@
                             {{-- DATOS AUTOMOTORES --}}
                             @php
                                 $automotores = $data['bienesPersonales']['automotores']['datos'] ?? [];
-                                $automotoresHistorial = $data['bienesPersonales']['automotores_historial']['datos'] ?? [];
+                                $automotoresHistorial =
+                                    $data['bienesPersonales']['automotores_historial']['datos'] ?? [];
                                 $autosembargos = $data['bienesPersonales']['autosembargos']['datos'] ?? [];
                             @endphp
                             <div class="col-12 mt-3">
@@ -641,8 +802,10 @@
                                                 <td>{{ $auto['tipo'] ?? '' }}</td>
                                                 <td>{{ $auto['origen'] ?? '' }}</td>
                                                 <td>{{ $auto['porcentaje'] ?? '' }}</td>
-                                                <td>{{ isset($auto['compra']) ? \Carbon\Carbon::parse($auto['compra'])->format('d-m-Y') : '' }}</td>
-                                                <td>{{ isset($auto['tramite']) ? \Carbon\Carbon::parse($auto['tramite'])->format('d-m-Y') : '' }}</td>
+                                                <td>{{ isset($auto['compra']) ? \Carbon\Carbon::parse($auto['compra'])->format('d-m-Y') : '' }}
+                                                </td>
+                                                <td>{{ isset($auto['tramite']) ? \Carbon\Carbon::parse($auto['tramite'])->format('d-m-Y') : '' }}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -683,8 +846,10 @@
                                                 <td>{{ $autoh['origen'] ?? '' }}</td>
                                                 <td>{{ $autoh['porcentaje'] ?? '' }}</td>
                                                 <td>{{ $autoh['dni'] ?? '' }}</td>
-                                                <td>{{ isset($autoh['compra']) ? \Carbon\Carbon::parse($autoh['compra'])->format('d-m-Y') : '' }}</td>
-                                                <td>{{ isset($autoh['tramite']) ? \Carbon\Carbon::parse($autoh['tramite'])->format('d-m-Y') : '' }}</td>
+                                                <td>{{ isset($autoh['compra']) ? \Carbon\Carbon::parse($autoh['compra'])->format('d-m-Y') : '' }}
+                                                </td>
+                                                <td>{{ isset($autoh['tramite']) ? \Carbon\Carbon::parse($autoh['tramite'])->format('d-m-Y') : '' }}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -713,8 +878,12 @@
                                         @foreach ($autosEmbargos as $autoe)
                                             <tr>
                                                 <td>{{ $autoe['dominio'] ?? '' }}</td>
-                                                <td class="text-end">{{ isset($autoe['deuda']) ? number_format($autoe['deuda'], 2, ',', '.') : '' }}</td>
-                                                <td class="text-end">{{ isset($autoe['valuacion']) ? number_format($autoe['valuacion'], 2, ',', '.') : '' }}</td>
+                                                <td class="text-end">
+                                                    {{ isset($autoe['deuda']) ? number_format($autoe['deuda'], 2, ',', '.') : '' }}
+                                                </td>
+                                                <td class="text-end">
+                                                    {{ isset($autoe['valuacion']) ? number_format($autoe['valuacion'], 2, ',', '.') : '' }}
+                                                </td>
                                                 <td>{{ $autoe['marca'] ?? '' }}</td>
                                                 <td>{{ $autoe['localidad'] ?? '' }}</td>
                                             </tr>
@@ -763,9 +932,13 @@
                                                     <tr>
                                                         <td>{{ $tipo }}</td>
                                                         <td>{{ $entidad }}</td>
-                                                        <td class="text-center">{{ isset($moras['periodo']) ? \Carbon\Carbon::parse($moras['periodo'])->format('m-Y') : '' }}</td>
+                                                        <td class="text-center">
+                                                            {{ isset($moras['periodo']) ? \Carbon\Carbon::parse($moras['periodo'])->format('m-Y') : '' }}
+                                                        </td>
                                                         <td class="text-center">{{ $moras['situacion'] ?? '' }}</td>
-                                                        <td class="text-end">{{ isset($moras['prestamo']) ? number_format($moras['prestamo'], 2, ',', '.') : '' }}</td>
+                                                        <td class="text-end">
+                                                            {{ isset($moras['prestamo']) ? number_format($moras['prestamo'], 2, ',', '.') : '' }}
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             @endforeach
@@ -780,9 +953,9 @@
                                     <b>3:</b> Cumplimiento deficiente (con atrasos entre 90 y 180 días) -
                                     <b>4:</b> Con alto riesgo de insolvencia (con atrasos entre 180 y 1 año) -
                                     <b>5:</b> Irrecuperable (con atrasos mayores a 1 año) -
-                                    <b>6:</b> Irrecuperable por disposición técnica (entidades liquidadas, en proceso de disolución o en quiebra, en gestión judicial)
+                                    <b>6:</b> Irrecuperable por disposición técnica (entidades liquidadas, en proceso de
+                                    disolución o en quiebra, en gestión judicial)
                                 </p>
-
                             @else
                                 <div class="alert alert-info mt-2">
                                     No se encontraron datos de Morosidad.
@@ -813,7 +986,8 @@
                                                 <td>{{ $chq['nroCheque'] ?? '' }}</td>
                                                 <td>{{ isset($chq['fechaRechazo']) ? \Carbon\Carbon::parse($chq['fechaRechazo'])->format('d-m-Y') : '' }}
                                                 </td>
-                                                <td class="text-end">{{ isset($chq['monto']) ? number_format($chq['monto'], 2, ',', '.') : '' }}
+                                                <td class="text-end">
+                                                    {{ isset($chq['monto']) ? number_format($chq['monto'], 2, ',', '.') : '' }}
                                                 </td>
                                                 <td>{{ $chq['causal'] ?? '' }}</td>
                                                 <td>{{ isset($chq['fechaPago']) ? \Carbon\Carbon::parse($chq['fechaPago'])->format('d-m-Y') : '' }}
@@ -896,7 +1070,7 @@
                             @if (count($menciones ?? []) > 0)
                                 <table class="table table-bordered">
                                     <thead>
-                                        <tr>                
+                                        <tr>
                                             <th>Fecha</th>
                                             <th>Detalle</th>
                                         </tr>
@@ -917,12 +1091,13 @@
                                 </div>
                             @endif
 
-                            <p><strong>La información suministrada en el presente informe, extraída de bases públicas, privadas y
-                                propias, es confidencial y
-                                reservada.<br>El cliente es el único habilitado a consultar la información, estando
-                                expresamente prohibida la divulgación de la misma a
-                                terceros —total o parcialmente— observando el deber de confidencialidad y uso permitido,
-                                según Ley 25.236.</strong></p>
+                            <p><strong>La información suministrada en el presente informe, extraída de bases públicas,
+                                    privadas y
+                                    propias, es confidencial y
+                                    reservada.<br>El cliente es el único habilitado a consultar la información, estando
+                                    expresamente prohibida la divulgación de la misma a
+                                    terceros —total o parcialmente— observando el deber de confidencialidad y uso permitido,
+                                    según Ley 25.236.</strong></p>
 
                         </form>
                     @else

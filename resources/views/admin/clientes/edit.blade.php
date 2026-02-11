@@ -210,15 +210,20 @@
                     <div class="col-md-2 col-sm-4">
                         <div class="form group">
                             <label for="estado">Estado</label><b>*</b>
-                            <select type="text" class="form-control" value="{{$cliente->estado}}" id="estado" name="estado" placeholder="Estado">
-                                <option value="{{$cliente->estado}}">{{strtoupper($cliente->estado ?? 'N/A')}}</option>
-                                <option value="ACTIVO" selected>ACTIVO</option>
-                                <option value="ATRASADO">ATRASADO</option>
-                                <option value="CANCELADO">CANCELADO</option>
-                                <option value="CANCELADO CON ATRASO">CANCELADO CON ATRASO</option>
-                                <option value="EN CONVENIO">EN CONVENIO</option>
-                                <option value="REGULARIZADO">REGULARIZADO</option>
-                            </select>
+                            @if(auth()->user()->hasRole('admin'))
+                                <select type="text" class="form-control" value="{{$cliente->estado}}" id="estado" name="estado" placeholder="Estado">
+                                    <option value="{{$cliente->estado}}">{{strtoupper($cliente->estado ?? 'N/A')}}</option>
+                                    <option value="ACTIVO" selected>ACTIVO</option>
+                                    <option value="ATRASADO">ATRASADO</option>
+                                    <option value="CANCELADO">CANCELADO</option>
+                                    <option value="CANCELADO CON ATRASO">CANCELADO CON ATRASO</option>
+                                    <option value="EN CONVENIO">EN CONVENIO</option>
+                                    <option value="REGULARIZADO">REGULARIZADO</option>
+                                </select>
+                            @else
+                                <input type="text" class="form-control" value="{{strtoupper($cliente->estado ?? 'N/A')}}" readonly style="background-color: #f8f9fa; color: #6c757d;">
+                                <input type="hidden" name="estado" value="{{$cliente->estado}}">
+                            @endif
                             @error('estado')
                                 <small style="color: red">{{$message}}</small>
                             @enderror

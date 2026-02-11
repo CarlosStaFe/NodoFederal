@@ -33,6 +33,11 @@ class Operacion extends Model
         return $this->belongsTo(Socio::class, 'socio_id');
     }
 
+    public function nodo()
+    {
+        return $this->belongsTo(Nodo::class, 'nodo_id');
+    }
+
     public function usuario()
     {
         return $this->belongsTo(User::class, 'id_usuario');

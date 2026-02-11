@@ -181,6 +181,9 @@ Route::get('/admin/operaciones/pdf', [OperacionController::class, 'pdf'])
 Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consultarApiPorCuil'])
     ->name('admin.operaciones.consultar.api')
     ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/socios/{nodoId}', [OperacionController::class, 'getSociosByNodo'])
+    ->name('admin.operaciones.socios-por-nodo')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
 Route::get('/admin/operaciones/cargar', [OperacionController::class, 'cargar'])
     ->name('admin.operaciones.cargar')
     ->middleware(['auth', 'can:admin.operaciones.cargar']);

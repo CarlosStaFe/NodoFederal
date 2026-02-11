@@ -16,7 +16,7 @@
             <form action="{{ route('admin.operaciones.consultar.api') }}" method="POST">
                 @csrf
                 <div class="row">
-                    <div class="col-lg-2 col-md-3 position-relative">
+                    <div class="col-lg-1 col-md-3 position-relative">
                         <label for="tipo" class="form-label">Tipo Doc.</label>
                         <select id="tipo" name="tipo" class="form-select" required>
                             <option value="" disabled selected>Tipo</option>
@@ -27,7 +27,7 @@
                             <small style="color: red">{{$message}}</small>
                         @enderror
                     </div>
-                    <div class="col-lg-2 col-md-2 position-relative">
+                    <div class="col-lg-1 col-md-2 position-relative">
                         <label for="sexo" class="form-label">Sexo</label>
                         <select id="sexo" name="sexo" class="form-select" required>
                             <option value="" disabled selected>Sexo</option>
@@ -52,10 +52,48 @@
                             <small style="color: red">{{$message}}</small>
                         @enderror
                     </div>
+                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('nodo'))
+                    <div class="col-lg-3 col-md-3 position-relative">
+                        <label for="nodo_id" class="form-label">Nodo</label>
+                        <select id="nodo_id" name="nodo_id" class="form-select">
+                            @if(auth()->user()->hasRole('admin'))
+                                <option value="" selected>Todos los nodos</option>
+                                @foreach($nodos as $nodo)
+                                    <option value="{{ $nodo->id }}">{{ $nodo->nombre }}</option>
+                                @endforeach
+                            @elseif(auth()->user()->hasRole('nodo') && auth()->user()->nodo_id)
+                                @php
+                                    $userNodo = $nodos->where('id', auth()->user()->nodo_id)->first();
+                                @endphp
+                                @if($userNodo)
+                                    <option value="{{ $userNodo->id }}" selected>{{ $userNodo->nombre }}</option>
+                                @else
+                                    <option value="" selected>Sin nodo asignado</option>
+                                @endif
+                            @else
+                                <option value="" selected>Sin nodo asignado</option>
+                            @endif
+                        </select>
+                        @error('nodo_id')
+                            <small style="color: red">{{$message}}</small>
+                        @enderror
+                    </div>
+                    <div class="col-lg-3 col-md-3 position-relative">
+                        <label for="socio_id" class="form-label">Socio</label>
+                        <select id="socio_id" name="socio_id" class="form-select">
+                            <option value="" selected>Todos los socios</option>
+                            @foreach($socios as $socio)
+                                <option value="{{ $socio->id }}">{{ $socio->razon_social ?? $socio->nombre }}</option>
+                            @endforeach
+                        </select>
+                        @error('socio_id')
+                            <small style="color: red">{{$message}}</small>
+                        @enderror
+                    </div>
+                    @endif
                     <br>
                 </div>
                 <br>
-
                 <div>
                     <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
                     <button type="submit" class="btn btn-success me-5">Consultar</button>
@@ -141,6 +179,52 @@
         // Inicializar estado al cargar
         actualizarCuit();
 
+        // Funcionalidad para filtrar socios por nodo
+        const nodoSelect = document.getElementById('nodo_id');
+        const socioSelect = document.getElementById('socio_id');
+        
+        if (nodoSelect && socioSelect) {
+            function cargarSociosPorNodo() {
+                const nodoId = nodoSelect.value;
+                
+                // Limpiar opciones actuales de socios
+                socioSelect.innerHTML = '<option value="" selected>Cargando...</option>';
+                
+                if (nodoId) {
+                    // Hacer petición AJAX para obtener socios del nodo
+                    fetch(`{{ url('admin/operaciones/socios') }}/${nodoId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            socioSelect.innerHTML = '<option value="" selected>Todos los socios</option>';
+                            data.forEach(socio => {
+                                const option = document.createElement('option');
+                                option.value = socio.id;
+                                option.textContent = socio.razon_social || socio.nombre;
+                                socioSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error al cargar socios:', error);
+                            socioSelect.innerHTML = '<option value="" selected>Error al cargar socios</option>';
+                        });
+                } else {
+                    // Si no hay nodo seleccionado, mostrar todos los socios
+                    socioSelect.innerHTML = '<option value="" selected>Todos los socios</option>';
+                    @foreach($socios as $socio)
+                        socioSelect.innerHTML += '<option value="{{ $socio->id }}">{{ $socio->razon_social ?? $socio->nombre }}</option>';
+                    @endforeach
+                }
+            }
+
+            nodoSelect.addEventListener('change', cargarSociosPorNodo);
+            
+            // Si el usuario es nodo y tiene un nodo preseleccionado, cargar sus socios automáticamente
+            @if(auth()->user()->hasRole('nodo') && auth()->user()->nodo_id)
+                // Cargar socios del nodo del usuario al cargar la página
+                setTimeout(cargarSociosPorNodo, 100);
+            @endif
+        }
+
         // Botón Limpiar
         document.getElementById('limpiar').addEventListener('click', function() {
             tipo.selectedIndex = 0;
@@ -149,6 +233,17 @@
             documento.disabled = false;
             documento.setAttribute('required', 'required');
             cuit.value = '';
+            
+            // Limpiar filtros de nodo y socio si existen
+            if (nodoSelect) {
+                nodoSelect.selectedIndex = 0;
+            }
+            if (socioSelect) {
+                socioSelect.innerHTML = '<option value="" selected>Todos los socios</option>';
+                @foreach($socios as $socio)
+                    socioSelect.innerHTML += '<option value="{{ $socio->id }}">{{ $socio->razon_social ?? $socio->nombre }}</option>';
+                @endforeach
+            }
         });
     });
 </script>

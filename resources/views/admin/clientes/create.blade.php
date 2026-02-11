@@ -210,11 +210,11 @@
                             <label for="estado">Estado</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('estado')}}" id="estado" name="estado" placeholder="Estado">
                                 <option value="ACTIVO" selected>ACTIVO</option>
-                                <option value="ATRASADO">ATRASADO</option>
+                                {{-- <option value="ATRASADO">ATRASADO</option>
                                 <option value="CANCELADO">CANCELADO</option>
                                 <option value="CANCELADO CON ATRASO">CANCELADO CON ATRASO</option>
                                 <option value="EN CONVENIO">EN CONVENIO</option>
-                                <option value="REGULARIZADO">REGULARIZADO</option>
+                                <option value="REGULARIZADO">REGULARIZADO</option> --}}
                             </select>
                             @error('estado')
                                 <small style="color: red">{{$message}}</small>

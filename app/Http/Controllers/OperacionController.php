@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Operacion;
+use App\Models\Nodo;
+use App\Models\Socio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -15,7 +17,18 @@ class OperacionController extends Controller
      */
     public function consultar()
     {
-        return view('admin.operaciones.consultar');
+        $nodos = Nodo::orderBy('nombre')->get();
+        $socios = Socio::orderBy('razon_social')->get();
+        return view('admin.operaciones.consultar', compact('nodos', 'socios'));
+    }
+    
+    /**
+     * Obtiene los socios que pertenecen a un nodo específico
+     */
+    public function getSociosByNodo($nodoId)
+    {
+        $socios = Socio::where('nodo_id', $nodoId)->orderBy('razon_social')->get();
+        return response()->json($socios);
     }
     
     /**
@@ -97,6 +110,11 @@ class OperacionController extends Controller
                 //dd($idLog, $result, $p);
                 if ((isset($result['code']) && $result['code'] == 200) && (isset($result['info']) && $result['info'] === 'OK') && !empty($idLog)) {
                     $user = Auth::user();
+                    
+                    // Usar filtros del formulario si están seleccionados, sino usar valores del usuario
+                    $nodoId = $request->input('nodo_id') ?: ($user->nodo_id ?? 24);
+                    $socioId = $request->input('socio_id') ?: ($user->socio_id ?? 1);
+                    
                     //dd($datos);
                     \App\Models\Consulta::create([
                         'numero' => $idLog,
@@ -104,8 +122,8 @@ class OperacionController extends Controller
                         'cuit' => $p['cuil'] ?? ($p['CUIL'] ?? ''),
                         'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? 'SIN NOMBRE'),
                         'fecha' => now(),
-                        'nodo_id' => $user->nodo_id ?? 24,
-                        'socio_id' => $user->socio_id ?? 1,
+                        'nodo_id' => $nodoId,
+                        'socio_id' => $socioId,
                         'user_id' => $user->id,
                         // Puedes agregar más campos si el JSON tiene otros datos relevantes
                     ]);
@@ -136,6 +154,67 @@ class OperacionController extends Controller
         // Si hay datos, verificar y actualizar tabla clientes
         if (isset($datos) && isset($datos['data'])) {
             $this->actualizarClientes($datos);
+            
+            // Buscar operaciones del cliente y agregarlas a $datos
+            $p = $datos['data']['datosParticulares'] ?? null;
+            if ($p && !empty($p['cuil'])) {
+                $cuil = $p['cuil'];
+                $cliente = \App\Models\Cliente::where('cuit', $cuil)->first();
+                
+                if ($cliente) {
+                    $user = Auth::user();
+                    
+                    // Obtener operaciones donde es titular
+                    $queryTitular = \App\Models\Operacion::where('cliente_id', $cliente->id)
+                        ->where('tipo', 'Solicitante')
+                        ->with(['socio', 'nodo']);
+            
+                    $operacionesTitular = $queryTitular->get();
+                    
+                    // Obtener operaciones donde es garante
+                    $queryGarante = \App\Models\Operacion::where('cliente_id', $cliente->id)
+                        ->where('tipo', 'Garante')
+                        ->with(['socio', 'nodo']);
+                    
+                    $operacionesGarante = $queryGarante->get();
+                    
+                    // Agregar operaciones a $datos en formato JSON
+                    $datos['operaciones'] = [
+                        'cliente_id' => $cliente->id,
+                        'cliente_cuit' => $cuil,
+                        'como_titular' => $operacionesTitular->map(function($op) {
+                            $opArray = $op->toArray();
+                            $opArray['nodo_nombre'] = $op->nodo ? $op->nodo->nombre : null;
+                            $opArray['socio_razon_social'] = $op->socio ? $op->socio->razon_social : null;
+                            $opArray['socio_numero'] = $op->socio ? $op->socio->numero : null;
+                            return $opArray;
+                        })->toArray(),
+                        'como_garante' => $operacionesGarante->map(function($op) {
+                            $opArray = $op->toArray();
+                            $opArray['nodo_nombre'] = $op->nodo ? $op->nodo->nombre : null;
+                            $opArray['socio_razon_social'] = $op->socio ? $op->socio->razon_social : null;
+                            $opArray['socio_numero'] = $op->socio ? $op->socio->numero : null;
+                            return $opArray;
+                        })->toArray(),
+                        'total_como_titular' => $operacionesTitular->count(),
+                        'total_como_garante' => $operacionesGarante->count(),
+                        'nodos_involucrados' => $operacionesTitular->merge($operacionesGarante)->pluck('nodo.nombre')->unique()->values()->toArray(),
+                        'socios_involucrados' => $operacionesTitular->merge($operacionesGarante)->map(function($op) {
+                            return [
+                                'id' => $op->socio->id ?? null,
+                                'numero' => $op->socio->numero ?? null,
+                                'razon_social' => $op->socio->razon_social ?? null
+                            ];
+                        })->unique('id')->values()->toArray(),
+                        'resumen' => [
+                            'activas_titular' => $operacionesTitular->where('estado_actual', 'ACTIVO')->count(),
+                            'afectadas_titular' => $operacionesTitular->where('estado_actual', '!=', 'ACTIVO')->count(),
+                            'activas_garante' => $operacionesGarante->where('estado_actual', 'ACTIVO')->count(),
+                            'afectadas_garante' => $operacionesGarante->where('estado_actual', '!=', 'ACTIVO')->count(),
+                        ]
+                    ];
+                }
+            }
         }
         
         return view('admin.operaciones.informe', compact('datos'));
@@ -251,6 +330,70 @@ class OperacionController extends Controller
         if (!$datos && request()->hasSession()) {
             $datos = request()->session()->get('datos_api');
         }
+        
+        // Agregar datos de operaciones locales al PDF igual que en el informe
+        if (isset($datos) && isset($datos['data'])) {
+            $p = $datos['data']['datosParticulares'] ?? null;
+            if ($p && !empty($p['cuil'])) {
+                $cuil = $p['cuil'];
+                $cliente = \App\Models\Cliente::where('cuit', $cuil)->first();
+                
+                if ($cliente) {
+                    $user = Auth::user();
+                    
+                    // Obtener operaciones donde es titular
+                    $queryTitular = \App\Models\Operacion::where('cliente_id', $cliente->id)
+                        ->where('tipo', 'Solicitante')
+                        ->with(['socio', 'nodo']);
+            
+                    $operacionesTitular = $queryTitular->get();
+                    
+                    // Obtener operaciones donde es garante
+                    $queryGarante = \App\Models\Operacion::where('cliente_id', $cliente->id)
+                        ->where('tipo', 'Garante')
+                        ->with(['socio', 'nodo']);
+                    
+                    $operacionesGarante = $queryGarante->get();
+                    
+                    // Agregar operaciones a $datos en formato JSON
+                    $datos['operaciones'] = [
+                        'cliente_id' => $cliente->id,
+                        'cliente_cuit' => $cuil,
+                        'como_titular' => $operacionesTitular->map(function($op) {
+                            $opArray = $op->toArray();
+                            $opArray['nodo_nombre'] = $op->nodo ? $op->nodo->nombre : null;
+                            $opArray['socio_razon_social'] = $op->socio ? $op->socio->razon_social : null;
+                            $opArray['socio_numero'] = $op->socio ? $op->socio->numero : null;
+                            return $opArray;
+                        })->toArray(),
+                        'como_garante' => $operacionesGarante->map(function($op) {
+                            $opArray = $op->toArray();
+                            $opArray['nodo_nombre'] = $op->nodo ? $op->nodo->nombre : null;
+                            $opArray['socio_razon_social'] = $op->socio ? $op->socio->razon_social : null;
+                            $opArray['socio_numero'] = $op->socio ? $op->socio->numero : null;
+                            return $opArray;
+                        })->toArray(),
+                        'total_como_titular' => $operacionesTitular->count(),
+                        'total_como_garante' => $operacionesGarante->count(),
+                        'nodos_involucrados' => $operacionesTitular->merge($operacionesGarante)->pluck('nodo.nombre')->unique()->values()->toArray(),
+                        'socios_involucrados' => $operacionesTitular->merge($operacionesGarante)->map(function($op) {
+                            return [
+                                'id' => $op->socio->id ?? null,
+                                'numero' => $op->socio->numero ?? null,
+                                'razon_social' => $op->socio->razon_social ?? null
+                            ];
+                        })->unique('id')->values()->toArray(),
+                        'resumen' => [
+                            'activas_titular' => $operacionesTitular->where('estado_actual', 'ACTIVO')->count(),
+                            'afectadas_titular' => $operacionesTitular->where('estado_actual', '!=', 'ACTIVO')->count(),
+                            'activas_garante' => $operacionesGarante->where('estado_actual', 'ACTIVO')->count(),
+                            'afectadas_garante' => $operacionesGarante->where('estado_actual', '!=', 'ACTIVO')->count(),
+                        ]
+                    ];
+                }
+            }
+        }
+        
         $pdf = PDF::loadView('admin.operaciones.pdf', compact('datos'));
         return $pdf->stream();
     }

@@ -192,7 +192,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-4 d-flex align-items-center justify-content-center">
                                 <div class="col-md-4 d-flex align-items-center flex-column">
                                     <h5 style="color: #0d6efd;">Predictor de Ingresos</h5>
@@ -293,44 +293,151 @@
                         </table>
                     @endif
 
-                    {{-- DATOS INFORMACION DE AGILDATA --}}
-                    @php $nodo = $data['morosidad']['deudoresCentroComercial']['datos'] ?? []; @endphp
-                    <div class="col-12 mt-3">
-                        <h4>Deudores Nodo Federal</h3>
-                    </div>
-                    @if (!empty($nodo) && is_array($nodo))
-                        @if (count($nodo ?? []) > 0)
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Estado</th>
-                                        <th>Fecha</th>
-                                        <th>Nodo</th>
-                                        <th>Socio</th>
-                                        <th>Tipo</th>
-                                        <th>Importe</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($nodo as $item)
-                                        <tr>
-                                            <td>{{ $item['codDeEstado'] ?? '' }}</td>
-                                            <td>{{ isset($item['fechaDeAtraso']) ? \Carbon\Carbon::parse($item['fechaDeAtraso'])->format('d-m-Y') : '' }}
-                                            </td>
-                                            <td>{{ $item['nombreInstituto'] ?? '' }}</td>
-                                            <td>{{ $item['nombreSocio'] ?? '' }}</td>
-                                            <td>{{ $item['tipoDeudor'] ?? '' }}</td>
-                                            <td class="text-end">
-                                                {{ isset($item['deudaTotal']) ? number_format($item['deudaTotal'], 2, ',', '.') : '' }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
+                    {{-- OPERACIONES LOCALES --}}
+                    @if (isset($datos['operaciones']))
+                        @php $operaciones = $datos['operaciones']; @endphp
+                        <div class="col-12 mt-3">
+                            <h3>Operaciones en Nodo Federal</h3>
+                            {{-- DEBUG: Mostrar datos para verificar --}}
+                            {{-- @php dd('Datos operaciones:', $operaciones); @endphp --}}
+                            
+                            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd; margin-bottom: 10px; font-size: 0.75em;">
+                                <tr>
+                                    <td style="border: 1px solid #ddd; text-align: center; background-color: #d1ecf1; font-weight: bold; padding: 10px;">
+                                        Como Titular:<br>{{ $operaciones['total_como_titular'] ?? 0 }} operaciones
+                                    </td>
+                                    <td style="border: 1px solid #ddd; text-align: center; background-color: #d3d3d3; font-weight: bold; padding: 10px;">
+                                        Como Garante:<br>{{ $operaciones['total_como_garante'] ?? 0 }} operaciones
+                                    </td>
+                                    <td style="border: 1px solid #ddd; text-align: center; background-color: #d4edda; font-weight: bold; padding: 10px;">
+                                        Activas (Titular):<br>{{ $operaciones['resumen']['activas_titular'] ?? 0 }}
+                                    </td>
+                                    <td style="border: 1px solid #ddd; text-align: center; background-color: #fff3cd; font-weight: bold; padding: 10px;">
+                                        Afectadas (Titular):<br>{{ $operaciones['resumen']['afectadas_titular'] ?? 0 }}
+                                    </td>
+                                </tr>
                             </table>
+                        </div>
+
+                        @if (count($operaciones['como_titular'] ?? []) > 0)
+                            <div class="col-12 mt-2">
+                                <h4 style="font-size: 0.95em;">Operaciones como Titular</h4>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="font-size: 0.7em">N° Op.</th>
+                                            <th style="font-size: 0.7em">Estado</th>
+                                            <th style="font-size: 0.7em">Fecha Operación</th>
+                                            <th style="font-size: 0.7em">Fecha Estado</th>
+                                            <th style="font-size: 0.7em">Nodo</th>
+                                            <th style="font-size: 0.7em">Socio</th>
+                                            <th style="font-size: 0.7em">Clase</th>
+                                            <th style="font-size: 0.7em">Valor Cuota</th>
+                                            <th style="font-size: 0.7em">Cuotas</th>
+                                            <th style="font-size: 0.7em">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 0.7em;">
+                                        @foreach ($operaciones['como_titular'] as $op)
+                                            <tr>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['numero'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; color: {{ ($op['estado_actual'] ?? '') == 'ACTIVO' ? 'green' : 'red' }}; font-weight: bold;">
+                                                    {{ $op['estado_actual'] ?? '' }}
+                                                </td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ isset($op['fecha_operacion']) ? \Carbon\Carbon::parse($op['fecha_operacion'])->format('d-m-Y') : '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ isset($op['fecha_estado']) ? \Carbon\Carbon::parse($op['fecha_estado'])->format('d-m-Y') : '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['nodo_nombre'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['socio_razon_social'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['clase'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
+                                                    {{ isset($op['valor_cuota']) ? '$' . number_format($op['valor_cuota'], 2, ',', '.') : '' }}
+                                                </td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">{{ $op['cant_cuotas'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
+                                                    {{ isset($op['total']) ? '$' . number_format($op['total'], 2, ',', '.') : '' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+
+                        @if (count($operaciones['como_garante'] ?? []) > 0)
+                            <div class="col-12 mt-2">
+                                <h4 style="font-size: 0.95em;">Operaciones como Garante</h4>
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+                                    <thead>
+                                        <tr>
+                                            <th style="font-size: 0.7em">N° Op.</th>
+                                            <th style="font-size: 0.7em">Estado</th>
+                                            <th style="font-size: 0.7em">Fecha Operación</th>
+                                            <th style="font-size: 0.7em">Fecha Estado</th>
+                                            <th style="font-size: 0.7em">Nodo</th>
+                                            <th style="font-size: 0.7em">Socio</th>
+                                            <th style="font-size: 0.7em">Clase</th>
+                                            <th style="font-size: 0.7em">Valor Cuota</th>
+                                            <th style="font-size: 0.7em">Cuotas</th>
+                                            <th style="font-size: 0.7em">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 0.7em;">
+                                        @foreach ($operaciones['como_garante'] as $op)
+                                            <tr>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['numero'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; color: {{ ($op['estado_actual'] ?? '') == 'ACTIVO' ? 'green' : 'red' }}; font-weight: bold;">
+                                                    {{ $op['estado_actual'] ?? '' }}
+                                                </td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ isset($op['fecha_operacion']) ? \Carbon\Carbon::parse($op['fecha_operacion'])->format('d-m-Y') : '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ isset($op['fecha_estado']) ? \Carbon\Carbon::parse($op['fecha_estado'])->format('d-m-Y') : '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['nodo_nombre'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['socio_razon_social'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px;">{{ $op['clase'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
+                                                    {{ isset($op['valor_cuota']) ? '$' . number_format($op['valor_cuota'], 2, ',', '.') : '' }}
+                                                </td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">{{ $op['cant_cuotas'] ?? '' }}</td>
+                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">
+                                                    {{ isset($op['total']) ? '$' . number_format($op['total'], 2, ',', '.') : '' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+
+                        @if (count($operaciones['nodos_involucrados'] ?? []) > 0 || count($operaciones['socios_involucrados'] ?? []) > 0)
+                            <div class="col-12 mt-2">
+                                <div style="display: table; width: 100%;">
+                                    <div style="display: table-cell; width: 50%; vertical-align: top; padding-right: 10px;">
+                                        <h5 style="font-size: 0.85em;">Nodos Involucrados</h5>
+                                        <ul style="list-style-type: disc; padding-left: 20px; font-size: 0.75em;">
+                                            @foreach ($operaciones['nodos_involucrados'] ?? [] as $nodo)
+                                                <li>{{ $nodo }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <div style="display: table-cell; width: 50%; vertical-align: top; padding-left: 10px;">
+                                        <h5 style="font-size: 0.85em;">Socios Involucrados</h5>
+                                        <ul style="list-style-type: disc; padding-left: 20px; font-size: 0.75em;">
+                                            @foreach ($operaciones['socios_involucrados'] ?? [] as $socio)
+                                                <li>
+                                                    <strong>N° {{ $socio['numero'] ?? '' }}:</strong>
+                                                    {{ $socio['razon_social'] ?? '' }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         @endif
                     @else
-                        <div class="alert alert-info mt-2">
-                            No se encontraron datos de deudores Nodo Federal.
+                        <div class="col-12 mt-3">
+                            <h3>Operaciones en Nodo Federal</h3>
+                            <div style="padding: 10px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
+                                <strong>Información:</strong> No se encontraron operaciones registradas en el sistema para este cliente.
+                            </div>
                         </div>
                     @endif
 

@@ -64,7 +64,7 @@ class ConsultaController extends Controller
                 }
                 
                 // Cargar relaciones y obtener resultados ordenados por nodo, socio, fecha y hora ascendente
-                $resultados = $consulta->with(['nodo', 'socio'])
+                $resultados = $consulta->with(['nodo', 'socio', 'user'])
                     ->orderByRaw('DATE(fecha) ASC, TIME(fecha) ASC')
                     ->get()
                     ->sortBy([
@@ -143,7 +143,7 @@ class ConsultaController extends Controller
             }
             
             // Obtener resultados ordenados
-            $resultados = $consulta->with(['nodo', 'socio'])
+            $resultados = $consulta->with(['nodo', 'socio', 'user'])
                 ->orderByRaw('DATE(fecha) ASC, TIME(fecha) ASC')
                 ->get()
                 ->sortBy([
@@ -195,10 +195,12 @@ class ConsultaController extends Controller
             $query = Consulta::query()
                 ->leftJoin('nodos', 'consultas.nodo_id', '=', 'nodos.id')
                 ->leftJoin('socios', 'consultas.socio_id', '=', 'socios.id')
+                ->leftJoin('users', 'consultas.user_id', '=', 'users.id')
                 ->select(
                     'consultas.*',
                     'nodos.nombre as nodo_nombre',
-                    'socios.razon_social as socio_razon_social'
+                    'socios.razon_social as socio_razon_social',
+                    'users.name as usuario_nombre'
                 );
 
             // Aplicar filtros
@@ -258,7 +260,8 @@ class ConsultaController extends Controller
             $htmlContent .= '<th>APELLIDO Y NOMBRES</th>';
             $htmlContent .= '<th>NODO</th>';
             $htmlContent .= '<th>SOCIO</th>';
-            $htmlContent .= '</tr>';
+            $htmlContent .= '<th>USUARIO</th>';
+            $htmlContent .= '</tr>';;
 
             // Datos de la tabla
             foreach ($resultados as $consulta) {
@@ -272,6 +275,7 @@ class ConsultaController extends Controller
                 $htmlContent .= '<td>' . htmlspecialchars($consulta->apelynombres ?? '') . '</td>';
                 $htmlContent .= '<td>' . htmlspecialchars($consulta->nodo_nombre ?? '') . '</td>';
                 $htmlContent .= '<td>' . htmlspecialchars($consulta->socio_razon_social ?? '') . '</td>';
+                $htmlContent .= '<td>' . htmlspecialchars($consulta->usuario_nombre ?? '') . '</td>';
                 $htmlContent .= '</tr>';
             }
             

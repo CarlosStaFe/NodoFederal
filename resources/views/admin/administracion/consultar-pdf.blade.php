@@ -182,13 +182,14 @@
         <thead>
             <tr>
                 <th style="width: 8%;">NRO.</th>
-                <th style="width: 12%;">FECHA</th>
-                <th style="width: 8%;">HORA</th>
-                <th style="width: 10%;">TIPO</th>
-                <th style="width: 12%;">CUIT</th>
-                <th style="width: 25%;">APELLIDO</th>
-                <th style="width: 15%;">NODO</th>
-                <th style="width: 20%;">SOCIO</th>
+                <th style="width: 10%;">FECHA</th>
+                <th style="width: 7%;">HORA</th>
+                <th style="width: 8%;">TIPO</th>
+                <th style="width: 11%;">CUIT</th>
+                <th style="width: 21%;">APELLIDO</th>
+                <th style="width: 12%;">NODO</th>
+                <th style="width: 14%;">SOCIO</th>
+                <th style="width: 9%;">USUARIO</th>
             </tr>
         </thead>
         <tbody>
@@ -207,6 +208,7 @@
                     $hora = $fechaObj ? $fechaObj->format('H:i') : '';
                     $nombreNodo = $item->nodo ? $item->nodo->nombre : '';
                     $nombreSocio = $item->socio ? $item->socio->razon_social : '';
+                    $nombreUsuario = (isset($item->user) && $item->user) ? $item->user->name : '';
                 @endphp
 
                 {{-- Si cambió el nodo --}}
@@ -214,7 +216,7 @@
                     {{-- Subtotal del socio anterior si existe --}}
                     @if($socioActual !== '')
                         <tr class="subtotal-socio">
-                            <td colspan="5"></td>
+                            <td colspan="6"></td>
                             <td style="text-align: right; font-weight: bold;">Subtotal {{ $socioActual }}:</td>
                             <td style="text-align: center; font-weight: bold;">{{ $contadorSocio }} consultas</td>
                             <td></td>
@@ -234,7 +236,7 @@
                 {{-- Si cambió el socio pero no el nodo --}}
                 @elseif($socioActual !== '' && $socioActual !== $nombreSocio)
                     <tr class="subtotal-socio">
-                        <td colspan="5"></td>
+                        <td colspan="6"></td>
                         <td style="text-align: right; font-weight: bold;">Subtotal {{ $socioActual }}:</td>
                         <td style="text-align: center; font-weight: bold;">{{ $contadorSocio }} consultas</td>
                         <td></td>
@@ -252,6 +254,7 @@
                     <td class="apellido">{{ $item->apelynombres ?? '' }}</td>
                     <td class="nodo">{{ $nombreNodo }}</td>
                     <td class="socio">{{ $nombreSocio }}</td>
+                    <td class="apellido">{{ $nombreUsuario }}</td>
                 </tr>
 
                 @php
@@ -265,14 +268,14 @@
                 @if($loop->last)
                     {{-- Subtotal del último socio --}}
                     <tr class="subtotal-socio">
-                        <td colspan="5"></td>
+                        <td colspan="6"></td>
                         <td style="text-align: right; font-weight: bold;">Subtotal {{ $socioActual }}:</td>
                         <td style="text-align: center; font-weight: bold;">{{ $contadorSocio }} consultas</td>
                         <td></td>
                     </tr>
                     {{-- Subtotal del último nodo --}}
                     <tr class="subtotal-nodo">
-                        <td colspan="6"></td>
+                        <td colspan="7"></td>
                         <td style="text-align: center; font-weight: bold;">Subtotal Nodo {{ $nodoActual }}:</td>
                         <td style="text-align: center; font-weight: bold;">{{ $contadorNodo }} consultas</td>
                     </tr>
@@ -282,10 +285,10 @@
             {{-- Total general --}}
             @if($totalGeneral > 0)
                 <tr class="total-general">
-                    <td colspan="7"></td>
-                    <td style="text-align: center; font-weight: bold; font-size: 11px;">
+                    <td colspan="8" style="text-align: center; font-weight: bold; font-size: 11px;">
                         TOTAL GENERAL: {{ $totalGeneral }} consultas
                     </td>
+                    <td></td>
                 </tr>
             @endif
         </tbody>

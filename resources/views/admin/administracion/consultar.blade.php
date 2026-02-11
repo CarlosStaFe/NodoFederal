@@ -83,17 +83,18 @@
             <br>
             <h4>Consumos realizados</h4>
             <div class="card-body">
-                <table id="example1" class="table table-striped table-bordered table-hover table-sm" style="font-size: 0.85em;">
+                <table id="example1" class="table table-striped table-bordered table-hover table-sm" style="font-size: 0.8em;">
                     <thead style="background-color:rgb(14, 107, 169); color: white;">
                         <tr>
-                            <th class="text-center" style="width: 50px;">NRO.</th>
-                            <th class="text-center" style="width: 50px;">FECHA</th>
+                            <th class="text-center" style="width: 40px;">NRO.</th>
+                            <th class="text-center" style="width: 40px;">FECHA</th>
                             <th class="text-center" style="width: 30px;">HORA</th>
                             <th class="text-center" style="width: 50px;">TIPO</th>
                             <th class="text-center" style="width: 60px;">CUIT</th>
                             <th class="text-center" style="width: 150px;">APELLIDO</th>
                             <th class="text-center" style="width: 150px;">NODO</th>
                             <th class="text-center" style="width: 150px;">SOCIO</th>
+                            <th class="text-center" style="width: 120px;">USUARIO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -193,6 +194,7 @@
                                 '',
                                 `<strong style="color: brown;">Subtotal ${socioActual}: ${contadorSocio} consultas</strong>`,
                                 '',
+                                '',
                                 ''
                             ]);
                         }
@@ -205,6 +207,7 @@
                             '',
                             '',
                             `<strong style="color: green;">Subtotal Nodo ${nodoActual}: ${contadorNodo} consultas</strong>`,
+                            '',
                             ''
                         ]);
                         contadorNodo = 0;
@@ -221,6 +224,7 @@
                             '',
                             `<strong style="color: #28a745;">Subtotal ${socioActual}: ${contadorSocio} consultas</strong>`,
                             '',
+                            '',
                             ''
                         ]);
                         contadorSocio = 0;
@@ -235,7 +239,8 @@
                         item.cuit || '',
                         item.apelynombres || '',
                         nombreNodo,
-                        nombreSocio
+                        nombreSocio,
+                        item.user ? item.user.name : ''
                     ]);
                     
                     nodoActual = nombreNodo;
@@ -254,6 +259,7 @@
                             '',
                             `<strong style="color: orange;">Subtotal ${socioActual}: ${contadorSocio} consultas</strong>`,
                             '',
+                            '',
                             ''
                         ]);
                         // Subtotal del último nodo
@@ -265,6 +271,7 @@
                             '',
                             '',
                             `<strong style="color: green;">Subtotal Nodo ${nodoActual}: ${contadorNodo} consultas</strong>`,
+                            '',
                             ''
                         ]);
                     }
@@ -279,7 +286,8 @@
                     '',
                     '',
                     '',
-                    `<strong style="color: blue;">TOTAL GENERAL: ${totalGeneral} consultas</strong>`
+                    `<strong style="color: blue;">TOTAL GENERAL: ${totalGeneral} consultas</strong>`,
+                    ''
                 ]);
             }
             
