@@ -62,63 +62,67 @@ class DatabaseSeeder extends Seeder
         $socioUser->assignRole($socio);
 
         //RUTA PARA EL ADMIN
-        Permission::create(['name' => 'admin.index']);
+        Permission::firstOrCreate(['name' => 'admin.index']);
 
         //RUTA PARA EL ADMIN - ADMINISTRACION
-        Permission::create(['name' => 'admin.administracion.consultar'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.administracion.consultar'])->syncRoles([$admin, $secretaria, $nodo]);
 
         //RUTA PARA EL ADMIN - USUARIOS
-        Permission::create(['name' => 'admin.usuarios.index'])->syncRoles([$admin, $secretaria, $nodo]);
-        Permission::create(['name' => 'admin.usuarios.create'])->syncRoles([$admin, $secretaria, $nodo]);
-        Permission::create(['name' => 'admin.usuarios.store'])->syncRoles([$admin, $secretaria, $nodo]);
-        Permission::create(['name' => 'admin.usuarios.show'])->syncRoles([$admin, $secretaria, $nodo]);
-        Permission::create(['name' => 'admin.usuarios.edit'])->syncRoles([$admin, $secretaria, $nodo]);
-        Permission::create(['name' => 'admin.usuarios.update'])->syncRoles([$admin, $secretaria, $nodo]);
-        Permission::create(['name' => 'admin.usuarios.confirm-delete'])->syncRoles([$admin, $secretaria, $nodo]);
-        Permission::create(['name' => 'admin.usuarios.destroy'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.index'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.create'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.store'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.show'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.edit'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.update'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.confirm-delete'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.destroy'])->syncRoles([$admin, $secretaria, $nodo]);
 
         //RUTA PARA EL ADMIN - NODOS
-        Permission::create(['name' => 'admin.nodos.index'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.create'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.store'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.show'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.edit'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.update'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.confirm-delete'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.destroy'])->syncRoles([$admin, $secretaria]);
-        Permission::create(['name' => 'admin.nodos.consultar'])->syncRoles([$admin, $secretaria, $nodo]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.index'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.create'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.store'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.show'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.edit'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.update'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.confirm-delete'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.destroy'])->syncRoles([$admin, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.nodos.consultar'])->syncRoles([$admin, $secretaria, $nodo]);
 
         //RUTA PARA EL ADMIN - SOCIOS
-        Permission::create(['name' => 'admin.socios.index'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.create'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.store'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.show'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.edit'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.update'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.confirm-delete'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.destroy'])->syncRoles([$admin,$secretaria,$nodo]);
-        Permission::create(['name' => 'admin.socios.buscar-por-numero'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.index'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.create'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.store'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.show'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.edit'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.update'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.confirm-delete'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.destroy'])->syncRoles([$admin,$secretaria,$nodo]);
+        Permission::firstOrCreate(['name' => 'admin.socios.buscar-por-numero'])->syncRoles([$admin,$secretaria,$nodo]);
 
         //RUTA PARA EL ADMIN - CLIENTES
-        Permission::create(['name' => 'admin.clientes.index'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.create'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.store'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.show'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.edit'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.update'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.confirm-delete'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.destroy'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.clientes.buscar-por-cuit'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.index'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.create'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.store'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.show'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.edit'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.update'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.confirm-delete'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.destroy'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.clientes.buscar-por-cuit'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
 
         //RUTA PARA EL ADMIN - OPERACIONES
-        Permission::create(['name' => 'admin.operaciones.consultar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.informe'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.pdf'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.cargar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.store'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
-        Permission::create(['name' => 'admin.operaciones.show'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.operaciones.consultar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.operaciones.informe'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.operaciones.pdf'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.operaciones.cargar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.operaciones.store'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.operaciones.show'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
 
-        Permission::create(['name' => 'admin.operaciones.afectar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+        Permission::firstOrCreate(['name' => 'admin.operaciones.afectar'])->syncRoles([$admin,$secretaria,$nodo,$socio]);
+
+        //RUTA PARA EL ADMIN - ADMINISTRACION BASE DE DATOS
+        Permission::firstOrCreate(['name' => 'admin.administracion.basedatos'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.administracion.consultar'])->syncRoles([$admin, $secretaria]);
 
         $this->call([
             LocalidadesSeeder::class,

@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <div class="row">
     <h1>Administración de Base de Datos</h1>
@@ -177,15 +178,18 @@ $(document).ready(function() {
                 "data": null,
                 "orderable": false,
                 "render": function(data, type, row) {
+                    var downloadUrl = "{{url('admin/administracion/basedatos/download')}}/" + encodeURIComponent(row.name);
+                    var deleteUrl = "{{url('admin/administracion/basedatos')}}/" + encodeURIComponent(row.name);
+                    
                     return `
-                        <a href="${row.download_url}" class="btn btn-sm btn-info" title="Descargar">
-                            <i class="bi bi-download"></i>
+                        <a href="${downloadUrl}" class="btn btn-sm btn-info" title="Descargar">
+                            <i class="fas fa-download"></i>
                         </a>
                         <button class="btn btn-sm btn-danger delete-backup" 
                                 data-filename="${row.name}" 
-                                data-url="${row.delete_url}" 
+                                data-url="${deleteUrl}" 
                                 title="Eliminar">
-                            <i class="bi bi-trash"></i>
+                            <i class="fas fa-trash"></i>
                         </button>
                     `;
                 }
@@ -207,19 +211,67 @@ $(document).ready(function() {
         var filename = $(this).data('filename');
         var url = $(this).data('url');
         
+        console.log('Eliminando backup:', filename, 'URL:', url); // Debug
+        
         if (confirm('¿Está seguro que desea eliminar el backup "' + filename + '"?')) {
+            // Verificar que tenemos el token CSRF
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            if (!csrfToken) {
+                console.error('Token CSRF no encontrado');
+                alert('Error: Token de seguridad no encontrado. Recargue la página e intente nuevamente.');
+                return;
+            }
+
             $.ajax({
                 url: url,
                 type: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                beforeSend: function() {
+                    // Mostrar indicador de carga
+                    $('button[data-filename="' + filename + '"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
                 },
                 success: function(response) {
+                    console.log('Respuesta exitosa:', response); // Debug
                     table.ajax.reload();
-                    alert('Backup eliminado correctamente');
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success('Backup eliminado correctamente');
+                    } else {
+                        alert('Backup eliminado correctamente');
+                    }
                 },
-                error: function(xhr) {
-                    alert('Error al eliminar el backup: ' + xhr.responseJSON.error);
+                error: function(xhr, status, error) {
+                    console.error('Error al eliminar:', xhr, status, error); // Debug
+                    console.error('Response text:', xhr.responseText); // Debug adicional
+                    
+                    var errorMsg = 'Error al eliminar el backup';
+                    
+                    if (xhr.status === 403) {
+                        errorMsg = 'No tiene permisos suficientes para eliminar backups. Contacte al administrador.';
+                    } else if (xhr.status === 404) {
+                        errorMsg = 'El archivo backup no fue encontrado.';
+                    } else if (xhr.status === 419) {
+                        errorMsg = 'Sesión expirada. Recargue la página e intente nuevamente.';
+                    } else if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg += ': ' + xhr.responseJSON.error;
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg += ': ' + xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        errorMsg += ': ' + xhr.responseText;
+                    }
+                    
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(errorMsg);
+                    } else {
+                        alert(errorMsg);
+                    }
+                },
+                complete: function() {
+                    // Restaurar botón
+                    $('button[data-filename="' + filename + '"]').prop('disabled', false).html('<i class="fas fa-trash"></i>');
                 }
             });
         }

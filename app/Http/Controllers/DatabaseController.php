@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Response;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use ZipArchive;
+use App\Models\User;
 
 class DatabaseController extends Controller
 {
@@ -37,6 +38,186 @@ class DatabaseController extends Controller
     public function index()
     {
         return view('admin.administracion.basedatos');
+    }
+
+    /**
+     * Mostrar usuarios conectados al sistema
+     */
+    public function conectados()
+    {
+        $usuariosConectados = $this->getUsuariosConectados();
+        $estadisticas = $this->getEstadisticasConectados();
+        
+        return view('admin.administracion.conectados', compact('usuariosConectados', 'estadisticas'));
+    }
+
+    /**
+     * AJAX para actualizar usuarios conectados
+     */
+    public function conectadosAjax()
+    {
+        $usuariosConectados = $this->getUsuariosConectados();
+        
+        return response()->json([
+            'total' => $usuariosConectados->count(),
+            'usuarios' => $usuariosConectados
+        ]);
+    }
+
+    /**
+     * Desconectar usuario específico eliminando su sesión
+     */
+    public function desconectarUsuario(Request $request)
+    {
+        try {
+            $userId = $request->input('user_id');
+            $sessionId = $request->input('session_id');
+            
+            if (!$userId) {
+                return response()->json(['error' => 'ID de usuario requerido'], 400);
+            }
+
+            // Eliminar sesiones del usuario
+            if ($sessionId) {
+                // Eliminar sesión específica
+                $deleted = DB::table('sessions')
+                    ->where('id', $sessionId)
+                    ->where('user_id', $userId)
+                    ->delete();
+            } else {
+                // Eliminar todas las sesiones del usuario
+                $deleted = DB::table('sessions')
+                    ->where('user_id', $userId)
+                    ->delete();
+            }
+
+            if ($deleted > 0) {
+                // Obtener información del usuario para el log
+                $user = User::find($userId);
+                $userName = $user ? $user->name : 'Usuario desconocido';
+                
+                // Log de la acción
+                \Log::info('Usuario desconectado por administrador', [
+                    'admin_user' => auth()->user()->name,
+                    'disconnected_user' => $userName,
+                    'user_id' => $userId,
+                    'session_id' => $sessionId,
+                    'ip' => $request->ip()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Usuario {$userName} desconectado correctamente",
+                    'deleted' => $deleted
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontraron sesiones activas para este usuario'
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al desconectar usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->input('user_id'),
+                'admin_user' => auth()->user()->name
+            ]);
+            
+            return response()->json([
+                'error' => 'Error interno del servidor',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Desconectar todos los usuarios (excepto el actual)
+     */
+    public function desconectarTodos(Request $request)
+    {
+        try {
+            $currentUserId = auth()->id();
+            
+            // Eliminar todas las sesiones excepto la del usuario actual
+            $deleted = DB::table('sessions')
+                ->whereNotNull('user_id')
+                ->where('user_id', '!=', $currentUserId)
+                ->delete();
+
+            // Log de la acción
+            \Log::warning('Todos los usuarios desconectados por administrador', [
+                'admin_user' => auth()->user()->name,
+                'sessions_deleted' => $deleted,
+                'ip' => $request->ip()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Se desconectaron {$deleted} sesiones de usuario",
+                'deleted' => $deleted
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error al desconectar todos los usuarios', [
+                'error' => $e->getMessage(),
+                'admin_user' => auth()->user()->name
+            ]);
+            
+            return response()->json([
+                'error' => 'Error interno del servidor',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener usuarios conectados
+     */
+    private function getUsuariosConectados()
+    {
+        return DB::table('sessions')
+            ->join('users', 'sessions.user_id', '=', 'users.id')
+            ->leftJoin('nodos', 'users.nodo_id', '=', 'nodos.id')
+            ->leftJoin('socios', 'users.socio_id', '=', 'socios.id')
+            ->leftJoin('model_has_roles', function($join) {
+                $join->on('users.id', '=', 'model_has_roles.model_id')
+                     ->where('model_has_roles.model_type', '=', 'App\\Models\\User');
+            })
+            ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                'sessions.id as session_id',
+                'nodos.nombre as nodo_nombre',
+                'socios.razon_social as socio_nombre',
+                'roles.name as rol',
+                'sessions.last_activity',
+                'sessions.ip_address',
+                'sessions.user_agent'
+            )
+            ->whereNotNull('sessions.user_id')
+            ->where('sessions.last_activity', '>', now()->subMinutes(config('session.lifetime', 120))->timestamp)
+            ->orderBy('sessions.last_activity', 'desc')
+            ->get()
+            ->map(function ($session) {
+                $session->last_activity_human = date('d/m/Y H:i:s', $session->last_activity);
+                $session->tiempo_inactivo = now()->diffInMinutes(date('Y-m-d H:i:s', $session->last_activity));
+                return $session;
+            });
+    }
+
+    /**
+     * Obtener estadísticas de usuarios conectados
+     */
+    private function getEstadisticasConectados()
+    {
+        return [
+            'total_usuarios' => DB::table('users')->count(),
+            'usuarios_conectados' => $this->getUsuariosConectados()->count(),
+            'sesiones_activas' => DB::table('sessions')->count(),
+            'sesiones_autenticadas' => DB::table('sessions')->whereNotNull('user_id')->count(),
+            'tiempo_sesion' => config('session.lifetime', 120)
+        ];
     }
 
     /**

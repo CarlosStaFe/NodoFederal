@@ -106,6 +106,12 @@
                                                 <p>Base de Datos</p>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a href="{{ url('admin/administracion/conectados') }}" class="nav-link active">
+                                                <i class="bi bi-people nav-icon"></i>
+                                                <p>Usuarios Conectados</p>
+                                            </a>
+                                        </li>
                                     @endif
                                 </ul>
                             </li>

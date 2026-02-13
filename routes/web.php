@@ -17,6 +17,11 @@ Route::get('/', function () {
     return redirect()->route('admin.index');
 });
 
+// Ruta de prueba temporal
+Route::get('/test-adminlte', function() {
+    return view('test-adminlte');
+});
+
 Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])
@@ -47,6 +52,20 @@ Route::post('/admin/administracion/basedatos/backup', [DatabaseController::class
     ->middleware(['auth', 'can:admin.administracion.basedatos']);
 Route::post('/admin/administracion/basedatos/restore', [DatabaseController::class, 'restore'])
     ->name('admin.administracion.basedatos.restore')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+
+// RUTAS PARA USUARIOS CONECTADOS
+Route::get('/admin/administracion/conectados', [DatabaseController::class, 'conectados'])
+    ->name('admin.administracion.conectados')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::get('/admin/administracion/conectados/ajax', [DatabaseController::class, 'conectadosAjax'])
+    ->name('admin.administracion.conectados.ajax')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::post('/admin/administracion/conectados/desconectar', [DatabaseController::class, 'desconectarUsuario'])
+    ->name('admin.administracion.conectados.desconectar')
+    ->middleware(['auth', 'can:admin.administracion.basedatos']);
+Route::post('/admin/administracion/conectados/desconectar-todos', [DatabaseController::class, 'desconectarTodos'])
+    ->name('admin.administracion.conectados.desconectar-todos')
     ->middleware(['auth', 'can:admin.administracion.basedatos']);
 Route::get('/admin/administracion/basedatos/backups', [DatabaseController::class, 'listBackups'])
     ->name('admin.administracion.basedatos.list')
