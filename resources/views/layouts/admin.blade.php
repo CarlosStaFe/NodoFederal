@@ -99,7 +99,7 @@
                                             <p>Consultar Totales</p>
                                         </a>
                                     </li>
-                                    @if(auth()->user()->hasRole(['admin', 'secretaria']))
+                                    @if(auth()->user()->hasRole(['admin', 'secretaria']) && auth()->user()->name !== 'Fabian Zanutigh')
                                         <li class="nav-item">
                                             <a href="{{ url('admin/administracion/basedatos') }}" class="nav-link active">
                                                 <i class="bi bi-database-gear nav-icon"></i>
