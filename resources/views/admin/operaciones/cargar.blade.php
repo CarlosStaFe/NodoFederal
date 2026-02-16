@@ -42,6 +42,11 @@
                             @error('cuit')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
+                            <div id="mensajeNoExiste" style="display: none;" class="alert alert-warning mt-2 mb-0">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                <strong>Cliente no encontrado.</strong> 
+                                <small>Verifique el CUIL ingresado.</small>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-1 col-sm-4 position-relative">
@@ -169,6 +174,11 @@
                             @error('cuit_garante')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
+                            <div id="mensajeNoExisteGarante" style="display: none;" class="alert alert-warning mt-2 mb-0">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                <strong>Garante no encontrado.</strong> 
+                                <small>Verifique el CUIL ingresado.</small>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-1 col-sm-4 position-relative">
@@ -250,12 +260,27 @@
         cuitInput.addEventListener('blur', function() {
             const cuit = cuitInput.value.trim();
             if (cuit.length === 11) {
+                // Ocultar mensaje previo si existe
+                if (mensajeNoExiste) {
+                    mensajeNoExiste.style.display = 'none';
+                }
+                
+                // Mostrar indicador de búsqueda
+                cuitInput.style.borderColor = '#17a2b8';
+                cuitInput.style.backgroundColor = '#f8f9ff';
+                
                 fetch(`/admin/clientes/buscar-por-cuit/${cuit}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             const cliente = data.cliente;
-                            console.log('Cliente recibido:', cliente);
+                            console.log('Cliente encontrado:', cliente);
+                            
+                            // Restablecer estilo del input (éxito)
+                            cuitInput.style.borderColor = '#28a745';
+                            cuitInput.style.backgroundColor = '';
+                            
+                            // Llenar campos
                             setInputValue('tipodoc', cliente.tipodoc || '');
                             setInputValue('sexo', cliente.sexo || '');
                             setInputValue('documento', cliente.documento || '');
@@ -263,8 +288,25 @@
                             setInputValue('nacimiento', cliente.nacimiento ? cliente.nacimiento.substring(0,10) : '');
                             setInputValue('estado', cliente.estado || '');
                             setInputValue('fechaestado', cliente.fechaestado ? cliente.fechaestado.substring(0,10) : '');
+                            
+                            // Restablecer estilo después de un momento
+                            setTimeout(() => {
+                                cuitInput.style.borderColor = '';
+                            }, 2000);
+                            
                         } else {
-                            mensajeNoExiste.style.display = 'block';
+                            // Cliente no encontrado
+                            console.log('Cliente no encontrado para CUIT:', cuit);
+                            
+                            // Estilo de error
+                            cuitInput.style.borderColor = '#dc3545';
+                            cuitInput.style.backgroundColor = '';
+                            
+                            // Mostrar mensaje de no encontrado
+                            if (mensajeNoExiste) {
+                                mensajeNoExiste.style.display = 'block';
+                            }
+                            
                             // Limpiar campos
                             setInputValue('tipodoc', '');
                             setInputValue('sexo', '');
@@ -273,9 +315,57 @@
                             setInputValue('nacimiento', '');
                             setInputValue('estado', '');
                             setInputValue('fechaestado', '');
+                            
+                            // Mantener foco en el campo CUIT después de un momento
+                            setTimeout(() => {
+                                cuitInput.focus();
+                                cuitInput.select(); // Seleccionar todo el texto para facilitar corrección
+                            }, 100);
                         }
+                    })
+                    .catch(error => {
+                        console.error('Error al buscar cliente:', error);
+                        
+                        // Restablecer estilo del input
+                        cuitInput.style.borderColor = '#dc3545';
+                        cuitInput.style.backgroundColor = '';
+                        
+                        // Mostrar mensaje de error
+                        if (mensajeNoExiste) {
+                            mensajeNoExiste.innerHTML = `
+                                <i class="fas fa-exclamation-circle"></i> 
+                                <strong>Error de conexión.</strong> 
+                                <small>Intente nuevamente.</small>
+                            `;
+                            mensajeNoExiste.style.display = 'block';
+                        }
+                        
+                        // Limpiar campos
+                        setInputValue('tipodoc', '');
+                        setInputValue('sexo', '');
+                        setInputValue('documento', '');
+                        setInputValue('apelnombres', '');
+                        setInputValue('nacimiento', '');
+                        setInputValue('estado', '');
+                        setInputValue('fechaestado', '');
                     });
             }
+        });
+        
+        // Ocultar mensaje cuando el usuario empiece a escribir de nuevo
+        cuitInput.addEventListener('input', function() {
+            if (mensajeNoExiste) {
+                mensajeNoExiste.style.display = 'none';
+                // Restablecer mensaje original
+                mensajeNoExiste.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Cliente no encontrado.</strong> 
+                    <small>Verifique el CUIL ingresado.</small>
+                `;
+            }
+            // Restablecer estilo del input
+            cuitInput.style.borderColor = '';
+            cuitInput.style.backgroundColor = '';
         });
     });
 </script>
@@ -296,6 +386,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         // ...existing code...
         const cuitGaranteInput = document.getElementById('cuit_garante');
+        const mensajeNoExisteGarante = document.getElementById('mensajeNoExisteGarante');
+
         // Prevenir Enter en CUIT Garante
         cuitGaranteInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -303,6 +395,15 @@
                 return false;
             }
         });
+        
+        // Limpiar estilo y mensaje cuando el usuario empieza a escribir
+        cuitGaranteInput.addEventListener('input', function() {
+            cuitGaranteInput.style.borderColor = '';
+            if (mensajeNoExisteGarante) {
+                mensajeNoExisteGarante.style.display = 'none';
+            }
+        });
+
         // Utilidad para setear valor solo si el input existe
         function setInputValue(id, value) {
             const el = document.getElementById(id);
@@ -312,6 +413,7 @@
                 console.warn('No se encontró el input con id:', id);
             }
         }
+        
         cuitGaranteInput.addEventListener('blur', function() {
             const cuit = cuitGaranteInput.value.trim();
             if (cuit.length === 11) {
@@ -319,20 +421,47 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Cliente encontrado - estilo normal
+                            cuitGaranteInput.style.borderColor = '#28a745'; // Verde
                             const cliente = data.cliente;
                             setInputValue('id_cliente_garante', cliente.id || '');
                             setInputValue('tipodoc_garante', cliente.tipodoc || '');
                             setInputValue('sexo_garante', cliente.sexo || '');
                             setInputValue('documento_garante', cliente.documento || '');
                             setInputValue('apelnombres_garante', cliente.apelnombres || '');
+                            // Ocultar mensaje de error si estaba visible
+                            if (mensajeNoExisteGarante) {
+                                mensajeNoExisteGarante.style.display = 'none';
+                            }
                         } else {
+                            // Cliente no encontrado
+                            cuitGaranteInput.style.borderColor = '#dc3545'; // Rojo
+                            // Limpiar campos
                             setInputValue('id_cliente_garante', '');
                             setInputValue('tipodoc_garante', '');
                             setInputValue('sexo_garante', '');
                             setInputValue('documento_garante', '');
                             setInputValue('apelnombres_garante', '');
+                            // Mostrar mensaje de advertencia
+                            if (mensajeNoExisteGarante) {
+                                mensajeNoExisteGarante.style.display = 'block';
+                            }
+                            // Mantener el foco en el campo CUIT
+                            setTimeout(() => {
+                                cuitGaranteInput.focus();
+                            }, 100);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al buscar garante:', error);
+                        cuitGaranteInput.style.borderColor = '#dc3545';
+                        if (mensajeNoExisteGarante) {
+                            mensajeNoExisteGarante.style.display = 'block';
                         }
                     });
+            } else if (cuit.length > 0) {
+                // CUIT incompleto
+                cuitGaranteInput.style.borderColor = '#ffc107'; // Amarillo
             }
         });
     });

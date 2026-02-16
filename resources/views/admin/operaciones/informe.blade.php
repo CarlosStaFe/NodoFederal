@@ -453,6 +453,44 @@
                                 </div>
                             @endif
 
+                            {{-- DATOS DEUDORES CENTRO COMERCIAL --}}
+                            @php $deudoresCentroComercial = $data['morosidad']['deudoresCentroComercial']['datos'] ?? []; @endphp
+                            <div class="col-12 mt-3">
+                                <h3>Deudores Nodo Federal</h3>
+                            </div>
+                            @if (count($deudoresCentroComercial ?? []) > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Estado</th>
+                                            <th>Fecha</th>
+                                            <th>Deuda Total</th>
+                                            <th>Nodo</th>
+                                            <th>Socio</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 0.80em;">
+                                        @foreach ($deudoresCentroComercial as $deudor)
+                                            <tr>
+                                                <td>{{ $deudor['codDeEstado'] ?? '' }}</td>
+                                                <td>{{ isset($deudor['fechaDeAtraso']) ? \Carbon\Carbon::parse($deudor['fechaDeAtraso'])->format('d-m-Y') : '' }}</td>
+                                                <td class="text-end">
+                                                    {{ isset($deudor['deudaTotal']) ? '$' . number_format($deudor['deudaTotal'], 2, ',', '.') : '' }}
+                                                </td>
+                                                <td>{{ $deudor['nombreInstituto'] ?? '' }}</td>
+                                                <td>{{ $deudor['nombreSocio'] ?? '' }}</td>
+                                                <td>{{ $deudor['tipoDeudor'] ?? '' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info mt-2">
+                                    No se encontraron datos de Deudores Centro Comercial.
+                                </div>
+                            @endif
+
                             {{-- DATOS LABORALES --}}
                             @php $datosLaborales = $data['datosLaborales'] ?? []; @endphp
                             <div class="col-12 mt-3">
