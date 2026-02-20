@@ -290,6 +290,46 @@
                                 </table>
                             @endif
 
+                            {{-- DATOS OBSERVACIONES VIGENTES BA --}}
+                            @php 
+                                // Intentar diferentes ubicaciones posibles
+                                $obsVigentesBa = $data['obsVigentesBa'] ?? 
+                                                $data['veraz']['obsVigentesBa'] ?? 
+                                                $data['morosidad']['obsVigentesBa'] ?? 
+                                                $data['morosidad']['obsVigentesBa']['datos'] ?? [];
+                            @endphp
+                            @if (count($obsVigentesBa ?? []) > 0)
+                                <div class="col-12 mt-3">
+                                    <h3>Denuncias de Morosidad Vigentes</h3>
+                                </div>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Código Entidad</th>
+                                            <th>Entidad</th>
+                                            <th>Fecha</th>
+                                            <th>Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 0.80em;">
+                                        @foreach ($obsVigentesBa as $obs)
+                                            <tr>
+                                                <td>{{ $obs['codigoEntidad'] ?? '' }}</td>
+                                                <td>{{ $obs['nombreEntidad'] ?? '' }}</td>
+                                                <td>{{ isset($obs['fecha']) ? \Carbon\Carbon::parse($obs['fecha'])->format('d-m-Y') : '' }}</td>
+                                                <td class="text-end">
+                                                    {{ isset($obs['monto']) ? '$' . number_format($obs['monto'], 2, ',', '.') : '' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info mt-2">
+                                    No se encontraron denuncias de morosidad vigentes.
+                                </div>
+                            @endif
+
                             {{-- DATOS INFORMACION DE AGILDATA --}}
                             {{-- OPERACIONES LOCALES --}}
                             @if (isset($datos['operaciones']))
@@ -1032,8 +1072,7 @@
                                                 </td>
                                                 <td>{{ isset($chq['fechaLevantamiento']) ? \Carbon\Carbon::parse($chq['fechaLevantamiento'])->format('d-m-Y') : '' }}
                                                 </td>
-                                                <td>{{ isset($chq['multa']) ? \Carbon\Carbon::parse($chq['multa'])->format('d-m-Y') : '' }}
-                                                </td>
+                                                <td>{{ $chq['multa'] ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
