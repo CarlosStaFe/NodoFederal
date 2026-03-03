@@ -78,7 +78,7 @@
             <div class="icon">
                 <i class="fas bi bi-briefcase-fill"></i>
             </div>
-            <a href="{{url('admin/operaciones/cargar')}}" class="small-box-footer">Cargar Operaciones <i class="fas bi bi-briefcase-fill"></i></a>
+            <a href="{{url('admin/operaciones/listar')}}" class="small-box-footer">Listado Operaciones <i class="fas bi bi-briefcase-fill"></i></a>
             </div>
         </div>
 

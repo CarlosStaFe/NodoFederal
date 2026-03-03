@@ -625,4 +625,243 @@ class OperacionController extends Controller
         return $resultados;
     }
 
+    /**
+     * Muestra el listado de operaciones con filtros
+     */
+    public function listar(Request $request)
+    {
+        $user = Auth::user();
+        $roles = $user->roles->pluck('name');
+        
+        // Obtener nodos según permisos
+        if ($roles->contains('nodo')) {
+            // Si es nodo, solo ve su nodo
+            $nodos = Nodo::where('id', $user->nodo_id)->get();
+        } elseif ($roles->contains('socio')) {
+            // Si es socio, ve el nodo de su socio
+            $socio = Socio::find($user->socio_id);
+            $nodos = $socio ? Nodo::where('id', $socio->nodo_id)->get() : collect();
+        } else {
+            // Admin y secretaria ven todos los nodos
+            $nodos = Nodo::orderBy('nombre')->get();
+        }
+        
+        // Obtener socios según permisos
+        if ($roles->contains('nodo')) {
+            // Si es nodo, solo ve sus socios
+            $socios = Socio::where('nodo_id', $user->nodo_id)->orderBy('razon_social')->get();
+        } elseif ($roles->contains('socio')) {
+            // Si es socio, solo ve su propio socio
+            $socios = Socio::where('id', $user->socio_id)->get();
+        } else {
+            // Admin y secretaria ven todos los socios
+            $socios = Socio::orderBy('razon_social')->get();
+        }
+
+        // Si es una petición AJAX, procesar filtros y devolver operaciones
+        if ($request->ajax()) {
+            try {
+                $query = Operacion::with(['cliente', 'nodo', 'socio', 'usuario']);
+
+                // Aplicar filtros según el rol del usuario
+                if ($roles->contains('nodo')) {
+                    $query->where('nodo_id', $user->nodo_id);
+                } elseif ($roles->contains('socio')) {
+                    $query->where('socio_id', $user->socio_id);
+                }
+
+                // Aplicar filtros del formulario
+                $nodo_id = $request->input('nodo_id');
+                if (!empty($nodo_id)) {
+                    // Verificar permisos antes de aplicar filtro
+                    if ($roles->contains('nodo') && $nodo_id != $user->nodo_id) {
+                        return response()->json(['error' => 'Sin permisos para ver este nodo'], 403);
+                    }
+                    if ($roles->contains('socio')) {
+                        $socio = Socio::find($user->socio_id);
+                        if ($socio && $nodo_id != $socio->nodo_id) {
+                            return response()->json(['error' => 'Sin permisos para ver este nodo'], 403);
+                        }
+                    }
+                    $query->where('nodo_id', $nodo_id);
+                }
+
+                $socio_id = $request->input('socio_id');
+                if (!empty($socio_id)) {
+                    // Verificar permisos antes de aplicar filtro
+                    if ($roles->contains('nodo')) {
+                        $socio = Socio::find($socio_id);
+                        if (!$socio || $socio->nodo_id != $user->nodo_id) {
+                            return response()->json(['error' => 'Sin permisos para ver este socio'], 403);
+                        }
+                    }
+                    if ($roles->contains('socio') && $socio_id != $user->socio_id) {
+                        return response()->json(['error' => 'Sin permisos para ver este socio'], 403);
+                    }
+                    $query->where('socio_id', $socio_id);
+                }
+
+                $desde_fecha = $request->input('desde_fecha');
+                $hasta_fecha = $request->input('hasta_fecha');
+                
+                if ($desde_fecha && $hasta_fecha) {
+                    $query->whereBetween('fecha_operacion', [
+                        $desde_fecha . ' 00:00:00', 
+                        $hasta_fecha . ' 23:59:59'
+                    ]);
+                }
+
+                // Aplicar búsqueda de DataTables
+                $searchValue = $request->input('search.value');
+                if (!empty($searchValue)) {
+                    $query->where(function($q) use ($searchValue) {
+                        $q->where('numero', 'LIKE', "%{$searchValue}%")
+                          ->orWhere('estado_actual', 'LIKE', "%{$searchValue}%")
+                          ->orWhere('tipo', 'LIKE', "%{$searchValue}%")
+                          ->orWhereHas('cliente', function($clienteQuery) use ($searchValue) {
+                              $clienteQuery->where('cuit', 'LIKE', "%{$searchValue}%")
+                                          ->orWhere('apelnombres', 'LIKE', "%{$searchValue}%");
+                          })
+                          ->orWhereHas('nodo', function($nodoQuery) use ($searchValue) {
+                              $nodoQuery->where('nombre', 'LIKE', "%{$searchValue}%");
+                          })
+                          ->orWhereHas('socio', function($socioQuery) use ($searchValue) {
+                              $socioQuery->where('razon_social', 'LIKE', "%{$searchValue}%");
+                          });
+                    });
+                }
+
+                // Obtener resultados con paginación para DataTables
+                $start = (int) $request->input('start', 0);
+                $length = (int) $request->input('length', 50);
+                $draw = (int) $request->input('draw', 1);
+
+                // Contar total sin filtros
+                $totalQuery = Operacion::query();
+                if ($roles->contains('nodo')) {
+                    $totalQuery->where('nodo_id', $user->nodo_id);
+                } elseif ($roles->contains('socio')) {
+                    $totalQuery->where('socio_id', $user->socio_id);
+                }
+                $recordsTotal = $totalQuery->count();
+
+                // Aplicar filtros y contar
+                $recordsFiltered = $query->count();
+
+                // Obtener datos paginados
+                $operaciones = $query->orderBy('fecha_operacion', 'desc')
+                    ->orderBy('created_at', 'desc')
+                    ->skip($start)
+                    ->take($length)
+                    ->get();
+
+                // Formatear datos para DataTables
+                $data = [];
+                foreach ($operaciones as $operacion) {
+                    $fechaOp = $operacion->fecha_operacion ? \Carbon\Carbon::parse($operacion->fecha_operacion)->format('d/m/Y') : '';
+                    $fechaEstado = $operacion->fecha_estado ? \Carbon\Carbon::parse($operacion->fecha_estado)->format('d/m/Y') : '';
+                    $valorCuota = $operacion->valor_cuota ? '$' . number_format($operacion->valor_cuota, 2, ',', '.') : '';
+                    $valorTotal = $operacion->total ? '$' . number_format($operacion->total, 2, ',', '.') : '';
+                    
+                    $estadoClass = $operacion->estado_actual === 'ACTIVO' ? 'text-success' : 
+                                  ($operacion->estado_actual === 'AFECTADO' ? 'text-danger' : 'text-warning');
+
+                    $acciones = '';
+                    if (auth()->user()->can('admin.operaciones.show')) {
+                        $cuit = $operacion->cliente ? $operacion->cliente->cuit : '';
+                        $acciones .= '<a href="/admin/operaciones/show?cuit=' . $cuit . '" class="btn btn-primary btn-sm me-1" title="Ver operaciones"><i class="bi bi-eye"></i></a>';
+                    }
+                    if (auth()->user()->can('admin.operaciones.cargar')) {
+                        $acciones .= '<a href="/admin/operaciones/afectar/' . $operacion->id . '" class="btn btn-warning btn-sm" title="Afectar/Desafectar"><i class="bi bi-fire"></i></a>';
+                    }
+
+                    $data[] = [
+                        'numero' => '<strong>' . ($operacion->numero ?? '') . '</strong>',
+                        'cuit' => $operacion->cliente ? $operacion->cliente->cuit : '',
+                        'apellidos' => $operacion->cliente ? $operacion->cliente->apelnombres : '',
+                        'estado' => '<span class="' . $estadoClass . '"><strong>' . ($operacion->estado_actual ?? '') . '</strong></span>',
+                        'tipo' => '<span class="badge ' . ($operacion->tipo === 'Solicitante' ? 'badge-primary' : 'badge-secondary') . '">' . ($operacion->tipo ?? '') . '</span>',
+                        'fecha_operacion' => $fechaOp,
+                        'fecha_estado' => $fechaEstado,
+                        'nodo' => $operacion->nodo ? $operacion->nodo->nombre : '',
+                        'socio' => $operacion->socio ? $operacion->socio->razon_social : '',
+                        'total' => '<div class="text-end">' . $valorTotal . '</div>',
+                        'acciones' => '<div class="text-center">' . $acciones . '</div>'
+                    ];
+                }
+
+                return response()->json([
+                    'draw' => $draw,
+                    'recordsTotal' => $recordsTotal,
+                    'recordsFiltered' => $recordsFiltered,
+                    'data' => $data
+                ]);
+                
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'Error interno del servidor',
+                    'message' => $e->getMessage(),
+                    'operaciones' => []
+                ], 500);
+            }
+        }
+
+        // Para peticiones normales, devolver la vista
+        return view('admin.operaciones.listar', compact('nodos', 'socios'));
+    }
+
+    /**
+     * Debug de operaciones (temporal)
+     */
+    public function debug()
+    {
+        $user = Auth::user();
+        $roles = $user->roles->pluck('name');
+        
+        // Obtener nodos según permisos
+        if ($roles->contains('nodo')) {
+            $nodos = Nodo::where('id', $user->nodo_id)->get();
+        } elseif ($roles->contains('socio')) {
+            $socio = Socio::find($user->socio_id);
+            $nodos = $socio ? Nodo::where('id', $socio->nodo_id)->get() : collect();
+        } else {
+            $nodos = Nodo::orderBy('nombre')->get();
+        }
+        
+        // Obtener socios según permisos
+        if ($roles->contains('nodo')) {
+            $socios = Socio::where('nodo_id', $user->nodo_id)->orderBy('razon_social')->get();
+        } elseif ($roles->contains('socio')) {
+            $socios = Socio::where('id', $user->socio_id)->get();
+        } else {
+            $socios = Socio::orderBy('razon_social')->get();
+        }
+
+        return view('admin.operaciones.debug', compact('nodos', 'socios'));
+    }
+
+    /**
+     * Obtener socios por nodo para el listado de operaciones
+     */
+    public function getSociosByNodoForList($nodoId)
+    {
+        $user = Auth::user();
+        $roles = $user->roles->pluck('name');
+        
+        // Verificar permisos
+        if ($roles->contains('nodo') && $nodoId != $user->nodo_id) {
+            return response()->json(['error' => 'Sin permisos'], 403);
+        }
+        
+        if ($roles->contains('socio')) {
+            $socio = Socio::find($user->socio_id);
+            if (!$socio || $socio->nodo_id != $nodoId) {
+                return response()->json(['error' => 'Sin permisos'], 403);
+            }
+        }
+        
+        $socios = Socio::where('nodo_id', $nodoId)->orderBy('razon_social')->get();
+        return response()->json($socios);
+    }
+
 }

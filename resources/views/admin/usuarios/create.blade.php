@@ -37,23 +37,53 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="nodo_id">Nodo</label><b>*</b>
-                            <select class="form-control" id="nodo_id" name="nodo_id" onchange="filtrarSocios()">
-                                <option selected disabled>Seleccione un Nodo</option>
-                                @foreach($nodos as $nodo)
-                                    <option value="{{$nodo->id}}" {{old('nodo_id') == $nodo->id ? 'selected' : ''}}>{{$nodo->nombre}}</option>
-                                @endforeach
-                            </select>
+                            @if(auth()->user()->hasRole('nodo'))
+                                {{-- Si el usuario es nodo, solo mostrar su nodo y deshabilitarlo --}}
+                                <select class="form-control" id="nodo_id" name="nodo_id" disabled>
+                                    @foreach($nodos as $nodo)
+                                        @if($nodo->id == auth()->user()->nodo_id)
+                                            <option value="{{$nodo->id}}" selected>{{$nodo->nombre}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                {{-- Campo hidden para enviar el valor --}}
+                                <input type="hidden" name="nodo_id" value="{{auth()->user()->nodo_id}}">
+                            @else
+                                {{-- Para otros roles, mostrar todos los nodos --}}
+                                <select class="form-control" id="nodo_id" name="nodo_id" onchange="filtrarSocios()">
+                                    <option selected disabled>Seleccione un Nodo</option>
+                                    @foreach($nodos as $nodo)
+                                        <option value="{{$nodo->id}}" {{old('nodo_id') == $nodo->id ? 'selected' : ''}}>{{$nodo->nombre}}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+                            @error('nodo_id')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="socio_id">Socio</label><b>*</b>
-                            <select class="form-control" id="socio_id" name="socio_id">
-                                <option selected disabled>Seleccione un Socio</option>
-                                @foreach($socios as $socio)
-                                    <option value="{{$socio->id}}" data-nodo-id="{{$socio->nodo_id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
-                                @endforeach
-                            </select>
+                            @if(auth()->user()->hasRole('nodo'))
+                                <select class="form-control" id="socio_id" name="socio_id" required>
+                                    <option value="" disabled selected>Debe seleccionar un Socio</option>
+                                    @foreach($socios as $socio)
+                                        <option value="{{$socio->id}}" data-nodo-id="{{$socio->nodo_id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
+                                    @endforeach
+                                </select>
+                                <small class="text-info">Debe seleccionar un socio para crear el usuario</small>
+                            @else
+                                <select class="form-control" id="socio_id" name="socio_id">
+                                    <option selected disabled>Seleccione un Socio</option>
+                                    @foreach($socios as $socio)
+                                        <option value="{{$socio->id}}" data-nodo-id="{{$socio->nodo_id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+                            @error('socio_id')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
                         </div>
                     </div>
                     <br>
@@ -181,14 +211,22 @@ function blanquearFormulario() {
     const socioSelect = document.getElementById('socio_id');
     const rolSelect = document.getElementById('rol');
     
-    // Resetear nodo a la primera opción (placeholder)
-    nodoSelect.selectedIndex = 0;
+    // Solo resetear nodo si el usuario NO es de rol 'nodo'
+    @if(!auth()->user()->hasRole('nodo'))
+        // Resetear nodo a la primera opción (placeholder)
+        nodoSelect.selectedIndex = 0;
+    @endif
     
     // Limpiar socio y resetear opciones completas
     socioSelect.innerHTML = '<option selected disabled>Seleccione un Socio</option>';
     todasLasOpciones.forEach(opcion => {
         socioSelect.appendChild(opcion.cloneNode(true));
     });
+    
+    // Filtrar socios si hay un nodo seleccionado (para usuarios con rol nodo)
+    @if(auth()->user()->hasRole('nodo'))
+        filtrarSocios();
+    @endif
     
     // Resetear rol a la primera opción (placeholder)
     rolSelect.selectedIndex = 0;
@@ -263,9 +301,28 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Formulario blanqueado - Todos los campos han sido limpiados');
     }
     
+    // Si el usuario tiene rol nodo, filtrar socios automáticamente al cargar
+    @if(auth()->user()->hasRole('nodo'))
+        // Esperar un momento para que el DOM esté completamente cargado
+        setTimeout(() => {
+            filtrarSocios();
+        }, 100);
+    @endif
+    
     // Agregar manejador de envío del formulario
     if (form) {
         form.addEventListener('submit', function(e) {
+            // Validación especial para usuarios con rol nodo
+            @if(auth()->user()->hasRole('nodo'))
+                const socioSelect = document.getElementById('socio_id');
+                if (!socioSelect.value || socioSelect.value === '') {
+                    e.preventDefault();
+                    alert('Debe seleccionar un socio para crear el usuario.');
+                    socioSelect.focus();
+                    return false;
+                }
+            @endif
+            
             // Mostrar indicador de carga
             const submitButton = form.querySelector('button[type="submit"]');
             if (submitButton) {

@@ -42,7 +42,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="socio_id">Socio</label>
-                            <select class="form-control" id="socio_id" name="socio_id" required>
+                            <select class="form-control" id="socio_id" name="socio_id">
                                 <option value="">Seleccione un Socio</option>
                                 @foreach($socios->sortBy('razon_social') as $socio)
                                     <option value="{{$socio->id}}"
@@ -52,6 +52,11 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @if(auth()->user()->hasRole('nodo'))
+                                <small class="text-info">Debe seleccionar un socio</small>
+                            @else
+                                <small class="text-muted">Opcional para usuarios con rol Nodo</small>
+                            @endif
                             @error('socio_id')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -146,6 +151,30 @@
                                 // Ejecutar el filtro al cargar la página si ya hay un nodo seleccionado
                                 document.addEventListener('DOMContentLoaded', function() {
                                     const nodoSelect = document.getElementById('nodo_id');
+                                    const socioSelect = document.getElementById('socio_id');
+                                    const rolSelect = document.getElementById('rol');
+                                    
+                                    // Función para controlar si el socio es requerido
+                                    function actualizarRequerimientoSocio() {
+                                        @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('secretaria'))
+                                            const rolSeleccionado = rolSelect.value;
+                                            if (rolSeleccionado === 'nodo') {
+                                                socioSelect.removeAttribute('required');
+                                            } else if (rolSeleccionado === 'socio') {
+                                                socioSelect.setAttribute('required', 'required');
+                                            }
+                                        @else
+                                            // Para usuarios con rol nodo, siempre requerido
+                                            socioSelect.setAttribute('required', 'required');
+                                        @endif
+                                    }
+                                    
+                                    // Ejecutar al cambiar el rol
+                                    rolSelect.addEventListener('change', actualizarRequerimientoSocio);
+                                    
+                                    // Ejecutar al cargar la página
+                                    actualizarRequerimientoSocio();
+                                    
                                     if (nodoSelect.value) {
                                         nodoSelect.dispatchEvent(new Event('change'));
                                     }

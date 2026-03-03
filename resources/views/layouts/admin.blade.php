@@ -244,6 +244,12 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="{{ url('admin/operaciones/listar') }}" class="nav-link active">
+                                            <i class="bi bi-list-ul nav-icon"></i>
+                                            <p>Listar Operaciones</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="{{ url('admin/operaciones/show') }}" class="nav-link active">
                                             <i class="bi bi-fire nav-icon"></i>
                                             <p>Afectar/Desafectar Cliente</p>
@@ -331,6 +337,10 @@
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
     <!-- AdminLTE App -->
     <script src="{{ url('dist/js/adminlte.min.js?v=3.2.0') }}"></script>
+
+    <!-- Scripts personalizados de las vistas -->
+    @yield('scripts')
+
 </body>
 
 </html>

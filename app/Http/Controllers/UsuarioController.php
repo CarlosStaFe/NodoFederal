@@ -50,7 +50,44 @@ class UsuarioController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'rol' => 'required|in:admin,secretaria,nodo,socio',
+            'nodo_id' => 'required_unless:rol,admin,secretaria|nullable|exists:nodos,id',
+            'socio_id' => 'required_unless:rol,admin,secretaria|nullable|exists:socios,id',
         ]);
+
+        $currentUser = Auth::user();
+        $currentUserRoles = $currentUser->roles->pluck('name');
+        
+        // Validación adicional para usuarios con rol 'nodo'
+        if ($currentUserRoles->contains('nodo')) {
+            // Si el usuario actual es nodo, debe usar su propio nodo_id
+            if ($request->nodo_id != $currentUser->nodo_id) {
+                return redirect()->back()
+                    ->withErrors(['nodo_id' => 'No tiene permisos para crear usuarios en otros nodos.'])
+                    ->withInput();
+            }
+            
+            // Solo puede crear usuarios con rol 'socio'
+            if ($request->rol !== 'socio') {
+                return redirect()->back()
+                    ->withErrors(['rol' => 'Solo puede crear usuarios con rol Socio.'])
+                    ->withInput();
+            }
+            
+            // Debe seleccionar un socio obligatoriamente
+            if (empty($request->socio_id)) {
+                return redirect()->back()
+                    ->withErrors(['socio_id' => 'Debe seleccionar un socio para crear el usuario.'])
+                    ->withInput();
+            }
+            
+            // Verificar que el socio pertenece al nodo del usuario
+            $socio = \App\Models\Socio::find($request->socio_id);
+            if (!$socio || $socio->nodo_id != $currentUser->nodo_id) {
+                return redirect()->back()
+                    ->withErrors(['socio_id' => 'El socio seleccionado no pertenece a su nodo.'])
+                    ->withInput();
+            }
+        }
 
         $usuario = new User();
         $usuario->name = $request->name;
@@ -102,25 +139,42 @@ class UsuarioController extends Controller
     
     public function update(Request $request, $id)
     {
+        $currentUser = Auth::user();
+        $currentUserRoles = $currentUser->roles->pluck('name');
+        
+        // Determinar si el socio es requerido según el rol y permisos
+        $socioRequerido = 'required_if:rol,socio';
+        
+        // Si el usuario actual no es admin/secretaria, mantener reglas más estrictas
+        if (!$currentUserRoles->contains('admin') && !$currentUserRoles->contains('secretaria')) {
+            $socioRequerido = 'required_unless:rol,admin,secretaria';
+        }
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
             'rol' => 'required|in:admin,secretaria,nodo,socio',
             'nodo_id' => 'required_if:rol,nodo,socio|nullable|exists:nodos,id',
-            'socio_id' => 'required_if:rol,socio|nullable|exists:socios,id',
+            'socio_id' => $socioRequerido . '|nullable|exists:socios,id',
         ]);
 
         $usuario = User::findOrFail($id);
         $usuario->name = $request->name;
         $usuario->email = $request->email;
+        
         if (in_array($request->rol, ['admin', 'secretaria'])) {
             $usuario->nodo_id = null;
             $usuario->socio_id = null;
-        } else {
+        } elseif ($request->rol == 'nodo') {
+            $usuario->nodo_id = $request->nodo_id;
+            // Para usuarios nodo, el socio es opcional si lo edita admin/secretaria
+            $usuario->socio_id = $request->socio_id ?: null;
+        } else { // rol socio
             $usuario->nodo_id = $request->nodo_id;
             $usuario->socio_id = $request->socio_id;
         }
+        
         if ($request->password) {
             $usuario->password = bcrypt($request->password);
         }

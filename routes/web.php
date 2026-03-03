@@ -203,6 +203,24 @@ Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consul
 Route::get('/admin/operaciones/socios/{nodoId}', [OperacionController::class, 'getSociosByNodo'])
     ->name('admin.operaciones.socios-por-nodo')
     ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/listar', [OperacionController::class, 'listar'])
+    ->name('admin.operaciones.listar')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/debug', [OperacionController::class, 'debug'])
+    ->name('admin.operaciones.debug')
+    ->middleware(['auth']);
+Route::get('/admin/test-scripts', function() {
+    return view('admin.test-scripts');
+})->name('admin.test-scripts')->middleware(['auth']);
+Route::get('/admin/operaciones/debug-simple', function() {
+    return view('admin.operaciones.debug-simple');
+})->name('admin.operaciones.debug-simple')->middleware(['auth']);
+Route::get('/admin/test-search', function() {
+    return view('admin.test-search');
+})->name('admin.test-search')->middleware(['auth']);
+Route::get('/admin/operaciones/listar/socios/{nodoId}', [OperacionController::class, 'getSociosByNodoForList'])
+    ->name('admin.operaciones.listar.socios-por-nodo')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
 Route::get('/admin/operaciones/cargar', [OperacionController::class, 'cargar'])
     ->name('admin.operaciones.cargar')
     ->middleware(['auth', 'can:admin.operaciones.cargar']);

@@ -42,15 +42,11 @@ class AdminController extends Controller
 
         //Contador de operaciones
         if ($roles->contains('admin') || $roles->contains('secretaria')) {
-            $total_operaciones = Operacion::where('tipo', 'Solicitante')->count();
+            $total_operaciones = Operacion::count();
         } elseif ($roles->contains('nodo')) {
-            $total_operaciones = Operacion::where('nodo_id', $user->nodo_id)
-            ->where('tipo', 'Solicitante')
-            ->count();
+            $total_operaciones = Operacion::where('nodo_id', $user->nodo_id)->count();
         } elseif ($roles->contains('socio')) {
-            $total_operaciones = Operacion::where('socio_id', $user->socio_id)
-            ->where('tipo', 'Solicitante')
-            ->count();
+            $total_operaciones = Operacion::where('socio_id', $user->socio_id)->count();
         } else {
             $total_operaciones = 0;
         }
