@@ -4,13 +4,122 @@ namespace App\Http\Controllers;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
 use \App\Helpers\CuitHelper;
+use Illuminate\Support\Facades\Auth;
 
 class ClienteController extends Controller
 {
     public function index()
     {
-        $clientes = Cliente::all();
-        return view('admin.clientes.index', compact('clientes'));
+        return view('admin.clientes.index');
+    }
+
+    public function getData(Request $request)
+    {
+        try {
+            $search = $request->get('search')['value'] ?? '';
+            
+            \Log::info('Petición DataTable completa:', $request->all());
+            
+            // Solo procesar si hay un término de búsqueda válido
+            if (empty($search) || strlen(trim($search)) < 1) {
+                \Log::info('Búsqueda vacía, devolviendo resultados vacíos');
+                return response()->json([
+                    'draw' => intval($request->get('draw')),
+                    'data' => [],
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0
+                ]);
+            }
+            
+            $searchTerm = trim($search);
+            \Log::info("Búsqueda de clientes con término: '{$searchTerm}'");
+            
+            $query = Cliente::query();
+            
+            // Aplicar filtros más específicos
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('tipodoc', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('documento', 'LIKE', "%{$searchTerm}%") 
+                  ->orWhere('sexo', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('apelnombres', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('cuit', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('localidad', function($localQuery) use ($searchTerm) {
+                      $localQuery->where('provincia', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
+            
+            $clientes = $query->with('localidad')->get();
+            \Log::info("Encontrados " . count($clientes) . " clientes");
+            
+            // Filtro adicional en PHP para asegurar coincidencia
+            $clientesFiltrados = $clientes->filter(function($cliente) use ($searchTerm) {
+                $contiene = (
+                    stripos($cliente->tipodoc ?? '', $searchTerm) !== false ||
+                    stripos($cliente->documento ?? '', $searchTerm) !== false ||
+                    stripos($cliente->sexo ?? '', $searchTerm) !== false ||
+                    stripos($cliente->apelnombres ?? '', $searchTerm) !== false ||
+                    stripos($cliente->cuit ?? '', $searchTerm) !== false ||
+                    stripos($cliente->localidad->provincia ?? '', $searchTerm) !== false
+                );
+                
+                if (!$contiene) {
+                    \Log::debug("Cliente ID {$cliente->id} ({$cliente->apelnombres}) NO contiene '{$searchTerm}' - Excluido");
+                }
+                
+                return $contiene;
+            });
+            
+            $data = [];
+            $linea = 1;
+            
+            foreach ($clientesFiltrados as $cliente) {
+                $acciones = '<a href="' . url('admin/clientes/' . $cliente->id) . '" type="button" class="btn btn-success btn-sm" title="Ver cliente"><i class="bi bi-eye"></i></a> ';
+                $acciones .= '<a href="' . url('admin/clientes/' . $cliente->id . '/edit') . '" type="button" class="btn btn-info btn-sm" title="Editar cliente"><i class="bi bi-pencil"></i></a>';
+                
+                if (Auth::user() && Auth::user()->hasRole('admin')) {
+                    $acciones .= ' <a href="' . url('admin/clientes/' . $cliente->id . '/confirm-delete') . '" type="button" class="btn btn-danger btn-sm" title="Eliminar cliente"><i class="bi bi-trash"></i></a>';
+                }
+                
+                // Calcular edad
+                $edad = '-';
+                if ($cliente->nacimiento) {
+                    $fechaNac = \Carbon\Carbon::parse($cliente->nacimiento);
+                    $edad = $fechaNac->age;
+                }
+                
+                $data[] = [
+                    $linea++,
+                    $cliente->tipodoc ?? '-',
+                    $cliente->documento ?? '-', 
+                    $cliente->sexo ?? '-',
+                    $cliente->apelnombres ?? '-',
+                    $cliente->cuit ?? '-',
+                    $cliente->nacimiento ? \Carbon\Carbon::parse($cliente->nacimiento)->format('d-m-Y') : '-',
+                    $edad,
+                    $cliente->localidad ? $cliente->localidad->provincia : '-',
+                    $acciones
+                ];
+            }
+            
+            \Log::info("Registros finales después de filtro: " . count($data));
+            
+            return response()->json([
+                'draw' => intval($request->get('draw')),
+                'data' => $data,
+                'recordsTotal' => count($data),
+                'recordsFiltered' => count($data)
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error in ClienteController::getData: ' . $e->getMessage());
+            return response()->json([
+                'draw' => intval($request->get('draw')),
+                'data' => [],
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function create()

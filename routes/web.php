@@ -162,6 +162,9 @@ Route::get('/admin/socios/buscar-por-numero/{numero}', [SocioController::class, 
 Route::get('/admin/clientes', [ClienteController::class, 'index'])
     ->name('admin.clientes.index')
     ->middleware(['auth', 'can:admin.clientes.index']);
+Route::get('/admin/clientes/data', [ClienteController::class, 'getData'])
+    ->name('admin.clientes.data')
+    ->middleware(['auth', 'can:admin.clientes.index']);
 Route::get('/admin/clientes/create', [ClienteController::class, 'create'])
     ->name('admin.clientes.create')
     ->middleware(['auth', 'can:admin.clientes.create']);

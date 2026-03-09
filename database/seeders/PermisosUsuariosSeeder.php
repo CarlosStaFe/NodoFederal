@@ -18,19 +18,29 @@ class PermisosUsuariosSeeder extends Seeder
             'admin.usuarios.destroy',
             'admin.usuarios.confirm-delete',
             'admin.nodos.confirm-delete',
+            'admin.nodos.destroy',
             'admin.socios.confirm-delete',
+            'admin.socios.destroy',
             'admin.clientes.confirm-delete',
+            'admin.clientes.destroy',
             'admin.administracion.basedatos',
             'admin.administracion.consultar',
             'admin.operaciones.consultar',
         ];
         
-        // Asignar permisos al usuario admin (ID 1)
-        $user = User::find(1);
+        // Crear permisos
         foreach ($permisos as $permiso) {
-            $permisoObj = Permission::firstOrCreate(['name' => $permiso]);
-            if ($user) {
-                $user->givePermissionTo($permisoObj);
+            Permission::firstOrCreate(['name' => $permiso]);
+        }
+        
+        // Asignar todos los permisos a usuarios con rol admin
+        $usuariosAdmin = User::role('admin')->get();
+        foreach ($usuariosAdmin as $admin) {
+            foreach ($permisos as $permiso) {
+                $permisoObj = Permission::where('name', $permiso)->first();
+                if ($permisoObj) {
+                    $admin->givePermissionTo($permisoObj);
+                }
             }
         }
         
@@ -41,18 +51,11 @@ class PermisosUsuariosSeeder extends Seeder
             $secretaria->givePermissionTo($permisoBaseDatos);
         }
         
-        // Asignar permisos de consulta a roles específicos
+        // Asignar permisos de consulta a roles específicos  
         $permisoConsultaAdmin = Permission::firstOrCreate(['name' => 'admin.administracion.consultar']);
         $permisoConsultaOper = Permission::firstOrCreate(['name' => 'admin.operaciones.consultar']);
         
-        // Asignar permisos a usuarios con rol admin
-        $usuariosAdmin = User::role('admin')->get();
-        foreach ($usuariosAdmin as $admin) {
-            $admin->givePermissionTo($permisoConsultaAdmin);
-            $admin->givePermissionTo($permisoConsultaOper);
-        }
-        
-        // Asignar permisos a usuarios con rol secretaria
+        // Asignar permisos de consulta a usuarios con rol secretaria (si no se asignó arriba)
         foreach ($usuariosSecretaria as $secretaria) {
             $secretaria->givePermissionTo($permisoConsultaAdmin);
             $secretaria->givePermissionTo($permisoConsultaOper);

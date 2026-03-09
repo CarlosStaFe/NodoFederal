@@ -129,10 +129,16 @@ class SocioController extends Controller
 
     public function destroy(Socio $socio)
     {
-        $socio->delete();
-        return redirect()->route('admin.socios.index')
-            ->with('mensaje', 'Socio eliminado con éxito.')
-            ->with('icono', 'success');
+        try {
+            $socio->delete();
+            return redirect()->route('admin.socios.index')
+                ->with('mensaje', 'Socio eliminado con éxito.')
+                ->with('icono', 'success');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.socios.index')
+                ->with('mensaje', 'Error al eliminar el socio: ' . $e->getMessage())
+                ->with('icono', 'error');
+        }
     }
 
     public function buscarPorNumero($numero)

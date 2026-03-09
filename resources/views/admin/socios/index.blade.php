@@ -49,9 +49,9 @@
                             <td>
                                 <a href="{{url('admin/socios/'.$socio->id)}}" type="button" class="btn btn-success btn-sm" title="Ver socio"><i class="bi bi-eye"></i></a>
                                 <a href="{{url('admin/socios/'.$socio->id.'/edit')}}" type="button" class="btn btn-info btn-sm" title="Editar socio"><i class="bi bi-pencil"></i></a>
-                                @if(auth()->user()->roles->first()->name === 'admin')
+                                @can('admin.socios.confirm-delete')
                                     <a href="{{url('admin/socios/'.$socio->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm" title="Eliminar socio"><i class="bi bi-trash"></i></a>
-                                @endif
+                                @endcan
                             </td>
                         </tr>
                         @endforeach

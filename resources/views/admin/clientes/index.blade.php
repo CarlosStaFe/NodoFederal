@@ -19,55 +19,20 @@
                 <table id="example1" class="table table-striped table-bordered table-hover table-sm">
                     <thead style="background-color:rgb(14, 107, 169); color: white;">
                         <tr>
-                            <th style="text-align: center; width: 5%;">#</th>
-                            <th style="text-align: center; width: 6%;">TIPO</th>
-                            <th style="text-align: center; width: 8%;">DOCUM.</th>
-                            <th style="text-align: center; width: 4%;">S.</th>
-                            <th style="text-align: center; width: 28%;">APELLIDO Y NOMBRES</th>
+                            <th style="text-align: center; width: 4%;">#</th>
+                            <th style="text-align: center; width: 5%;">TIPO</th>
+                            <th style="text-align: center; width: 7%;">DOCUM.</th>
+                            <th style="text-align: center; width: 3%;">S.</th>
+                            <th style="text-align: center; width: 30%;">APELLIDO Y NOMBRES</th>
                             <th style="text-align: center; width: 10%;">C.U.I.T.</th>
-                            <th style="text-align: center; width: 18%;">ESTADO</th>
-                            <th style="text-align: center; width: 10%;">FECHA EST.</th>
-                            <th style="text-align: center; width: 11%;">ACCIONES</th>
+                            <th style="text-align: center; width: 10%;">FECHA NAC.</th>
+                            <th style="text-align: center; width: 5%;">EDAD</th>
+                            <th style="text-align: center; width: 10%;">PROVINCIA</th>
+                            <th style="text-align: center; width: 16%;">ACCIONES</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $linea = 1; ?>
-                        @foreach($clientes as $cliente)
-                        <tr>
-                            @php
-                            $estado = strtoupper($cliente->estado);
-                                if ($estado == 'ACTIVO') {
-                                    $color = 'white';
-                                    $bg = 'green';
-                                } elseif ($estado == 'ATRASADO') {
-                                    $color = 'black';
-                                    $bg = 'yellow';
-                                } elseif (in_array($estado, ['REGULARIZADO', 'CANCELADO', 'EN CONVENIO'])) {
-                                    $color = 'white';
-                                    $bg = 'orange';
-                                } elseif ($estado == 'CANCELADO CON ATRASO') {
-                                    $color = 'white';
-                                    $bg = 'red';
-                                }
-                            @endphp
-
-                            <td style="text-align: right;">{{ $linea++ }}</td>
-                            <td>{{ $cliente->tipodoc }}</td>
-                            <td>{{ $cliente->documento }}</td>
-                            <td style="text-align: center;">{{ $cliente->sexo }}</td>
-                            <td>{{ $cliente->apelnombres }}</td>
-                            <td>{{ $cliente->cuit }}</td>
-                            <td class="text-center" style="color: {{ $color }};@if(isset($bg)) background-color: {{ $bg }};@endif">{{ $cliente->estado }}</td>
-                            <td>{{ \Carbon\Carbon::parse($cliente->fechaestado)->format('d-m-Y') }}</td>
-                            <td>
-                                <a href="{{url('admin/clientes/'.$cliente->id)}}" type="button" class="btn btn-success btn-sm" title="Ver cliente"><i class="bi bi-eye"></i></a>
-                                <a href="{{url('admin/clientes/'.$cliente->id.'/edit')}}" type="button" class="btn btn-info btn-sm" title="Editar cliente"><i class="bi bi-pencil"></i></a>
-                                @if(auth()->user()->roles->first()->name === 'admin')
-                                    <a href="{{url('admin/clientes/'.$cliente->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm" title="Eliminar cliente"><i class="bi bi-trash"></i></a>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
+                        <!-- Se carga dinámicamente via AJAX -->
                     </tbody>
                 </table>                
             </div>
@@ -77,6 +42,35 @@
     <script>
         $(function() {
             $("#example1").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "searching": true,
+                "searchDelay": 500,
+                "ajax": {
+                    "url": "{{ route('admin.clientes.data') }}",
+                    "type": "GET",
+                    "data": function(d) {
+                        // Asegurar que solo se envíe la búsqueda del servidor
+                        console.log('Búsqueda enviada:', d.search.value);
+                        return d;
+                    },
+                    "error": function(xhr, error, thrown) {
+                        console.log("Error en AJAX:", xhr, error, thrown);
+                        alert("Error al cargar datos: " + error);
+                    }
+                },
+                "columns": [
+                    { "data": 0, "name": "numero", "orderable": false, "searchable": false },
+                    { "data": 1, "name": "tipodoc", "searchable": true },
+                    { "data": 2, "name": "documento", "searchable": true },
+                    { "data": 3, "name": "sexo", "searchable": true },
+                    { "data": 4, "name": "apelnombres", "searchable": true },
+                    { "data": 5, "name": "cuit", "searchable": true },
+                    { "data": 6, "name": "nacimiento", "searchable": false },
+                    { "data": 7, "name": "edad", "orderable": false, "searchable": false },
+                    { "data": 8, "name": "provincia", "searchable": true },
+                    { "data": 9, "name": "acciones", "orderable": false, "searchable": false }
+                ],
                 "responsive": true,
                 "lengthChange": true,
                 "autoWidth": false,
@@ -84,11 +78,12 @@
                 "pageLength": 10,
                 "language": {
                     "lengthMenu": "Mostrar _MENU_ registros por página",
-                    "zeroRecords": "No se encontraron resultados",
+                    "zeroRecords": "No se encontraron resultados. Escriba algo en el campo de búsqueda para mostrar datos.",
                     "info": "Mostrando página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay registros disponibles",
+                    "infoEmpty": "Escriba en el campo de búsqueda para mostrar resultados",
                     "infoFiltered": "(filtrado de _MAX_ registros totales)",
                     "search": "Buscar:",
+                    "processing": "Procesando...",
                     "paginate": {
                         "first": "Primero",
                         "last": "Último",
@@ -97,8 +92,12 @@
                     },
                 },
                 "columnDefs": [
-                    { "orderable": false, "targets": [0,8] }
-                ]
+                    { "orderable": false, "targets": [0,7,9] },
+                    { "className": "text-right", "targets": [0] }
+                ],
+                "drawCallback": function(settings) {
+                    console.log('DataTable redibujado con', settings.json.recordsFiltered, 'registros');
+                }
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>
