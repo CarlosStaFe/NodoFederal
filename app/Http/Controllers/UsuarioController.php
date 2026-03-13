@@ -125,8 +125,8 @@ class UsuarioController extends Controller
 
     public function show($id)
     {
-    $usuario = User::with(['nodo', 'socio'])->findOrFail($id);
-    return view('admin.usuarios.show', compact('usuario'));
+        $usuario = User::with(['nodo', 'socio', 'createdBy', 'updatedBy'])->findOrFail($id);
+        return view('admin.usuarios.show', compact('usuario'));
     }
 
     public function edit($id)

@@ -47,10 +47,16 @@
             </div>
         </div>
         <br>
-        <div class="form group">
+        
+        {{-- Usar el componente de auditoría --}}
+        <x-audit-info :model="$usuario" />
+        
+        <br>
+        <div class="form group ml-3">
             <a href="{{url('admin/usuarios')}}" class="btn btn-secondary">Cancelar</a>
             <button type="submit" class="btn btn-primary">Registrar Usuario</button>
         </div>
+        <br>
     </div>
 </div>
 

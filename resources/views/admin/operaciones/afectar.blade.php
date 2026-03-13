@@ -146,6 +146,9 @@
                                     <option value="CANCELADO">CANCELADO</option>
                                     <option value="REGULARIZADO">REGULARIZADO</option>
                                     <option value="EN CONVENIO">EN CONVENIO</option>
+                                @elseif(strtoupper($operacion->estado_actual) == 'EN CONVENIO')
+                                    <option value="ATRASADO">ATRASADO</option>
+                                    <option value="CANCELADO">CANCELADO</option>
                                 @endif
                             </select>
                             @error('estado_nuevo')

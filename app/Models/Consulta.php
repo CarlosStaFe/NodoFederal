@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\AuditableTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Consulta extends Model
 {
+    use AuditableTrait;
+
     protected $fillable = [
         'numero',
         'tipo',
@@ -15,6 +18,8 @@ class Consulta extends Model
         'nodo_id',
         'socio_id',
         'user_id',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [

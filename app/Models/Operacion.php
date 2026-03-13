@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\AuditableTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Operacion extends Model
 {
+    use AuditableTrait;
+
     protected $table = 'operaciones';
     protected $fillable = [
         'numero',
@@ -22,6 +25,8 @@ class Operacion extends Model
         'fecha_cuota',
         'clase',
         'usuario_id',
+        'created_by',
+        'updated_by',
     ];
     public function cliente()
     {

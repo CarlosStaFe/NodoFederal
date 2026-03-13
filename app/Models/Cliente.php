@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\AuditableTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Cliente extends Model
 {
+    use AuditableTrait;
     protected $fillable = [
         'tipodoc',
         'documento',
@@ -21,6 +23,8 @@ class Cliente extends Model
         'estado',
         'fechaestado',
         'observacion',
+        'created_by',
+        'updated_by',
     ];
 
     public function localidad()

@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\AuditableTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Nodo extends Model
 {
+    use AuditableTrait;
+
+    protected $fillable = [
+        'created_by',
+        'updated_by',
+    ];
     public function users()
     {
         return $this->hasMany(User::class);
