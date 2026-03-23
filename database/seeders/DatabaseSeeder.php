@@ -122,7 +122,6 @@ class DatabaseSeeder extends Seeder
 
         //RUTA PARA EL ADMIN - ADMINISTRACION BASE DE DATOS
         Permission::firstOrCreate(['name' => 'admin.administracion.basedatos'])->syncRoles([$admin]);
-        Permission::firstOrCreate(['name' => 'admin.administracion.consultar'])->syncRoles([$admin, $secretaria]);
 
         $this->call([
             LocalidadesSeeder::class,

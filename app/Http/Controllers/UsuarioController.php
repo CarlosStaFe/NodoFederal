@@ -51,7 +51,7 @@ class UsuarioController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'rol' => 'required|in:admin,secretaria,nodo,socio',
             'nodo_id' => 'required_unless:rol,admin,secretaria|nullable|exists:nodos,id',
-            'socio_id' => 'required_unless:rol,admin,secretaria|nullable|exists:socios,id',
+            'socio_id' => 'required_unless:rol,admin,secretaria,nodo|nullable|exists:socios,id',
         ]);
 
         $currentUser = Auth::user();
@@ -73,19 +73,14 @@ class UsuarioController extends Controller
                     ->withInput();
             }
             
-            // Debe seleccionar un socio obligatoriamente
-            if (empty($request->socio_id)) {
-                return redirect()->back()
-                    ->withErrors(['socio_id' => 'Debe seleccionar un socio para crear el usuario.'])
-                    ->withInput();
-            }
-            
-            // Verificar que el socio pertenece al nodo del usuario
-            $socio = \App\Models\Socio::find($request->socio_id);
-            if (!$socio || $socio->nodo_id != $currentUser->nodo_id) {
-                return redirect()->back()
-                    ->withErrors(['socio_id' => 'El socio seleccionado no pertenece a su nodo.'])
-                    ->withInput();
+            // Si se selecciona un socio, verificar que pertenece al nodo del usuario
+            if (!empty($request->socio_id)) {
+                $socio = \App\Models\Socio::find($request->socio_id);
+                if (!$socio || $socio->nodo_id != $currentUser->nodo_id) {
+                    return redirect()->back()
+                        ->withErrors(['socio_id' => 'El socio seleccionado no pertenece a su nodo.'])
+                        ->withInput();
+                }
             }
         }
 
@@ -98,7 +93,8 @@ class UsuarioController extends Controller
             $usuario->socio_id = 1;
         } else {
             $usuario->nodo_id = $request->nodo_id;
-            $usuario->socio_id = $request->socio_id;
+            // Para rol 'nodo', socio_id puede ser null
+            $usuario->socio_id = $request->rol === 'nodo' ? null : $request->socio_id;
         }
         $usuario->save();
 
@@ -147,7 +143,7 @@ class UsuarioController extends Controller
         
         // Si el usuario actual no es admin/secretaria, mantener reglas más estrictas
         if (!$currentUserRoles->contains('admin') && !$currentUserRoles->contains('secretaria')) {
-            $socioRequerido = 'required_unless:rol,admin,secretaria';
+            $socioRequerido = 'required_unless:rol,admin,secretaria,nodo';
         }
         
         $request->validate([

@@ -62,17 +62,36 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="socio_id">Socio</label><b>*</b>
+                            <label for="rol">Rol</label><b>*</b>
+                            <select class="form-control" id="rol" name="rol" required onchange="manejarCambioRol()">
+                                <option selected disabled>Seleccione un Rol</option>
+                                @if(auth()->user()->hasRole('nodo'))
+                                    <option value="socio" {{old('rol') == 'socio' ? 'selected' : ''}}>Socio</option>
+                                @else
+                                    <option value="admin" {{old('rol') == 'admin' ? 'selected' : ''}}>Administrador</option>
+                                    <option value="secretaria" {{old('rol') == 'secretaria' ? 'selected' : ''}}>Secretaria</option>
+                                    <option value="nodo" {{old('rol') == 'nodo' ? 'selected' : ''}}>Nodo</option>
+                                    <option value="socio" {{old('rol') == 'socio' ? 'selected' : ''}}>Socio</option>
+                                @endif
+                            </select>
+                            @error('rol')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="socio-field">
+                        <div class="form-group">
+                            <label for="socio_id">Socio <span id="socio-required" style="display:none;"><b>*</b></span></label>
                             @if(auth()->user()->hasRole('nodo'))
-                                <select class="form-control" id="socio_id" name="socio_id" required>
-                                    <option value="" disabled selected>Debe seleccionar un Socio</option>
+                                <select class="form-control" id="socio_id" name="socio_id">
+                                    <option value="" disabled selected>Seleccione un Socio</option>
                                     @foreach($socios as $socio)
                                         <option value="{{$socio->id}}" data-nodo-id="{{$socio->nodo_id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
                                     @endforeach
                                 </select>
-                                <small class="text-info">Debe seleccionar un socio para crear el usuario</small>
+                                <small class="text-info" id="socio-help">Opcional para usuarios con rol Nodo</small>
                             @else
                                 <select class="form-control" id="socio_id" name="socio_id">
                                     <option selected disabled>Seleccione un Socio</option>
@@ -80,6 +99,7 @@
                                         <option value="{{$socio->id}}" data-nodo-id="{{$socio->nodo_id}}" {{old('socio_id') == $socio->id ? 'selected' : ''}}>{{$socio->razon_social}}</option>
                                     @endforeach
                                 </select>
+                                <small class="text-info" id="socio-help">Requerido para rol Socio</small>
                             @endif
                             @error('socio_id')
                                 <small style="color: red">{{$message}}</small>
@@ -105,27 +125,8 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="rol">Rol</label><b>*</b>
-                            <select class="form-control" id="rol" name="rol" required>
-                                <option selected disabled>Seleccione un Rol</option>
-                                @if(auth()->user()->hasRole('nodo'))
-                                    <option value="socio" {{old('rol') == 'socio' ? 'selected' : ''}}>Socio</option>
-                                @else
-                                    <option value="admin" {{old('rol') == 'admin' ? 'selected' : ''}}>Administrador</option>
-                                    <option value="secretaria" {{old('rol') == 'secretaria' ? 'selected' : ''}}>Secretaria</option>
-                                    <option value="nodo" {{old('rol') == 'nodo' ? 'selected' : ''}}>Nodo</option>
-                                    <option value="socio" {{old('rol') == 'socio' ? 'selected' : ''}}>Socio</option>
-                                @endif
-                            </select>
-                            @error('rol')
-                                <small style="color: red">{{$message}}</small>
-                            @enderror
-                        </div>
-                    </div>
                     <br>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="password">Contraseña</label><b>*</b>
                             <div class="input-group">
@@ -150,7 +151,7 @@
                             }
                         </script>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="password_confirmation">Verificar Contraseña</label>
                             <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required readonly>
@@ -180,6 +181,7 @@ let todasLasOpciones = [];
 function filtrarSocios() {
     const nodoSelect = document.getElementById('nodo_id');
     const socioSelect = document.getElementById('socio_id');
+    const rolSelect = document.getElementById('rol');
     const nodoId = nodoSelect.value;
     
     // Limpiar el select de socios
@@ -196,6 +198,63 @@ function filtrarSocios() {
             socioSelect.appendChild(opcion.cloneNode(true));
         }
     });
+    
+    // Mantener el estado deshabilitado si el rol es 'nodo'
+    if (rolSelect.value === 'nodo') {
+        socioSelect.disabled = true;
+    }
+}
+
+// Función para manejar cambio de rol
+function manejarCambioRol() {
+    const rolSelect = document.getElementById('rol');
+    const socioField = document.getElementById('socio-field');
+    const socioSelect = document.getElementById('socio_id');
+    const socioRequired = document.getElementById('socio-required');
+    const socioHelp = document.getElementById('socio-help');
+    
+    const rolSeleccionado = rolSelect.value;
+    
+    // Limpiar selección de socio
+    socioSelect.value = '';
+    
+    switch (rolSeleccionado) {
+        case 'nodo':
+            // Para rol nodo: campo visible pero deshabilitado
+            socioField.style.display = 'block';
+            socioSelect.removeAttribute('required');
+            socioSelect.disabled = true;
+            socioRequired.style.display = 'none';
+            socioHelp.textContent = 'Campo deshabilitado para usuarios con rol Nodo';
+            break;
+        case 'socio':
+            // Para rol socio: campo visible, requerido y habilitado con filtrado por nodo
+            socioField.style.display = 'block';
+            socioSelect.setAttribute('required', 'required');
+            socioSelect.disabled = false;
+            socioRequired.style.display = 'inline';
+            socioHelp.textContent = 'Requerido para usuarios con rol Socio - Se filtrarán por nodo seleccionado';
+            break;
+        case 'admin':
+        case 'secretaria':
+            // Para admin y secretaria: ocultar campo
+            socioField.style.display = 'none';
+            socioSelect.removeAttribute('required');
+            socioSelect.disabled = false;
+            break;
+        default:
+            // Estado inicial: mostrar campo sin requerir
+            socioField.style.display = 'block';
+            socioSelect.removeAttribute('required');
+            socioSelect.disabled = false;
+            socioRequired.style.display = 'none';
+            socioHelp.textContent = 'Seleccione primero un rol';
+    }
+    
+    // Actualizar filtrado de socios si hay nodo seleccionado y el rol es socio
+    if (rolSeleccionado === 'socio') {
+        filtrarSocios();
+    }
 }
 
 // Función para blanquear todos los datos del formulario
@@ -230,6 +289,9 @@ function blanquearFormulario() {
     
     // Resetear rol a la primera opción (placeholder)
     rolSelect.selectedIndex = 0;
+    
+    // Habilitar el select de socios después de blanquear
+    socioSelect.disabled = false;
     
     // Rehabilitar botón de envío si estaba deshabilitado
     const submitButton = document.querySelector('button[type="submit"]');
@@ -309,19 +371,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     @endif
     
+    // Ejecutar lógica de rol inicial si hay un rol pre-seleccionado (old values)
+    const rolSelect = document.getElementById('rol');
+    if (rolSelect.value && rolSelect.value !== '') {
+        manejarCambioRol();
+    }
+    
     // Agregar manejador de envío del formulario
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Validación especial para usuarios con rol nodo
-            @if(auth()->user()->hasRole('nodo'))
-                const socioSelect = document.getElementById('socio_id');
-                if (!socioSelect.value || socioSelect.value === '') {
-                    e.preventDefault();
-                    alert('Debe seleccionar un socio para crear el usuario.');
-                    socioSelect.focus();
-                    return false;
-                }
-            @endif
+            // Validación especial para rol socio
+            const rolSelect = document.getElementById('rol');
+            const socioSelect = document.getElementById('socio_id');
+            if (rolSelect.value === 'socio' && (!socioSelect.value || socioSelect.value === '')) {
+                e.preventDefault();
+                alert('Debe seleccionar un socio para usuarios con rol Socio.');
+                socioSelect.focus();
+                return false;
+            }
             
             // Mostrar indicador de carga
             const submitButton = form.querySelector('button[type="submit"]');
