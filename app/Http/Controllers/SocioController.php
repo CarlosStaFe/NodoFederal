@@ -127,16 +127,18 @@ class SocioController extends Controller
         return view('admin.socios.delete', compact('socio'));
     }
 
-    public function destroy(Socio $socio)
+    public function destroy($id)
     {
         try {
-            $socio->delete();
+            $socio = Socio::findOrFail($id);
+            $socio->estado = 'Inactivo';
+            $socio->save();
             return redirect()->route('admin.socios.index')
-                ->with('mensaje', 'Socio eliminado con éxito.')
+                ->with('mensaje', 'Socio desactivado con éxito.')
                 ->with('icono', 'success');
         } catch (\Exception $e) {
             return redirect()->route('admin.socios.index')
-                ->with('mensaje', 'Error al eliminar el socio: ' . $e->getMessage())
+                ->with('mensaje', 'Error al desactivar el socio: ' . $e->getMessage())
                 ->with('icono', 'error');
         }
     }

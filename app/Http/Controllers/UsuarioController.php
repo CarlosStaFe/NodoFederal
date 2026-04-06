@@ -207,12 +207,19 @@ class UsuarioController extends Controller
 
     public function destroy($id)
     {
-        $usuario = User::findOrFail($id);
-        $usuario->delete();
+        try {
+            $usuario = User::findOrFail($id);
+            $usuario->email = 'usuario' . $id . '@eliminado.com';
+            $usuario->save();
 
-        return redirect()->route('admin.usuarios.index')
-            ->with('mensaje', 'Usuario eliminado con éxito.')
-            ->with('icono', 'success');
+            return redirect()->route('admin.usuarios.index')
+                ->with('mensaje', 'Usuario desactivado con éxito.')
+                ->with('icono', 'success');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.usuarios.index')
+                ->with('mensaje', 'Error al desactivar el usuario: ' . $e->getMessage())
+                ->with('icono', 'error');
+        }
     }
 
 }

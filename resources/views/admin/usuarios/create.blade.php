@@ -110,7 +110,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="name">Nombre del Usuario</label><b>*</b>
-                            <input type="text" class="form-control" value="{{old('name')}}" id="name" name="name" placeholder="Nombre del Usuario" required>
+                            <input type="text" class="form-control" value="" id="name" name="name" placeholder="Nombre del Usuario" required>
                             @error('name')
                                 <small style="color: red">{{$message}}</small>
                             @enderror

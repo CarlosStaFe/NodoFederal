@@ -102,9 +102,9 @@
                     <br>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="password">Contraseña</label>
+                            <label for="password">Contraseña <small class="text-muted">(opcional - dejar vacío para mantener actual)</small></label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Nueva contraseña">
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-outline-secondary" onclick="generarPassword()">Generar</button>
                                 </div>
@@ -185,8 +185,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="password_confirmation">Verificar Contraseña</label>
-                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required>
+                            <label for="password_confirmation">Verificar Contraseña <small class="text-muted">(opcional)</small></label>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirmar nueva contraseña">
                             @error('password_confirmation')
                                     <small style="color: red">{{$message}}</small>
                             @enderror

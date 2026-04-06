@@ -21,7 +21,7 @@
                         <select id="tipo" name="tipo" class="form-select" required>
                             <option value="" disabled selected>Tipo</option>
                             <option value="DNI">DNI</option>
-                            <option value="CUIL">CUIL</option>
+                            <option value="CUIT">CUIT</option>
                         </select>
                         @error('tipo')
                             <small style="color: red">{{$message}}</small>
@@ -47,7 +47,7 @@
                     </div>
                     <div class="col-lg-2 col-md-2 position-relative">
                         <label for="cuit" class="form-label">C.U.I.T.</label>
-                        <input id="cuit" name="cuit" type="text" value="" class="form-control" placeholder="Ingrese un CUIT" >
+                        <input id="cuit" name="cuit" type="text" value="" class="form-control" placeholder="Ingrese un CUIT" disabled>
                         @error('cuit')
                             <small style="color: red">{{$message}}</small>
                         @enderror
@@ -96,10 +96,32 @@
                 <br>
                 <div>
                     <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
-                    <button type="submit" class="btn btn-success me-5">Consultar</button>
+                    <button type="submit" class="btn btn-success me-5" id="btnConsultar">
+                        <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <span id="btnText">Consultar</span>
+                    </button>
                     <a href="{{ url('admin') }}" class="btn btn-info">Salir</a>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor para mostrar resultados -->
+<div class="col-md-12 mt-3" id="resultadosContainer" style="display: none;">
+    <div class="card card-outline card-success">
+        <div class="card-header">
+            <h3 class="card-title">Resultados de la Consulta</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" onclick="cerrarResultados()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="resultadosContent">
+                <!-- Aquí se mostrarán los resultados -->
+            </div>
         </div>
     </div>
 </div>
@@ -138,8 +160,14 @@
 
         function actualizarCuit() {
             if(tipo.value === 'DNI') {
+                // Habilitar campos necesarios para DNI
+                sexo.disabled = false;
+                sexo.setAttribute('required', 'required');
                 documento.disabled = false;
                 documento.setAttribute('required', 'required');
+                cuit.disabled = true;
+                cuit.removeAttribute('required');
+                cuit.placeholder = 'Se calculará automáticamente';
                 
                 // Validar que tenga al menos 7 dígitos antes de calcular CUIT
                 if(documento.value.length >= 7 && documento.value.length <= 8 && (sexo.value === 'M' || sexo.value === 'F')) {
@@ -164,17 +192,44 @@
                     documento.setCustomValidity('');
                 }
             } else if(tipo.value === 'CUIT') {
+                // Para CUIT, deshabilitar sexo y número, habilitar CUIT
+                sexo.value = '';
+                sexo.disabled = true;
+                sexo.removeAttribute('required');
                 documento.value = '';
                 documento.disabled = true;
                 documento.removeAttribute('required');
                 documento.setCustomValidity('');
                 cuit.value = '';
+                cuit.disabled = false;
+                cuit.setAttribute('required', 'required');
+                cuit.placeholder = 'Ingrese el CUIT completo (11 dígitos)';
+                cuit.setCustomValidity('');
+            }
+        }
+        
+        // Función para validar CUIT
+        function validarCuit() {
+            if(tipo.value === 'CUIT' && cuit.value.length > 0) {
+                // Verificar que sea numérico
+                if(!/^\d+$/.test(cuit.value)) {
+                    cuit.setCustomValidity('El CUIT solo puede contener números');
+                } else if(cuit.value.length !== 11) {
+                    cuit.setCustomValidity('El CUIT debe tener exactamente 11 dígitos');
+                } else {
+                    cuit.setCustomValidity('');
+                }
+            } else if(tipo.value === 'CUIT' && cuit.value.length === 0) {
+                cuit.setCustomValidity('El CUIT es obligatorio');
+            } else {
+                cuit.setCustomValidity('');
             }
         }
 
         documento.addEventListener('input', actualizarCuit);
         tipo.addEventListener('change', actualizarCuit);
         sexo.addEventListener('change', actualizarCuit);
+        cuit.addEventListener('input', validarCuit);
 
         // Inicializar estado al cargar
         actualizarCuit();
@@ -225,14 +280,124 @@
             @endif
         }
 
+        // Validación antes de enviar el formulario
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevenir envío normal del formulario
+            
+            // Validar que los campos requeridos estén completos según el tipo de documento
+            if(tipo.value === 'DNI') {
+                if(!documento.value || !sexo.value) {
+                    alert('Para consultas por DNI debe completar el número de documento y el sexo.');
+                    return false;
+                }
+                if(documento.value.length < 7 || documento.value.length > 8 || !/^\d+$/.test(documento.value)) {
+                    alert('El número de documento debe tener entre 7 y 8 dígitos numéricos.');
+                    return false;
+                }
+            } else if(tipo.value === 'CUIT') {
+                if(!cuit.value) {
+                    alert('Para consultas por CUIT debe ingresar el número de CUIT.');
+                    return false;
+                }
+                if(cuit.value.length !== 11 || !/^\d+$/.test(cuit.value)) {
+                    alert('El CUIT debe tener exactamente 11 dígitos numéricos.');
+                    return false;
+                }
+            } else {
+                alert('Debe seleccionar un tipo de documento.');
+                return false;
+            }
+            
+            // Realizar consulta AJAX
+            realizarConsulta();
+        });
+        
+        // Función para realizar la consulta AJAX
+        function realizarConsulta() {
+            const btnConsultar = document.getElementById('btnConsultar');
+            const spinner = document.getElementById('spinner');
+            const btnText = document.getElementById('btnText');
+            
+            // Mostrar loading
+            btnConsultar.disabled = true;
+            spinner.classList.remove('d-none');
+            btnText.textContent = 'Consultando...';
+            
+            // Preparar datos del formulario
+            const formData = new FormData(form);
+            
+            // Realizar petición AJAX
+            fetch('{{ route("admin.operaciones.consultar.api") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                mostrarResultados(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al realizar la consulta. Inténtelo nuevamente.');
+            })
+            .finally(() => {
+                // Ocultar loading
+                btnConsultar.disabled = false;
+                spinner.classList.add('d-none');
+                btnText.textContent = 'Consultar';
+            });
+        }
+        
+        // Función para mostrar resultados
+        function mostrarResultados(data) {
+            const resultadosContainer = document.getElementById('resultadosContainer');
+            const resultadosContent = document.getElementById('resultadosContent');
+            
+            if(data.success && data.data && data.data.length > 0) {
+                let html = '<div class="table-responsive"><table class="table table-striped table-bordered">';
+                html += '<thead><tr><th>Campo</th><th>Valor</th></tr></thead><tbody>';
+                
+                data.data.forEach(item => {
+                    for(let key in item) {
+                        if(item.hasOwnProperty(key)) {
+                            html += `<tr><td><strong>${key}</strong></td><td>${item[key] || '-'}</td></tr>`;
+                        }
+                    }
+                });
+                
+                html += '</tbody></table></div>';
+                resultadosContent.innerHTML = html;
+            } else {
+                resultadosContent.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> No se encontraron datos para la consulta realizada.</div>';
+            }
+            
+            resultadosContainer.style.display = 'block';
+            resultadosContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Función para cerrar resultados
+        function cerrarResultados() {
+            document.getElementById('resultadosContainer').style.display = 'none';
+        }
+
         // Botón Limpiar
         document.getElementById('limpiar').addEventListener('click', function() {
             tipo.selectedIndex = 0;
             sexo.selectedIndex = 0;
+            sexo.disabled = false;
+            sexo.setAttribute('required', 'required');
             documento.value = '';
             documento.disabled = false;
             documento.setAttribute('required', 'required');
+            documento.setCustomValidity('');
             cuit.value = '';
+            cuit.disabled = true;
+            cuit.removeAttribute('required');
+            cuit.placeholder = 'Ingrese un CUIT';
+            cuit.setCustomValidity('');
             
             // Limpiar filtros de nodo y socio si existen
             if (nodoSelect) {
