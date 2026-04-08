@@ -94,8 +94,9 @@
                     <br>
                 </div>
                 <br>
-                <div>
-                    <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
+                <p>><small class="text-info">* Puede consultar por DNI (completando documento y sexo, se calculará el CUIT automáticamente) o por CUIT ( deberá completar el valor). Al consultar será redirigido automáticamente al informe.</small></p>
+                <br>
+                <div>                    <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
                     <button type="submit" class="btn btn-success me-5" id="btnConsultar">
                         <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         <span id="btnText">Consultar</span>
@@ -128,6 +129,8 @@
 
 <script>
     function calcularCuit(dni, sexo) {
+        console.log('Calculando CUIT para DNI:', dni, 'Sexo:', sexo);
+        
         // Basado en reglas AFIP
         let prefijo = (sexo === 'F') ? '27' : '20';
         if (sexo === 'X') prefijo = '23';
@@ -149,14 +152,21 @@
             if(digito === 11) digito = 0;
             if(digito === 10) digito = 9;
         }
-        return prefijo + dni + digito;
+        
+        const cuitCalculado = prefijo + dni + digito;
+        console.log('CUIT calculado:', cuitCalculado);
+        return cuitCalculado;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    $(document).ready(function() {
+        console.log('Document ready (jQuery)');
+        
         const tipo = document.getElementById('tipo');
         const documento = document.getElementById('documento');
         const sexo = document.getElementById('sexo');
         const cuit = document.getElementById('cuit');
+        
+        console.log('Elements found:', { tipo, documento, sexo, cuit });
 
         function actualizarCuit() {
             if(tipo.value === 'DNI') {
@@ -280,12 +290,17 @@
             @endif
         }
 
-        // Validación antes de enviar el formulario
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevenir envío normal del formulario
+        // Interceptar envío del formulario
+        $('form').on('submit', function(e) {
+            console.log('Form submit intercepted');
+            e.preventDefault();
             
-            // Validar que los campos requeridos estén completos según el tipo de documento
+            // Validaciones básicas
+            if(!tipo.value) {
+                alert('Debe seleccionar un tipo de documento.');
+                return false;
+            }
+            
             if(tipo.value === 'DNI') {
                 if(!documento.value || !sexo.value) {
                     alert('Para consultas por DNI debe completar el número de documento y el sexo.');
@@ -294,6 +309,10 @@
                 if(documento.value.length < 7 || documento.value.length > 8 || !/^\d+$/.test(documento.value)) {
                     alert('El número de documento debe tener entre 7 y 8 dígitos numéricos.');
                     return false;
+                }
+                // Asegurar que el CUIT esté calculado antes de enviar
+                if(!cuit.value) {
+                    cuit.value = calcularCuit(documento.value.padStart(8, '0'), sexo.value);
                 }
             } else if(tipo.value === 'CUIT') {
                 if(!cuit.value) {
@@ -304,52 +323,54 @@
                     alert('El CUIT debe tener exactamente 11 dígitos numéricos.');
                     return false;
                 }
-            } else {
-                alert('Debe seleccionar un tipo de documento.');
-                return false;
             }
             
-            // Realizar consulta AJAX
-            realizarConsulta();
-        });
-        
-        // Función para realizar la consulta AJAX
-        function realizarConsulta() {
-            const btnConsultar = document.getElementById('btnConsultar');
-            const spinner = document.getElementById('spinner');
-            const btnText = document.getElementById('btnText');
+            // Hacer petición AJAX
+            const btnConsultar = $('#btnConsultar');
+            const spinner = $('#spinner');
+            const btnText = $('#btnText');
             
-            // Mostrar loading
-            btnConsultar.disabled = true;
-            spinner.classList.remove('d-none');
-            btnText.textContent = 'Consultando...';
+            btnConsultar.prop('disabled', true);
+            spinner.removeClass('d-none');
+            btnText.text('Consultando...');
             
-            // Preparar datos del formulario
-            const formData = new FormData(form);
-            
-            // Realizar petición AJAX
-            fetch('{{ route("admin.operaciones.consultar.api") }}', {
-                method: 'POST',
-                body: formData,
+            $.post({
+                url: '{{ route("admin.operaciones.consultar.api") }}',
+                data: $(this).serialize(),
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    console.log('Success response:', response);
+                    
+                    if(response.success) {
+                        // Cambiar el texto del botón para indicar redirección
+                        btnText.text('Redirigiendo al informe...');
+                        
+                        // Usar la URL proporcionada por el servidor o fallback a la ruta fija
+                        const redirectUrl = response.redirect_url || '{{ route("admin.operaciones.informe") }}';
+                        
+                        // Redireccionar después de un breve delay
+                        setTimeout(function() {
+                            window.location.href = redirectUrl;
+                        }, 500);
+                    } else {
+                        // Si no fue exitosa, mostrar los resultados como error
+                        mostrarResultados(response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr.responseText);
+                    alert('Error: ' + xhr.responseText);
+                },
+                complete: function() {
+                    btnConsultar.prop('disabled', false);
+                    spinner.addClass('d-none');
+                    btnText.text('Consultar');
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                mostrarResultados(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al realizar la consulta. Inténtelo nuevamente.');
-            })
-            .finally(() => {
-                // Ocultar loading
-                btnConsultar.disabled = false;
-                spinner.classList.add('d-none');
-                btnText.textContent = 'Consultar';
             });
-        }
+        });
         
         // Función para mostrar resultados
         function mostrarResultados(data) {
@@ -371,7 +392,11 @@
                 html += '</tbody></table></div>';
                 resultadosContent.innerHTML = html;
             } else {
-                resultadosContent.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> No se encontraron datos para la consulta realizada.</div>';
+                let errorMsg = data.error || 'No se encontraron datos para la consulta realizada.';
+                if(data.debug) {
+                    console.log('Debug info:', data.debug);
+                }
+                resultadosContent.innerHTML = `<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> ${errorMsg}</div>`;
             }
             
             resultadosContainer.style.display = 'block';
@@ -379,36 +404,14 @@
         }
         
         // Función para cerrar resultados
-        function cerrarResultados() {
+        window.cerrarResultados = function() {
             document.getElementById('resultadosContainer').style.display = 'none';
         }
 
         // Botón Limpiar
-        document.getElementById('limpiar').addEventListener('click', function() {
-            tipo.selectedIndex = 0;
-            sexo.selectedIndex = 0;
-            sexo.disabled = false;
-            sexo.setAttribute('required', 'required');
-            documento.value = '';
-            documento.disabled = false;
-            documento.setAttribute('required', 'required');
-            documento.setCustomValidity('');
-            cuit.value = '';
-            cuit.disabled = true;
-            cuit.removeAttribute('required');
-            cuit.placeholder = 'Ingrese un CUIT';
-            cuit.setCustomValidity('');
-            
-            // Limpiar filtros de nodo y socio si existen
-            if (nodoSelect) {
-                nodoSelect.selectedIndex = 0;
-            }
-            if (socioSelect) {
-                socioSelect.innerHTML = '<option value="" selected>Todos los socios</option>';
-                @foreach($socios as $socio)
-                    socioSelect.innerHTML += '<option value="{{ $socio->id }}">{{ $socio->razon_social ?? $socio->nombre }}</option>';
-                @endforeach
-            }
+        $('#limpiar').on('click', function() {
+            $('form')[0].reset();
+            actualizarCuit();
         });
     });
 </script>

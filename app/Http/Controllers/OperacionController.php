@@ -32,6 +32,49 @@ class OperacionController extends Controller
     }
     
     /**
+     * Calcula el CUIT a partir del DNI y sexo
+     */
+    private function calcularCuit($dni, $sexo)
+    {
+        // Pad el DNI a 8 dígitos
+        $dni = str_pad($dni, 8, '0', STR_PAD_LEFT);
+        
+        // Prefijo según el sexo
+        $prefijo = ($sexo === 'F') ? '27' : '20';
+        if ($sexo === 'X') $prefijo = '23';
+        
+        $cuitBase = $prefijo . $dni;
+        $multiplicadores = [5,4,3,2,7,6,5,4,3,2];
+        
+        $suma = 0;
+        for($i = 0; $i < 10; $i++) {
+            $suma += (int)$cuitBase[$i] * $multiplicadores[$i];
+        }
+        
+        $resto = $suma % 11;
+        $digito = 11 - $resto;
+        
+        if($digito === 11) $digito = 0;
+        if($digito === 10) {
+            // Cambiar prefijo y recalcular
+            if($prefijo === '20') $prefijo = '23';
+            else if($prefijo === '27') $prefijo = '23';
+            
+            $cuitBase = $prefijo . $dni;
+            $suma = 0;
+            for($i = 0; $i < 10; $i++) {
+                $suma += (int)$cuitBase[$i] * $multiplicadores[$i];
+            }
+            $resto = $suma % 11;
+            $digito = 11 - $resto;
+            if($digito === 11) $digito = 0;
+            if($digito === 10) $digito = 9;
+        }
+        
+        return $prefijo . $dni . $digito;
+    }
+
+    /**
      * Obtiene un token de autenticación desde la API externa usando datos del .env
      */
     public function obtenerTokenApi()
@@ -70,36 +113,87 @@ class OperacionController extends Controller
      */
     public function consultarApiPorCuil(Request $request)
     {
+        // Log para debug - ver qué datos llegan
+        Log::info('Datos recibidos en consultarApiPorCuil', [
+            'tipo' => $request->input('tipo'),
+            'documento' => $request->input('documento'),
+            'cuit' => $request->input('cuit'),
+            'sexo' => $request->input('sexo'),
+            'is_ajax' => $request->ajax()
+        ]);
+        
         $dni = $request->input('documento');
         $cuit = $request->input('cuit');
-        $apiUrl = env('API_CUIL');
-
-        if ($cuit) {
-            $apiUrl = preg_replace('/\?/', $cuit, $apiUrl, 1);
-        } elseif ($dni) {
-            $apiUrl = preg_replace('/\?/', $dni, $apiUrl, 1);
+        $tipo = $request->input('tipo');
+        $sexo = $request->input('sexo');
+        
+        // Para consultas por DNI, debemos usar el CUIT calculado
+        $cuilParaConsulta = null;
+        
+        if ($tipo === 'DNI' && $dni && $sexo) {
+            // Calcular CUIT a partir del DNI y sexo
+            $cuilParaConsulta = $this->calcularCuit($dni, $sexo);
+            Log::info('CUIT calculado para DNI', [
+                'dni' => $dni,
+                'sexo' => $sexo, 
+                'cuit_calculado' => $cuilParaConsulta
+            ]);
+        } elseif ($tipo === 'CUIT' && $cuit) {
+            $cuilParaConsulta = $cuit;
+            Log::info('Usando CUIT directo', ['cuit' => $cuilParaConsulta]);
         }
-        //dd($apiUrl);
+        
+        if (!$cuilParaConsulta) {
+            Log::error('No se pudo determinar CUIT para la consulta');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se pudo determinar el CUIT para la consulta.',
+                    'data' => []
+                ]);
+            }
+            return back()->with('error', 'No se pudo determinar el CUIT para la consulta.');
+        }
+        
+        $apiUrl = env('API_CUIL');
+        Log::info('API_CUIL configurada', ['url' => $apiUrl]);
+
+        // Reemplazar el placeholder con el CUIT
+        $apiUrl = preg_replace('/\?/', $cuilParaConsulta, $apiUrl, 1);
+        
+        Log::info('URL final construida', ['final_url' => $apiUrl]);
 
         // Obtener el token
         $token = $this->obtenerTokenApi();
-        //dd($token);
+        Log::info('Token obtenido', ['token_success' => !empty($token)]);
+        
         if (!$token) {
+            Log::error('No se pudo obtener token de API');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se pudo obtener el token de autenticación.',
+                    'data' => []
+                ]);
+            }
             return back()->with('error', 'No se pudo obtener el token de autenticación.');
         }
         $access_token = $token['access_token'] ?? null;
-        //dd($access_token);
 
-        if (!$token) {
-            return back()->with('error', 'No se pudo obtener el token de autenticación.');
-        }
-
-        $response = Http::withToken($access_token)->get($apiUrl);
-        // Mostrar en consola para depuración
-        //dd($response);
+        Log::info('Realizando petición a API', ['url' => $apiUrl]);
+        $response = Http::withToken($access_token)->timeout(30)->get($apiUrl);
+        
+        Log::info('Respuesta de API', [
+            'status' => $response->status(),
+            'successful' => $response->successful(),
+            'body' => $response->body()
+        ]);
 
         if ($response->successful()) {
+            Log::info('Respuesta exitosa de API');
             $datos = $response->json();
+            Log::info('Datos procesados de API', ['datos' => $datos]);
+            
             // Guardar en sesión para el informe
             session(['datos_api' => $datos]);
             // Persistir los datos en la sesión para el próximo request
@@ -133,9 +227,34 @@ class OperacionController extends Controller
             //dd($datos);
 
             $request->session()->put('datos_api', $datos);
-            // Redirigir al informe después de consultar
+            
+            // Si es una petición AJAX, devolver JSON
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Consulta realizada exitosamente',
+                    'redirect_url' => route('admin.operaciones.informe'),
+                    'data' => [$datos] // Envolver en array para consistencia con el frontend
+                ]);
+            }
+            
+            // Redirigir al informe después de consultar (solo para peticiones normales)
             return redirect()->route('admin.operaciones.informe');
         } else {
+            Log::error('Error en respuesta de API', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'headers' => $response->headers()
+            ]);
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se pudo obtener datos de la API. Status: ' . $response->status(),
+                    'debug' => $response->body(),
+                    'data' => []
+                ]);
+            }
             return back()->with('error', 'No se pudo obtener datos de la API.');
         }
     }
