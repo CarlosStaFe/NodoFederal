@@ -96,12 +96,13 @@
                 <br>
                 <p>><small class="text-info">* Puede consultar por DNI (completando documento y sexo, se calculará el CUIT automáticamente) o por CUIT ( deberá completar el valor). Al consultar será redirigido automáticamente al informe.</small></p>
                 <br>
-                <div>                    <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
+                <div>                    
+                    <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
                     <button type="submit" class="btn btn-success me-5" id="btnConsultar">
                         <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         <span id="btnText">Consultar</span>
                     </button>
-                    <a href="{{ url('admin') }}" class="btn btn-info">Salir</a>
+                    <a href="{{ url('admin') }}" class="btn btn-info" id="btnSalir">Salir</a>
                 </div>
             </form>
         </div>
@@ -327,10 +328,14 @@
             
             // Hacer petición AJAX
             const btnConsultar = $('#btnConsultar');
+            const btnLimpiar = $('#limpiar');
+            const btnSalir = $('#btnSalir');
             const spinner = $('#spinner');
             const btnText = $('#btnText');
             
             btnConsultar.prop('disabled', true);
+            btnLimpiar.prop('disabled', true);
+            btnSalir.addClass('disabled').css('pointer-events', 'none');
             spinner.removeClass('d-none');
             btnText.text('Consultando...');
             
@@ -366,6 +371,8 @@
                 },
                 complete: function() {
                     btnConsultar.prop('disabled', false);
+                    btnLimpiar.prop('disabled', false);
+                    btnSalir.removeClass('disabled').css('pointer-events', '');
                     spinner.addClass('d-none');
                     btnText.text('Consultar');
                 }
@@ -410,8 +417,59 @@
 
         // Botón Limpiar
         $('#limpiar').on('click', function() {
+            // Resetear formulario
             $('form')[0].reset();
-            actualizarCuit();
+            
+            // Limpiar campos manualmente para asegurar limpieza completa
+            document.getElementById('tipo').value = '';
+            document.getElementById('sexo').value = '';
+            document.getElementById('documento').value = '';
+            document.getElementById('cuit').value = '';
+            
+            // Resetear estados de campos
+            const tipoField = document.getElementById('tipo');
+            const sexoField = document.getElementById('sexo');
+            const documentoField = document.getElementById('documento');
+            const cuitField = document.getElementById('cuit');
+            
+            // Habilitar todos los campos inicialmente
+            sexoField.disabled = false;
+            documentoField.disabled = false;
+            cuitField.disabled = true; // CUIT inicia deshabilitado
+            
+            // Remover atributos required
+            sexoField.removeAttribute('required');
+            documentoField.removeAttribute('required');
+            cuitField.removeAttribute('required');
+            
+            // Limpiar validaciones custom
+            sexoField.setCustomValidity('');
+            documentoField.setCustomValidity('');
+            cuitField.setCustomValidity('');
+            
+            // Resetear placeholders
+            documentoField.placeholder = 'Ingrese un número';
+            cuitField.placeholder = 'Ingrese un CUIT';
+            
+            // Limpiar campos de nodo y socio si existen
+            const nodoField = document.getElementById('nodo_id');
+            const socioField = document.getElementById('socio_id');
+            if (nodoField) nodoField.value = '';
+            if (socioField) socioField.value = '';
+            
+            // Ocultar resultados si están visibles
+            const resultadosContainer = document.getElementById('resultadosContainer');
+            if (resultadosContainer) {
+                resultadosContainer.style.display = 'none';
+            }
+            
+            console.log('Formulario limpiado completamente');
+        });
+
+        // Deshabilitar flecha de retroceso
+        history.pushState(null, null, location.href);
+        window.addEventListener('popstate', function(event) {
+            history.go(1);
         });
     });
 </script>

@@ -7,7 +7,6 @@ use App\Models\Socio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class OperacionController extends Controller
@@ -82,10 +81,8 @@ class OperacionController extends Controller
         $url = env('API_TOKEN');
         $user = env('API_USER');
         $password = env('API_PASSWORD');
-        //dd($url, $user, $password);
         
         if (empty($url)) {
-            Log::error('API_TOKEN no está definido en el .env');
             return null;
         }
     
@@ -93,17 +90,10 @@ class OperacionController extends Controller
             'username' => $user,
             'password' => $password,
         ]);
-    
-        // dd($response->json());
 
         if ($response && $response->successful()) {
             return $response->json();
         } else {
-            Log::error('Error autenticando con la API', [
-                'url' => $url,
-                'status' => $response ? $response->status() : 'sin respuesta',
-                'body' => $response ? $response->body() : 'sin respuesta'
-            ]);
             return null;
         }
     }
@@ -113,14 +103,6 @@ class OperacionController extends Controller
      */
     public function consultarApiPorCuil(Request $request)
     {
-        // Log para debug - ver qué datos llegan
-        Log::info('Datos recibidos en consultarApiPorCuil', [
-            'tipo' => $request->input('tipo'),
-            'documento' => $request->input('documento'),
-            'cuit' => $request->input('cuit'),
-            'sexo' => $request->input('sexo'),
-            'is_ajax' => $request->ajax()
-        ]);
         
         $dni = $request->input('documento');
         $cuit = $request->input('cuit');
@@ -133,18 +115,11 @@ class OperacionController extends Controller
         if ($tipo === 'DNI' && $dni && $sexo) {
             // Calcular CUIT a partir del DNI y sexo
             $cuilParaConsulta = $this->calcularCuit($dni, $sexo);
-            Log::info('CUIT calculado para DNI', [
-                'dni' => $dni,
-                'sexo' => $sexo, 
-                'cuit_calculado' => $cuilParaConsulta
-            ]);
         } elseif ($tipo === 'CUIT' && $cuit) {
             $cuilParaConsulta = $cuit;
-            Log::info('Usando CUIT directo', ['cuit' => $cuilParaConsulta]);
         }
         
         if (!$cuilParaConsulta) {
-            Log::error('No se pudo determinar CUIT para la consulta');
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -155,20 +130,27 @@ class OperacionController extends Controller
             return back()->with('error', 'No se pudo determinar el CUIT para la consulta.');
         }
         
-        $apiUrl = env('API_CUIL');
-        Log::info('API_CUIL configurada', ['url' => $apiUrl]);
+        //$apiUrl = env('API_CUIL');
+        if ($tipo === 'DNI') {
+            $apiUrl = env('API_CUIL');
+        } else {
+            $apiUrl = env('API_CUIT');
+        }
 
         // Reemplazar el placeholder con el CUIT
         $apiUrl = preg_replace('/\?/', $cuilParaConsulta, $apiUrl, 1);
         
-        Log::info('URL final construida', ['final_url' => $apiUrl]);
+        // Mostrar URL por consola para debug
+        \Illuminate\Support\Facades\Log::info('API URL construida', [
+            'tipo' => $tipo,
+            'cuit_consulta' => $cuilParaConsulta,
+            'api_url' => $apiUrl
+        ]);
 
         // Obtener el token
         $token = $this->obtenerTokenApi();
-        Log::info('Token obtenido', ['token_success' => !empty($token)]);
         
         if (!$token) {
-            Log::error('No se pudo obtener token de API');
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -180,19 +162,10 @@ class OperacionController extends Controller
         }
         $access_token = $token['access_token'] ?? null;
 
-        Log::info('Realizando petición a API', ['url' => $apiUrl]);
         $response = Http::withToken($access_token)->timeout(30)->get($apiUrl);
-        
-        Log::info('Respuesta de API', [
-            'status' => $response->status(),
-            'successful' => $response->successful(),
-            'body' => $response->body()
-        ]);
 
         if ($response->successful()) {
-            Log::info('Respuesta exitosa de API');
             $datos = $response->json();
-            Log::info('Datos procesados de API', ['datos' => $datos]);
             
             // Guardar en sesión para el informe
             session(['datos_api' => $datos]);
@@ -209,18 +182,28 @@ class OperacionController extends Controller
                     $nodoId = $request->input('nodo_id') ?: ($user->nodo_id ?? 24);
                     $socioId = $request->input('socio_id') ?: ($user->socio_id ?? 1);
                     
-                    //dd($datos);
-                    \App\Models\Consulta::create([
-                        'numero' => $idLog,
-                        'tipo' => 'Consulta',
-                        'cuit' => $p['cuil'] ?? ($p['CUIL'] ?? ''),
-                        'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? 'SIN NOMBRE'),
-                        'fecha' => now(),
-                        'nodo_id' => $nodoId,
-                        'socio_id' => $socioId,
-                        'user_id' => $user->id,
-                        // Puedes agregar más campos si el JSON tiene otros datos relevantes
-                    ]);
+                    $cuitConsulta = $p['cuil'] ?? ($p['CUIL'] ?? '');
+                    
+                    // Verificar si ya existe una consulta reciente con los mismos datos (último minuto)
+                    $existeReciente = \App\Models\Consulta::where('cuit', $cuitConsulta)
+                        ->where('user_id', $user->id)
+                        ->where('created_at', '>', now()->subMinute())
+                        ->exists();
+                    
+                    if (!$existeReciente) {
+                        //dd($datos);
+                        \App\Models\Consulta::create([
+                            'numero' => $idLog,
+                            'tipo' => 'Consulta',
+                            'cuit' => $cuitConsulta,
+                            'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? 'SIN NOMBRE'),
+                            'fecha' => now(),
+                            'nodo_id' => $nodoId,
+                            'socio_id' => $socioId,
+                            'user_id' => $user->id,
+                            // Puedes agregar más campos si el JSON tiene otros datos relevantes
+                        ]);
+                    }
                 }
             //$datosBcra = $this->leerBCRA($cuit);
             //$datos['bcra'] = $datosBcra;
@@ -241,11 +224,6 @@ class OperacionController extends Controller
             // Redirigir al informe después de consultar (solo para peticiones normales)
             return redirect()->route('admin.operaciones.informe');
         } else {
-            Log::error('Error en respuesta de API', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-                'headers' => $response->headers()
-            ]);
             
             if ($request->ajax()) {
                 return response()->json([
@@ -424,18 +402,8 @@ class OperacionController extends Controller
                 
                 $cliente->save();
                 
-                Log::info('Cliente creado automáticamente desde informe', [
-                    'cuil' => $cuil,
-                    'nombre' => $cliente->apelnombres,
-                    'id' => $cliente->id
-                ]);
-                
             } catch (\Exception $e) {
-                Log::error('Error creando cliente desde informe', [
-                    'cuil' => $cuil,
-                    'error' => $e->getMessage(),
-                    'datos' => $p
-                ]);
+                // Error creando cliente desde informe
             }
         }
     }

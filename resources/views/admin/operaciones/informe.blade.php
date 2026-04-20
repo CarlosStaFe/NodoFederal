@@ -1191,4 +1191,12 @@
         </div>
     </div>
 
+<script>
+    // Deshabilitar flecha de retroceso
+    history.pushState(null, null, location.href);
+    window.addEventListener('popstate', function(event) {
+        history.go(1);
+    });
+</script>
+
 @endsection
