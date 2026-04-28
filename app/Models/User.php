@@ -60,4 +60,49 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Obtiene un token válido para este usuario desde cache/memoria
+     */
+    public function getApiToken(): ?string
+    {
+        $tokenService = app(\App\Services\ApiTokenService::class);
+        return $tokenService->getValidToken($this);
+    }
+
+    /**
+     * Obtiene información del token del usuario
+     */
+    public function getTokenInfo(): ?array
+    {
+        $tokenService = app(\App\Services\ApiTokenService::class);
+        return $tokenService->getTokenInfo($this);
+    }
+
+    /**
+     * Verifica si el usuario tiene un token válido en memoria
+     */
+    public function hasValidApiToken(): bool
+    {
+        $tokenInfo = $this->getTokenInfo();
+        return $tokenInfo && $tokenInfo['is_valid'];
+    }
+
+    /**
+     * Invalida el token del usuario en memoria
+     */
+    public function invalidateApiToken(): void
+    {
+        $tokenService = app(\App\Services\ApiTokenService::class);
+        $tokenService->invalidateUserToken($this);
+    }
+
+    /**
+     * Fuerza la renovación del token del usuario
+     */
+    public function refreshApiToken(): bool
+    {
+        $tokenService = app(\App\Services\ApiTokenService::class);
+        return $tokenService->forceRefreshUserToken($this);
+    }
 }

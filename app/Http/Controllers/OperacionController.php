@@ -74,28 +74,16 @@ class OperacionController extends Controller
     }
 
     /**
-     * Obtiene un token de autenticación desde la API externa usando datos del .env
+     * Obtiene un token de autenticación desde la API externa usando el servicio de tokens
      */
     public function obtenerTokenApi()
     {
-        $url = env('API_TOKEN');
-        $user = env('API_USER');
-        $password = env('API_PASSWORD');
+        // Usar el servicio de tokens que maneja cache automáticamente
+        $tokenService = app(\App\Services\ApiTokenService::class);
+        $user = Auth::user();
         
-        if (empty($url)) {
-            return null;
-        }
-    
-        $response = Http::post($url, [
-            'username' => $user,
-            'password' => $password,
-        ]);
-
-        if ($response && $response->successful()) {
-            return $response->json();
-        } else {
-            return null;
-        }
+        // Obtener token desde memoria (cache) para el usuario autenticado
+        return $tokenService->getValidToken($user);
     }
 
     /**
@@ -134,7 +122,7 @@ class OperacionController extends Controller
         if ($tipo === 'DNI') {
             $apiUrl = env('API_CUIL');
         } else {
-            $apiUrl = env('API_CUIT');
+            $apiUrl = env('API_CUIL');
         }
 
         // Reemplazar el placeholder con el CUIT
@@ -148,9 +136,9 @@ class OperacionController extends Controller
         ]);
 
         // Obtener el token
-        $token = $this->obtenerTokenApi();
+        $access_token = $this->obtenerTokenApi();
         
-        if (!$token) {
+        if (!$access_token) {
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -160,7 +148,6 @@ class OperacionController extends Controller
             }
             return back()->with('error', 'No se pudo obtener el token de autenticación.');
         }
-        $access_token = $token['access_token'] ?? null;
 
         $response = Http::withToken($access_token)->timeout(30)->get($apiUrl);
 
