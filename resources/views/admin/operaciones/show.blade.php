@@ -92,6 +92,10 @@
                             @forelse($operaciones as $op)
                                 @php
                                 $estado = strtoupper($op->estado_actual);
+                                // Valores por defecto
+                                $color = 'black';
+                                $bg = 'white';
+                                
                                     if ($estado == 'ACTIVO') {
                                         $color = 'white';
                                         $bg = 'green';
@@ -149,6 +153,10 @@
                             @forelse($operacionesComoGarante as $g)
                                 @php
                                 $estado = strtoupper($g->estado_actual);
+                                // Valores por defecto
+                                $color = 'black';
+                                $bg = 'white';
+                                
                                     if ($estado == 'ACTIVO') {
                                         $color = 'white';
                                         $bg = 'green';

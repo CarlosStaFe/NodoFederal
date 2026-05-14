@@ -111,6 +111,10 @@
                             <label for="estado_actual">Estado Actual</label>
                             @php
                                 $estado = strtoupper($operacion->estado_actual);
+                                // Valores por defecto
+                                $color = 'black';
+                                $bg = 'white';
+                                
                                 if ($estado == 'ACTIVO') {
                                     $color = 'white';
                                     $bg = 'green';
