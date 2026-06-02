@@ -20,6 +20,16 @@ class OperacionController extends Controller
         $socios = Socio::orderBy('razon_social')->get();
         return view('admin.operaciones.consultar', compact('nodos', 'socios'));
     }
+
+    /**
+     * Muestra el formulario de consulta de empresas por CUIT.
+     */
+    public function consultarCuit()
+    {
+        $nodos = Nodo::orderBy('nombre')->get();
+        $socios = Socio::orderBy('razon_social')->get();
+        return view('admin.operaciones.consultar-cuit', compact('nodos', 'socios'));
+    }
     
     /**
      * Obtiene los socios que pertenecen a un nodo específico
@@ -93,25 +103,25 @@ class OperacionController extends Controller
     {
         
         $dni = $request->input('documento');
-        $cuit = $request->input('cuit');
+        $cuil = $request->input('cuil');
         $tipo = $request->input('tipo');
         $sexo = $request->input('sexo');
         
-        // Para consultas por DNI, debemos usar el CUIT calculado
+        // Para consultas por DNI, debemos usar el CUIL calculado
         $cuilParaConsulta = null;
         
         if ($tipo === 'DNI' && $dni && $sexo) {
-            // Calcular CUIT a partir del DNI y sexo
+            // Calcular CUIL a partir del DNI y sexo
             $cuilParaConsulta = $this->calcularCuit($dni, $sexo);
-        } elseif ($tipo === 'CUIT' && $cuit) {
-            $cuilParaConsulta = $cuit;
+        } elseif ($tipo === 'CUIL' && $cuil) {
+            $cuilParaConsulta = $cuil;
         }
         
         if (!$cuilParaConsulta) {
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'No se pudo determinar el CUIT para la consulta.',
+                    'error' => 'No se pudo determinar el CUIL para la consulta.',
                     'data' => []
                 ]);
             }
@@ -131,7 +141,7 @@ class OperacionController extends Controller
         // Mostrar URL por consola para debug
         \Illuminate\Support\Facades\Log::info('API URL construida', [
             'tipo' => $tipo,
-            'cuit_consulta' => $cuilParaConsulta,
+            'cuil_consulta' => $cuilParaConsulta,
             'api_url' => $apiUrl
         ]);
 
@@ -169,10 +179,10 @@ class OperacionController extends Controller
                     $nodoId = $request->input('nodo_id') ?: ($user->nodo_id ?? 24);
                     $socioId = $request->input('socio_id') ?: ($user->socio_id ?? 1);
                     
-                    $cuitConsulta = $p['cuil'] ?? ($p['CUIL'] ?? '');
+                    $cuilConsulta = $p['cuil'] ?? ($p['CUIL'] ?? '');
                     
                     // Verificar si ya existe una consulta reciente con los mismos datos (último minuto)
-                    $existeReciente = \App\Models\Consulta::where('cuit', $cuitConsulta)
+                    $existeReciente = \App\Models\Consulta::where('cuit', $cuilConsulta)
                         ->where('user_id', $user->id)
                         ->where('created_at', '>', now()->subMinute())
                         ->exists();
@@ -182,7 +192,7 @@ class OperacionController extends Controller
                         \App\Models\Consulta::create([
                             'numero' => $idLog,
                             'tipo' => 'Consulta',
-                            'cuit' => $cuitConsulta,
+                            'cuit' => $cuilConsulta,
                             'apelynombres' => $p['apellidoNombre'] ?? ($p['nombre'] ?? 'SIN NOMBRE'),
                             'fecha' => now(),
                             'nodo_id' => $nodoId,
@@ -222,6 +232,123 @@ class OperacionController extends Controller
             }
             return back()->with('error', 'No se pudo obtener datos de la API.');
         }
+    }
+
+    /**
+     * Consulta la API externa de empresas por CUIT y guarda el resultado para informe-cuit.
+     */
+    public function consultarApiPorCuitEmpresa(Request $request)
+    {
+        $cuit = preg_replace('/\D/', '', (string) $request->input('cuit', ''));
+
+        if (strlen($cuit) !== 11) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'El CUIT debe tener exactamente 11 dígitos.',
+                    'data' => []
+                ]);
+            }
+            return back()->with('error', 'El CUIT debe tener exactamente 11 dígitos.');
+        }
+
+        $apiUrl = env('API_CUIT');
+        if (!$apiUrl) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se encontró configuración de API_CUIT.',
+                    'data' => []
+                ]);
+            }
+            return back()->with('error', 'No se encontró configuración de API_CUIT.');
+        }
+
+        $apiUrl = preg_replace('/\?/', $cuit, $apiUrl, 1);
+
+        \Illuminate\Support\Facades\Log::info('API URL empresa construida', [
+            'cuit_consulta' => $cuit,
+            'api_url' => $apiUrl
+        ]);
+
+        $access_token = $this->obtenerTokenApi();
+        if (!$access_token) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se pudo obtener el token de autenticación.',
+                    'data' => []
+                ]);
+            }
+            return back()->with('error', 'No se pudo obtener el token de autenticación.');
+        }
+
+        $response = Http::withToken($access_token)->timeout(30)->get($apiUrl);
+
+        if ($response->successful()) {
+            $datos = $response->json();
+            $request->session()->put('datos_api_empresa', $datos);
+            $request->session()->put('consulta_empresa_filtros', [
+                'cuit' => $cuit,
+                'nodo_id' => $request->input('nodo_id'),
+                'socio_id' => $request->input('socio_id'),
+            ]);
+
+            // Registrar consulta si la respuesta viene OK y con idLog
+            $result = $datos['result'] ?? [];
+            $idLog = $datos['data']['idLog'] ?? 0;
+            $empresa = $datos['data']['datosGenerales']['empresa']['datos'] ?? [];
+
+            if ((isset($result['code']) && (int) $result['code'] === 200)
+                && (isset($result['info']) && $result['info'] === 'OK')
+                && !empty($idLog)) {
+                $user = Auth::user();
+                $nodoId = $request->input('nodo_id') ?: ($user->nodo_id ?? 24);
+                $socioId = $request->input('socio_id') ?: ($user->socio_id ?? 1);
+                $cuitConsulta = (string) ($empresa['cuit'] ?? $cuit);
+                $razonSocial = $empresa['razon'] ?? 'SIN RAZON SOCIAL';
+
+                $existeReciente = \App\Models\Consulta::where('cuit', $cuitConsulta)
+                    ->where('user_id', $user->id)
+                    ->where('created_at', '>', now()->subMinute())
+                    ->exists();
+
+                if (!$existeReciente) {
+                    \App\Models\Consulta::create([
+                        'numero' => $idLog,
+                        'tipo' => 'Consulta Empresa',
+                        'cuit' => $cuitConsulta,
+                        'apelynombres' => $razonSocial,
+                        'fecha' => now(),
+                        'nodo_id' => $nodoId,
+                        'socio_id' => $socioId,
+                        'user_id' => $user->id,
+                    ]);
+                }
+            }
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Consulta de empresa realizada exitosamente',
+                    'redirect_url' => route('admin.operaciones.informe-cuit'),
+                    'data' => [$datos]
+                ]);
+            }
+
+            return redirect()->route('admin.operaciones.informe-cuit');
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'No se pudo obtener datos de la API. Status: ' . $response->status(),
+                'debug' => $response->body(),
+                'data' => []
+            ]);
+        }
+
+        return back()->with('error', 'No se pudo obtener datos de la API.');
     }
 
     /**
@@ -302,6 +429,30 @@ class OperacionController extends Controller
         }
         
         return view('admin.operaciones.informe', compact('datos'));
+    }
+
+    /**
+     * Muestra los datos de la consulta de empresa en el formulario informe-cuit.
+     */
+    public function informeCuit()
+    {
+        $datos = session('datos_api_empresa');
+        $filtrosConsulta = session('consulta_empresa_filtros', []);
+        if (!$datos && request()->hasSession()) {
+            $datos = request()->session()->get('datos_api_empresa');
+            $filtrosConsulta = request()->session()->get('consulta_empresa_filtros', []);
+        }
+
+        $nodoConsulta = null;
+        $socioConsulta = null;
+        if (!empty($filtrosConsulta['nodo_id'])) {
+            $nodoConsulta = Nodo::find($filtrosConsulta['nodo_id']);
+        }
+        if (!empty($filtrosConsulta['socio_id'])) {
+            $socioConsulta = Socio::find($filtrosConsulta['socio_id']);
+        }
+
+        return view('admin.operaciones.informe-cuit', compact('datos', 'filtrosConsulta', 'nodoConsulta', 'socioConsulta'));
     }
     
     /**
@@ -470,6 +621,34 @@ class OperacionController extends Controller
         
         $pdf = PDF::loadView('admin.operaciones.pdf', compact('datos'));
         return $pdf->stream();
+    }
+
+    /**
+     * Genera PDF del informe de empresa por CUIT.
+     */
+    public function pdfCuit()
+    {
+        $datos = session('datos_api_empresa');
+        if (!$datos && request()->hasSession()) {
+            $datos = request()->session()->get('datos_api_empresa');
+        }
+
+        $filtrosConsulta = session('consulta_empresa_filtros', []);
+        if (!$filtrosConsulta && request()->hasSession()) {
+            $filtrosConsulta = request()->session()->get('consulta_empresa_filtros', []);
+        }
+
+        $nodoConsulta = null;
+        $socioConsulta = null;
+        if (!empty($filtrosConsulta['nodo_id'])) {
+            $nodoConsulta = Nodo::find($filtrosConsulta['nodo_id']);
+        }
+        if (!empty($filtrosConsulta['socio_id'])) {
+            $socioConsulta = Socio::find($filtrosConsulta['socio_id']);
+        }
+
+        $pdf = PDF::loadView('admin.operaciones.pdf-cuit', compact('datos', 'filtrosConsulta', 'nodoConsulta', 'socioConsulta'));
+        return $pdf->stream('informe-empresa-cuit.pdf');
     }
 
     /**

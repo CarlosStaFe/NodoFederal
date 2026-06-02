@@ -21,7 +21,7 @@
                         <select id="tipo" name="tipo" class="form-select" required>
                             <option value="" disabled selected>Tipo</option>
                             <option value="DNI">DNI</option>
-                            <option value="CUIT">CUIT</option>
+                            <option value="CUIL">CUIL</option>
                         </select>
                         @error('tipo')
                             <small style="color: red">{{$message}}</small>
@@ -46,9 +46,9 @@
                         @enderror
                     </div>
                     <div class="col-lg-2 col-md-2 position-relative">
-                        <label for="cuit" class="form-label">C.U.I.T.</label>
-                        <input id="cuit" name="cuit" type="text" value="" class="form-control" placeholder="Ingrese un CUIT" disabled>
-                        @error('cuit')
+                        <label for="cuil" class="form-label">C.U.I.L.</label>
+                        <input id="cuil" name="cuil" type="text" value="" class="form-control" placeholder="Ingrese un CUIL" disabled>
+                        @error('cuil')
                             <small style="color: red">{{$message}}</small>
                         @enderror
                     </div>
@@ -94,7 +94,7 @@
                     <br>
                 </div>
                 <br>
-                <p>><small class="text-info">* Puede consultar por DNI (completando documento y sexo, se calculará el CUIT automáticamente) o por CUIT ( deberá completar el valor). Al consultar será redirigido automáticamente al informe.</small></p>
+                <p>><small class="text-info">* Puede consultar por DNI (completando documento y sexo, se calculará el CUIL automáticamente) o por CUIL ( deberá completar el valor). Al consultar será redirigido automáticamente al informe.</small></p>
                 <br>
                 <div>                    
                     <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
@@ -129,8 +129,8 @@
 </div>
 
 <script>
-    function calcularCuit(dni, sexo) {
-        console.log('Calculando CUIT para DNI:', dni, 'Sexo:', sexo);
+    function calcularCuil(dni, sexo) {
+        console.log('Calculando CUIL para DNI:', dni, 'Sexo:', sexo);
         
         // Basado en reglas AFIP
         let prefijo = (sexo === 'F') ? '27' : '20';
@@ -165,31 +165,31 @@
         const tipo = document.getElementById('tipo');
         const documento = document.getElementById('documento');
         const sexo = document.getElementById('sexo');
-        const cuit = document.getElementById('cuit');
+        const cuil = document.getElementById('cuil');
         
-        console.log('Elements found:', { tipo, documento, sexo, cuit });
+        console.log('Elements found:', { tipo, documento, sexo, cuil });
 
-        function actualizarCuit() {
+        function actualizarCuil() {
             if(tipo.value === 'DNI') {
                 // Habilitar campos necesarios para DNI
                 sexo.disabled = false;
                 sexo.setAttribute('required', 'required');
                 documento.disabled = false;
                 documento.setAttribute('required', 'required');
-                cuit.disabled = true;
-                cuit.removeAttribute('required');
-                cuit.placeholder = 'Se calculará automáticamente';
+                cuil.disabled = true;
+                cuil.removeAttribute('required');
+                cuil.placeholder = 'Se calculará automáticamente';
                 
-                // Validar que tenga al menos 7 dígitos antes de calcular CUIT
+                // Validar que tenga al menos 7 dígitos antes de calcular CUIL
                 if(documento.value.length >= 7 && documento.value.length <= 8 && (sexo.value === 'M' || sexo.value === 'F')) {
                     // Solo permitir números
                     if(/^\d+$/.test(documento.value)) {
-                        cuit.value = calcularCuit(documento.value.padStart(8, '0'), sexo.value);
+                        cuil.value = calcularCuil(documento.value.padStart(8, '0'), sexo.value);
                     } else {
-                        cuit.value = '';
+                        cuil.value = '';
                     }
                 } else {
-                    cuit.value = '';
+                    cuil.value = '';
                 }
                 
                 // Mostrar mensaje de error si no cumple con la longitud mínima
@@ -202,8 +202,8 @@
                 } else {
                     documento.setCustomValidity('');
                 }
-            } else if(tipo.value === 'CUIT') {
-                // Para CUIT, deshabilitar sexo y número, habilitar CUIT
+            } else if(tipo.value === 'CUIL') {
+                // Para CUIL, deshabilitar sexo y número, habilitar CUIL
                 sexo.value = '';
                 sexo.disabled = true;
                 sexo.removeAttribute('required');
@@ -211,39 +211,39 @@
                 documento.disabled = true;
                 documento.removeAttribute('required');
                 documento.setCustomValidity('');
-                cuit.value = '';
-                cuit.disabled = false;
-                cuit.setAttribute('required', 'required');
-                cuit.placeholder = 'Ingrese el CUIT completo (11 dígitos)';
-                cuit.setCustomValidity('');
+                cuil.value = '';
+                cuil.disabled = false;
+                cuil.setAttribute('required', 'required');
+                cuil.placeholder = 'Ingrese 11 dígitos';
+                cuil.setCustomValidity('');
             }
         }
         
-        // Función para validar CUIT
-        function validarCuit() {
-            if(tipo.value === 'CUIT' && cuit.value.length > 0) {
+        // Función para validar CUIL
+        function validarCuil() {
+            if(tipo.value === 'CUIL' && cuil.value.length > 0) {
                 // Verificar que sea numérico
-                if(!/^\d+$/.test(cuit.value)) {
-                    cuit.setCustomValidity('El CUIT solo puede contener números');
-                } else if(cuit.value.length !== 11) {
-                    cuit.setCustomValidity('El CUIT debe tener exactamente 11 dígitos');
+                if(!/^\d+$/.test(cuil.value)) {
+                    cuil.setCustomValidity('El CUIL solo puede contener números');
+                } else if(cuil.value.length !== 11) {
+                    cuil.setCustomValidity('El CUIL debe tener exactamente 11 dígitos');
                 } else {
-                    cuit.setCustomValidity('');
+                    cuil.setCustomValidity('');
                 }
-            } else if(tipo.value === 'CUIT' && cuit.value.length === 0) {
-                cuit.setCustomValidity('El CUIT es obligatorio');
+            } else if(tipo.value === 'CUIL' && cuil.value.length === 0) {
+                cuil.setCustomValidity('El CUIL es obligatorio');
             } else {
-                cuit.setCustomValidity('');
+                cuil.setCustomValidity('');
             }
         }
 
-        documento.addEventListener('input', actualizarCuit);
-        tipo.addEventListener('change', actualizarCuit);
-        sexo.addEventListener('change', actualizarCuit);
-        cuit.addEventListener('input', validarCuit);
+        documento.addEventListener('input', actualizarCuil);
+        tipo.addEventListener('change', actualizarCuil);
+        sexo.addEventListener('change', actualizarCuil);
+        cuil.addEventListener('input', validarCuil);
 
         // Inicializar estado al cargar
-        actualizarCuit();
+        actualizarCuil();
 
         // Funcionalidad para filtrar socios por nodo
         const nodoSelect = document.getElementById('nodo_id');
@@ -311,17 +311,17 @@
                     alert('El número de documento debe tener entre 7 y 8 dígitos numéricos.');
                     return false;
                 }
-                // Asegurar que el CUIT esté calculado antes de enviar
-                if(!cuit.value) {
-                    cuit.value = calcularCuit(documento.value.padStart(8, '0'), sexo.value);
+                // Asegurar que el CUIL esté calculado antes de enviar
+                if(!cuil.value) {
+                    cuil.value = calcularCuil(documento.value.padStart(8, '0'), sexo.value);
                 }
-            } else if(tipo.value === 'CUIT') {
-                if(!cuit.value) {
-                    alert('Para consultas por CUIT debe ingresar el número de CUIT.');
+            } else if(tipo.value === 'CUIL') {
+                if(!cuil.value) {
+                    alert('Para consultas por CUIL debe ingresar el número de CUIL.');
                     return false;
                 }
-                if(cuit.value.length !== 11 || !/^\d+$/.test(cuit.value)) {
-                    alert('El CUIT debe tener exactamente 11 dígitos numéricos.');
+                if(cuil.value.length !== 11 || !/^\d+$/.test(cuil.value)) {
+                    alert('El CUIL debe tener exactamente 11 dígitos numéricos.');
                     return false;
                 }
             }
@@ -424,32 +424,32 @@
             document.getElementById('tipo').value = '';
             document.getElementById('sexo').value = '';
             document.getElementById('documento').value = '';
-            document.getElementById('cuit').value = '';
+            document.getElementById('cuil').value = '';
             
             // Resetear estados de campos
             const tipoField = document.getElementById('tipo');
             const sexoField = document.getElementById('sexo');
             const documentoField = document.getElementById('documento');
-            const cuitField = document.getElementById('cuit');
+            const cuilField = document.getElementById('cuil');
             
             // Habilitar todos los campos inicialmente
             sexoField.disabled = false;
             documentoField.disabled = false;
-            cuitField.disabled = true; // CUIT inicia deshabilitado
+            cuilField.disabled = true; // CUIL inicia deshabilitado
             
             // Remover atributos required
             sexoField.removeAttribute('required');
             documentoField.removeAttribute('required');
-            cuitField.removeAttribute('required');
+            cuilField.removeAttribute('required');
             
             // Limpiar validaciones custom
             sexoField.setCustomValidity('');
             documentoField.setCustomValidity('');
-            cuitField.setCustomValidity('');
+            cuilField.setCustomValidity('');
             
             // Resetear placeholders
             documentoField.placeholder = 'Ingrese un número';
-            cuitField.placeholder = 'Ingrese un CUIT';
+            cuilField.placeholder = 'Ingrese un CUIL';
             
             // Limpiar campos de nodo y socio si existen
             const nodoField = document.getElementById('nodo_id');

@@ -90,7 +90,7 @@
                             <th class="text-center" style="width: 40px;">FECHA</th>
                             <th class="text-center" style="width: 30px;">HORA</th>
                             <th class="text-center" style="width: 50px;">TIPO</th>
-                            <th class="text-center" style="width: 60px;">CUIT</th>
+                            <th class="text-center" style="width: 60px;">CUIL</th>
                             <th class="text-center" style="width: 150px;">APELLIDO</th>
                             <th class="text-center" style="width: 150px;">NODO</th>
                             <th class="text-center" style="width: 150px;">SOCIO</th>
@@ -106,6 +106,19 @@
 </div>
 
 <script>
+    // Neutraliza el botón Atrás mientras esta vista esté activa.
+    (function bloquearRetroceso() {
+        if (!window.history || !window.history.pushState) {
+            return;
+        }
+
+        window.history.pushState({ noBackExitsApp: true }, '', window.location.href);
+
+        window.addEventListener('popstate', function() {
+            window.history.pushState({ noBackExitsApp: true }, '', window.location.href);
+        });
+    })();
+
     // Datos de socios para filtrado dinámico
     const sociosData = @json($socios->toArray());
     

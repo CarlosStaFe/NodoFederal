@@ -79,7 +79,7 @@
                     <thead style="background-color:rgb(14, 107, 169); color: white;">
                         <tr>
                             <th class="text-center">N° Op.</th>
-                            <th class="text-center">Cliente (CUIT)</th>
+                            <th class="text-center">Cliente (CUIL)</th>
                             <th class="text-center">Apellido y Nombres</th>
                             <th class="text-center">Estado</th>
                             <th class="text-center">Tipo</th>

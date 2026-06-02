@@ -194,14 +194,29 @@ Route::get('/admin/clientes/buscar-por-cuit/{cuit}', [ClienteController::class, 
 Route::get('/admin/operaciones/consultar', [OperacionController::class, 'consultar'])
     ->name('admin.operaciones.consulta')
     ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/consultar-cuit', [OperacionController::class, 'consultarCuit'])
+    ->name('admin.operaciones.consultar-cuit')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/empresas', [OperacionController::class, 'consultarCuit'])
+    ->name('admin.operaciones.empresas')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
 Route::get('/admin/operaciones/informe', [OperacionController::class, 'informe'])
     ->name('admin.operaciones.informe')
+    ->middleware(['auth', 'can:admin.operaciones.informe']);
+Route::get('/admin/operaciones/informe-cuit', [OperacionController::class, 'informeCuit'])
+    ->name('admin.operaciones.informe-cuit')
     ->middleware(['auth', 'can:admin.operaciones.informe']);
 Route::get('/admin/operaciones/pdf', [OperacionController::class, 'pdf'])
     ->name('admin.operaciones.pdf')
     ->middleware(['auth', 'can:admin.operaciones.pdf']);
+Route::get('/admin/operaciones/pdf-cuit', [OperacionController::class, 'pdfCuit'])
+    ->name('admin.operaciones.pdf-cuit')
+    ->middleware(['auth', 'can:admin.operaciones.pdf']);
 Route::post('/admin/operaciones/consultar', [OperacionController::class, 'consultarApiPorCuil'])
     ->name('admin.operaciones.consultar.api')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::post('/admin/operaciones/consultar-cuit', [OperacionController::class, 'consultarApiPorCuitEmpresa'])
+    ->name('admin.operaciones.consultar-cuit.api')
     ->middleware(['auth', 'can:admin.operaciones.consultar']);
 Route::get('/admin/operaciones/socios/{nodoId}', [OperacionController::class, 'getSociosByNodo'])
     ->name('admin.operaciones.socios-por-nodo')
