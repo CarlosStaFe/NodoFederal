@@ -4,9 +4,122 @@ namespace App\Http\Controllers;
 use App\Models\Socio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Artisan;
 
 class SocioController extends Controller
 {
+    public function procesar()
+    {
+        $user = Auth::user();
+        $roles = $user->roles->pluck('name');
+
+        if ($roles->contains('nodo')) {
+            $nodos = \App\Models\Nodo::where('id', $user->nodo_id)->get();
+            $socios = Socio::where('nodo_id', $user->nodo_id)->get();
+        } elseif ($roles->contains('socio')) {
+            $nodos = \App\Models\Nodo::where('id', $user->nodo_id)->get();
+            $socios = Socio::where('id', $user->socio_id)->where('nodo_id', $user->nodo_id)->get();
+        } elseif ($roles->contains('admin') || $roles->contains('secretaria')) {
+            $nodos = \App\Models\Nodo::all();
+            $socios = Socio::all();
+        } else {
+            $nodos = collect();
+            $socios = collect();
+        }
+
+        return view('admin.operaciones.procesar', compact('nodos', 'socios'));
+    }
+
+    public function getSociosByNodo($nodoId)
+    {
+        $socios = Socio::where('nodo_id', $nodoId)
+            ->orderBy('razon_social')
+            ->get();
+
+        return response()->json($socios);
+    }
+
+    public function procesarArchivo(Request $request)
+    {
+        $request->validate([
+            'archivo_nombre' => 'required|string|max:255',
+            'contenido_json' => 'required|json',
+            'nodo_id' => 'nullable|integer',
+            'socio_id' => 'nullable|integer',
+        ]);
+
+        $registros = json_decode($request->input('contenido_json'), true);
+        if (!is_array($registros) || count($registros) === 0) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'No se recibieron registros para procesar.',
+            ], 422);
+        }
+
+        $nodoId = $request->filled('nodo_id') ? (int) $request->input('nodo_id') : null;
+        $socioId = $request->filled('socio_id') ? (int) $request->input('socio_id') : null;
+
+        foreach ($registros as &$registro) {
+            if (!is_array($registro)) {
+                continue;
+            }
+
+            if ($nodoId && empty($registro['id_nodo'])) {
+                $registro['id_nodo'] = $nodoId;
+            }
+
+            if ($socioId && empty($registro['id_socio'])) {
+                $registro['id_socio'] = $socioId;
+            }
+        }
+        unset($registro);
+
+        $nombreBase = pathinfo($request->input('archivo_nombre'), PATHINFO_FILENAME);
+        $nombreBase = preg_replace('/[^A-Za-z0-9_-]/', '_', (string) $nombreBase);
+        if ($nombreBase === '') {
+            $nombreBase = 'afectaciones';
+        }
+
+        $nombreJson = $nombreBase . '.json';
+        $rutaJson = storage_path('app/' . $nombreJson);
+
+        if (file_exists($rutaJson)) {
+            return response()->json([
+                'ok' => false,
+                'message' => "El archivo {$nombreJson} ya existe. Revise el archivo y su contenido antes de procesar.",
+            ], 409);
+        }
+
+        file_put_contents(
+            $rutaJson,
+            json_encode($registros, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+        );
+
+        $exitCode = Artisan::call('procesar:afectaciones', [
+            '--file' => $nombreJson,
+        ]);
+
+        $salida = trim((string) Artisan::output());
+
+        if ($exitCode !== 0) {
+            return response()->json([
+                'ok' => false,
+                'message' => $salida !== ''
+                    ? $salida
+                    : 'El archivo no se pudo procesar por errores de validacion.',
+                'archivo_json' => $nombreJson,
+                'salida' => $salida,
+            ], 422);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Archivo convertido y procesado correctamente.',
+            'archivo_json' => $nombreJson,
+            'salida' => $salida,
+        ]);
+    }
+
     public function index()
     {
         $user = Auth::user();

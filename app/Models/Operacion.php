@@ -24,6 +24,7 @@ class Operacion extends Model
         'total',
         'fecha_cuota',
         'clase',
+        'referencia',
         'usuario_id',
         'created_by',
         'updated_by',

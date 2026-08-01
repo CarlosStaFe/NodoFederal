@@ -239,6 +239,15 @@ Route::get('/admin/test-search', function() {
 Route::get('/admin/operaciones/listar/socios/{nodoId}', [OperacionController::class, 'getSociosByNodoForList'])
     ->name('admin.operaciones.listar.socios-por-nodo')
     ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/procesar', [SocioController::class, 'procesar'])
+    ->name('admin.operaciones.procesar')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::get('/admin/operaciones/procesar/socios/{nodoId}', [SocioController::class, 'getSociosByNodo'])
+    ->name('admin.operaciones.procesar.socios-por-nodo')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
+Route::post('/admin/operaciones/procesar/archivo', [SocioController::class, 'procesarArchivo'])
+    ->name('admin.operaciones.procesar.archivo')
+    ->middleware(['auth', 'can:admin.operaciones.consultar']);
 Route::get('/admin/operaciones/cargar', [OperacionController::class, 'cargar'])
     ->name('admin.operaciones.cargar')
     ->middleware(['auth', 'can:admin.operaciones.cargar']);

@@ -1039,6 +1039,7 @@ class OperacionController extends Controller
                         'nodo' => $operacion->nodo ? $operacion->nodo->nombre : '',
                         'socio' => $operacion->socio ? $operacion->socio->razon_social : '',
                         'total' => '<div class="text-end">' . $valorTotal . '</div>',
+                        'referencia' => $operacion->referencia ?? '',
                         'acciones' => '<div class="text-center">' . $acciones . '</div>'
                     ];
                 }

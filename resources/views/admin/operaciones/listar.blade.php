@@ -88,6 +88,7 @@
                             <th class="text-center">Nodo</th>
                             <th class="text-center">Socio</th>
                             <th class="text-center">Total</th>
+                            <th class="text-center">Referencia</th>
                             <th class="text-center" style="width: 80px;">Acciones</th>
                         </tr>
                     </thead>
@@ -191,6 +192,7 @@ $(document).ready(function() {
                 { data: 'nodo', name: 'nodo', orderable: true, searchable: true },
                 { data: 'socio', name: 'socio', orderable: true, searchable: true },
                 { data: 'total', name: 'total', orderable: true, searchable: false },
+                { data: 'referencia', name: 'referencia', orderable: true, searchable: true, defaultContent: '' },
                 { data: 'acciones', name: 'acciones', orderable: false, searchable: false }
             ],
             order: [[4, 'desc']], // Ordenar por fecha de operación descendente

@@ -262,6 +262,12 @@
                                             <p>Afectar/Desafectar Cliente</p>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.operaciones.procesar') }}" class="nav-link active" style="color: #dc3545 !important;">
+                                            <i class="bi bi-floppy nav-icon" style="font-weight: 700;"></i>
+                                            <p style="color: #dc3545 !important; font-weight: 700;">Procesar Masivos</p>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         @endcan

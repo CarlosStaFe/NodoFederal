@@ -333,6 +333,13 @@
             } else if(document.getElementById('tipopersona')) {
                 sexo = document.getElementById('tipopersona').value;
             }
+            const dniValido = /^\d{7,8}$/.test(dni);
+
+            if(!dniValido) {
+                document.getElementById('cuit').value = '';
+                return;
+            }
+
             if(dni && sexo) {
                 fetch("{{ route('clientes.calcular-cuit') }}", {
                     method: 'POST',
@@ -371,6 +378,7 @@
             }
         }
         document.getElementById('documento').addEventListener('input', actualizarCuit);
+        document.getElementById('documento').addEventListener('blur', actualizarCuit);
         if(document.getElementById('sexo')) {
             document.getElementById('sexo').addEventListener('change', actualizarCuit);
         }

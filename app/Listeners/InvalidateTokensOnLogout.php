@@ -24,6 +24,14 @@ class InvalidateTokensOnLogout
     public function handle(Logout $event): void
     {
         $user = $event->user;
+
+        if (request()->hasSession()) {
+            request()->session()->forget([
+                'api_connection_active',
+                'api_connection_started_at',
+                'api_connection_last_check',
+            ]);
+        }
         
         if ($user) {
             Log::info("Usuario cerrando sesión: {$user->email}, invalidando tokens...");

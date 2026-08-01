@@ -3,14 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Models\Cliente;
-use App\Models\Operacion;
 use App\Models\Localidad;
-use App\Models\Nodo;
+use App\Models\Operacion;
 use App\Models\Socio;
 use App\Models\User;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ProcesarAfectaciones extends Command
 {
@@ -19,7 +18,7 @@ class ProcesarAfectaciones extends Command
      *
      * @var string
      */
-    protected $signature = 'procesar:afectaciones {--test=0 : Número de registros de prueba (0 = todos)}';
+    protected $signature = 'procesar:afectaciones {--test=0 : Numero de registros de prueba (0 = todos)} {--file=afectaciones.json : Archivo JSON dentro de storage/app}';
 
     /**
      * The console command description.
@@ -33,16 +32,19 @@ class ProcesarAfectaciones extends Command
      */
     public function handle()
     {
-        $this->info('Iniciando procesamiento de afectaciones...');
-        
-        // Verificar si el archivo existe usando ruta completa
-        $rutaArchivo = storage_path('app/afectaciones.json');
+        $archivoJson = basename((string) $this->option('file'));
+        if (!str_ends_with(strtolower($archivoJson), '.json')) {
+            $archivoJson .= '.json';
+        }
+
+        $this->info('Iniciando procesamiento de afectaciones desde: ' . $archivoJson);
+
+        $rutaArchivo = storage_path('app/' . $archivoJson);
         if (!file_exists($rutaArchivo)) {
-            $this->error("El archivo afectaciones.json no existe en: {$rutaArchivo}");
+            $this->error("El archivo {$archivoJson} no existe en: {$rutaArchivo}");
             return 1;
         }
 
-        // Leer el archivo JSON
         $contenido = file_get_contents($rutaArchivo);
         $afectaciones = json_decode($contenido, true);
 
@@ -57,12 +59,54 @@ class ProcesarAfectaciones extends Command
             $this->info("Modo de prueba: procesando solo {$testLimit} registros");
         }
 
+        $registrosConCuilInvalido = [];
+        foreach ($afectaciones as $indice => $afectacion) {
+            $cuilOriginal = (string) ($afectacion['CUIL'] ?? '');
+            $cuilLimpio = preg_replace('/\D/', '', $cuilOriginal);
+
+            if (strlen($cuilLimpio) !== 11) {
+                $registrosConCuilInvalido[] = [
+                    'indice' => $indice + 1,
+                    'id' => $afectacion['ID'] ?? 'N/A',
+                    'cuil' => $cuilOriginal,
+                ];
+            }
+        }
+
+        if (!empty($registrosConCuilInvalido)) {
+            $this->error('Se detectaron CUIL invalidos. Todos deben tener 11 digitos.');
+            foreach ($registrosConCuilInvalido as $errorCuil) {
+                $this->line(
+                    '- Fila ' . $errorCuil['indice'] .
+                    ' | ID: ' . $errorCuil['id'] .
+                    ' | CUIL: ' . ($errorCuil['cuil'] !== '' ? $errorCuil['cuil'] : '[vacio]')
+                );
+            }
+
+            return 1;
+        }
+
+        $registrosConReferenciaDuplicada = $this->obtenerReferenciasDuplicadasPorSocio($afectaciones);
+
+        if (!empty($registrosConReferenciaDuplicada)) {
+            $this->error('Se detectaron referencias existentes para el socio correspondiente en la tabla operaciones.');
+            foreach ($registrosConReferenciaDuplicada as $errorReferencia) {
+                $this->line(
+                    '- Fila ' . $errorReferencia['indice'] .
+                    ' | ID: ' . $errorReferencia['id'] .
+                    ' | Socio ID: ' . $errorReferencia['socio_id'] .
+                    ' | Referencia: ' . $errorReferencia['referencia']
+                );
+            }
+
+            return 1;
+        }
+
         $this->info('Total de registros a procesar: ' . count($afectaciones));
-        
-        // Obtener una localidad y usuario por defecto para campos obligatorios
+
         $localidadDefault = Localidad::first();
         $usuarioDefault = User::first();
-        
+
         if (!$localidadDefault || !$usuarioDefault) {
             $this->error('No se encontraron localidades o usuarios en la base de datos');
             return 1;
@@ -71,16 +115,15 @@ class ProcesarAfectaciones extends Command
         $clientesCreados = 0;
         $operacionesCreadas = 0;
         $errores = 0;
+        $ultimoNumeroOperacion = (int) (Operacion::max('numero') ?? 0);
 
         $progressBar = $this->output->createProgressBar(count($afectaciones));
         $progressBar->start();
 
         foreach ($afectaciones as $afectacion) {
             try {
-                // Buscar cliente por CUIL
                 $cliente = Cliente::where('cuit', $afectacion['CUIL'] ?? '')->first();
-                
-                // Si no existe el cliente, crearlo
+
                 if (!$cliente) {
                     $cliente = $this->crearCliente($afectacion, $localidadDefault->id);
                     if ($cliente) {
@@ -88,29 +131,35 @@ class ProcesarAfectaciones extends Command
                     }
                 }
 
-                // Crear operación si se tiene cliente
                 if ($cliente) {
-                    $operacion = $this->crearOperacion($afectacion, $cliente->id, $usuarioDefault->id);
+                    $this->actualizarEstadoClienteDesdeAfectacion($cliente, $afectacion);
+
+                    $operacion = $this->crearOperacion(
+                        $afectacion,
+                        $cliente->id,
+                        $usuarioDefault->id,
+                        $ultimoNumeroOperacion + 1
+                    );
                     if ($operacion) {
                         $operacionesCreadas++;
+                        $ultimoNumeroOperacion++;
                     }
                 }
-
             } catch (\Exception $e) {
                 $errores++;
-                \Log::error('Error procesando afectación ID: ' . ($afectacion['ID'] ?? 'N/A'), [
+                Log::error('Error procesando afectacion ID: ' . ($afectacion['ID'] ?? 'N/A'), [
                     'error' => $e->getMessage(),
-                    'data' => $afectacion
+                    'data' => $afectacion,
                 ]);
             }
-            
+
             $progressBar->advance();
         }
 
         $progressBar->finish();
-        
+
         $this->newLine();
-        $this->info("Procesamiento completado:");
+        $this->info('Procesamiento completado:');
         $this->info("- Clientes creados: {$clientesCreados}");
         $this->info("- Operaciones creadas: {$operacionesCreadas}");
         if ($errores > 0) {
@@ -120,24 +169,23 @@ class ProcesarAfectaciones extends Command
         return 0;
     }
 
-    private function crearCliente($afectacion, $localidadDefaultId)
+    private function crearCliente(array $afectacion, int $localidadDefaultId): ?Cliente
     {
         try {
-            // Extraer DNI del CUIL (quitar primeros 2 y último dígito)
-            $cuil = $afectacion['CUIL'] ?? '';
-            $documento = $afectacion['DNI'] ?? '';
-            
-            // Si no hay DNI, intentar extraerlo del CUIL
-            if (empty($documento) && strlen($cuil) == 11) {
-                $documento = substr($cuil, 2, -1);
+            $cuil = preg_replace('/\D/', '', (string) ($afectacion['CUIL'] ?? ''));
+            $documento = '';
+
+            if (strlen($cuil) === 11) {
+                $documento = substr($cuil, 2, 8);
+            } else {
+                $documento = (string) ($afectacion['DNI'] ?? '');
             }
-            
-            // Asegurar que el documento no exceda el rango de integer (máximo 2,147,483,647)
+
             $documentoInt = 0;
             if (!empty($documento)) {
-                $documentoInt = (int)$documento;
+                $documentoInt = (int) $documento;
                 if ($documentoInt > 2147483647) {
-                    $documentoInt = 0; // Si es muy grande, usar 0
+                    $documentoInt = 0;
                 }
             }
 
@@ -146,98 +194,205 @@ class ProcesarAfectaciones extends Command
                 'documento' => $documentoInt,
                 'sexo' => '-',
                 'cuit' => $cuil ?: '-',
-                'apelnombres' => mb_substr($afectacion['TITULAR'] ?? '-', 0, 50), // Limitar a 50 caracteres
+                'apelnombres' => mb_substr($afectacion['TITULAR'] ?? '-', 0, 50),
                 'nacimiento' => null,
-                'nacionalidad' => "Argentina",
+                'nacionalidad' => 'Argentina',
                 'domicilio' => '-',
                 'cod_postal_id' => $localidadDefaultId,
                 'telefono' => '-',
                 'email' => null,
-                'estado' => 'Activo',
-                'fechaestado' => null,
-                'observacion' => 'Importado desde afectaciones.json'
+                'estado' => $this->obtenerEstadoClienteDesdeAfectacion($afectacion),
+                'fechaestado' => $this->parsearFechaDeuda($afectacion['FECHA DEUDA'] ?? null),
+                'observacion' => 'Importado desde afectaciones.json',
             ]);
 
             return $cliente;
         } catch (\Exception $e) {
-            \Log::error('Error creando cliente: ' . $e->getMessage(), $afectacion);
+            Log::error('Error creando cliente: ' . $e->getMessage(), $afectacion);
             return null;
         }
     }
 
-    private function crearOperacion($afectacion, $clienteId, $usuarioDefaultId)
+    private function actualizarEstadoClienteDesdeAfectacion(Cliente $cliente, array $afectacion): void
+    {
+        $cliente->estado = $this->obtenerEstadoClienteDesdeAfectacion($afectacion);
+        $cliente->fechaestado = $this->parsearFechaDeuda($afectacion['FECHA DEUDA'] ?? null);
+        $cliente->save();
+    }
+
+    private function obtenerEstadoClienteDesdeAfectacion(array $afectacion): string
+    {
+        $estado = trim((string) ($afectacion['CODIGO DE ATRASO'] ?? ''));
+        if ($estado === '') {
+            $estado = 'PENDIENTE';
+        }
+
+        return mb_substr($estado, 0, 20);
+    }
+
+    private function parsearFechaDeuda($fecha): string
+    {
+        if (!empty($fecha)) {
+            try {
+                return Carbon::createFromFormat('n/j/y', (string) $fecha)->format('Y-m-d');
+            } catch (\Exception $e) {
+                return Carbon::now()->format('Y-m-d');
+            }
+        }
+
+        return Carbon::now()->format('Y-m-d');
+    }
+
+    private function crearOperacion(array $afectacion, int $clienteId, int $usuarioDefaultId, int $numeroOperacion): ?Operacion
     {
         try {
-            // Procesar fecha de deuda
-            $fechaDeuda = null;
-            if (!empty($afectacion['FECHA DEUDA'])) {
-                try {
-                    // Parsear fecha desde formato "m/d/y" (ej: "7/16/21") y convertir a "yyyy-mm-dd"
-                    $fechaCarbon = Carbon::createFromFormat('n/j/y', $afectacion['FECHA DEUDA']);
-                    $fechaDeuda = $fechaCarbon->format('Y-m-d');
-                } catch (\Exception $e) {
-                    $fechaDeuda = Carbon::now()->format('Y-m-d');
-                }
-            } else {
-                $fechaDeuda = Carbon::now()->format('Y-m-d');
+            $fechaDeuda = $this->parsearFechaDeuda($afectacion['FECHA DEUDA'] ?? null);
+
+            $cantCuotas = 1;
+            if (!empty($afectacion['CUOTAS'])) {
+                $cantCuotas = max(1, (int) $afectacion['CUOTAS']);
             }
 
-            // Procesar deuda total (quitar símbolos y convertir a decimal)
+            $valorCuota = 0;
+            if (!empty($afectacion['IMPORTE'])) {
+                $valorLimpioCuota = preg_replace('/[^\d.]/', '', str_replace(',', '.', (string) $afectacion['IMPORTE']));
+                $valorCuota = (float) $valorLimpioCuota;
+            }
+
             $deudaTotal = 0;
             if (!empty($afectacion['DEUDA TOTAL'])) {
-                // Eliminar comas y otros símbolos, luego convertir a float y formatear con 2 decimales
-                $valorLimpio = preg_replace('/[^\d.]/', '', str_replace(',', '', $afectacion['DEUDA TOTAL']));
-                $deudaTotal = number_format((float)$valorLimpio, 2, '.', '');
+                $valorLimpio = preg_replace('/[^\d.]/', '', str_replace(',', '', (string) $afectacion['DEUDA TOTAL']));
+                $deudaTotal = (float) $valorLimpio;
+            } elseif ($cantCuotas > 0 && $valorCuota > 0) {
+                $deudaTotal = $cantCuotas * $valorCuota;
             }
 
-            // Verificar que nodo_id existe, sino usar 1 por defecto
             $nodoId = 1;
             if (!empty($afectacion['id_nodo'])) {
-                $nodoExiste = \App\Models\Nodo::find((int)$afectacion['id_nodo']);
+                $nodoExiste = \App\Models\Nodo::find((int) $afectacion['id_nodo']);
                 if ($nodoExiste) {
-                    $nodoId = (int)$afectacion['id_nodo'];
+                    $nodoId = (int) $afectacion['id_nodo'];
                 }
             }
 
-            // Verificar que socio_id existe, sino usar 1 por defecto
-            $socioId = 1;
-            if (!empty($afectacion['id_socio'])) {
-                $socioExiste = \App\Models\Socio::find((int)$afectacion['id_socio']);
-                if ($socioExiste) {
-                    $socioId = (int)$afectacion['id_socio'];
-                }
-            }
+            $socioId = $this->resolverSocioIdDesdeAfectacion($afectacion);
 
-            // Procesar tipo de deudor
-            $tipoDeudor = strtoupper($afectacion['TIPO DEUDOR'] ?? '');
-            $tipo = 'Solicitante'; // Valor por defecto
-            if ($tipoDeudor === 'SOLICITANTE') {
-                $tipo = 'Solicitante';
-            } elseif ($tipoDeudor === 'GARANTE') {
+            $tipoDeudor = strtoupper((string) ($afectacion['TIPO DEUDOR'] ?? ''));
+            $tipo = 'Solicitante';
+            if ($tipoDeudor === 'GARANTE') {
                 $tipo = 'Garante';
             }
 
+            $referencia = $this->normalizarReferencia($afectacion['REFERENCIA'] ?? null);
+
+            $clase = mb_substr(trim((string) ($afectacion['OPERACION'] ?? '')), 0, 20);
+            if ($clase === '') {
+                $clase = 'Comercial';
+            }
+
             $operacion = Operacion::create([
-                'numero' => (int)($afectacion['ID'] ?? 0),
+                'numero' => $numeroOperacion,
                 'cliente_id' => $clienteId,
-                'estado_actual' => mb_substr($afectacion['CODIGO DE ATRASO'] ?? 'PENDIENTE', 0, 20),
+                'estado_actual' => mb_substr((string) ($afectacion['CODIGO DE ATRASO'] ?? 'PENDIENTE'), 0, 20),
                 'fecha_estado' => $fechaDeuda,
                 'nodo_id' => $nodoId,
                 'socio_id' => $socioId,
                 'tipo' => $tipo,
                 'fecha_operacion' => $fechaDeuda,
-                'valor_cuota' => 0,
-                'cant_cuotas' => 1,
+                'valor_cuota' => $valorCuota,
+                'cant_cuotas' => $cantCuotas,
                 'total' => $deudaTotal,
                 'fecha_cuota' => $fechaDeuda,
-                'clase' => 'Comercial',
-                'usuario_id' => $usuarioDefaultId
+                'clase' => $clase,
+                'referencia' => $referencia !== '' ? $referencia : null,
+                'usuario_id' => $usuarioDefaultId,
             ]);
 
             return $operacion;
         } catch (\Exception $e) {
-            \Log::error('Error creando operación: ' . $e->getMessage(), $afectacion);
+            Log::error('Error creando operacion: ' . $e->getMessage(), $afectacion);
             return null;
         }
+    }
+
+    private function obtenerReferenciasDuplicadasPorSocio(array $afectaciones): array
+    {
+        $registrosConReferenciaDuplicada = [];
+        $referenciasPorSocio = [];
+        $filasPorClave = [];
+
+        foreach ($afectaciones as $indice => $afectacion) {
+            $referencia = $this->normalizarReferencia($afectacion['REFERENCIA'] ?? null);
+            if ($referencia === '') {
+                continue;
+            }
+
+            $socioId = $this->resolverSocioIdDesdeAfectacion($afectacion);
+            $clave = $socioId . '|' . $referencia;
+
+            $referenciasPorSocio[$socioId][] = $referencia;
+            $filasPorClave[$clave][] = [
+                'indice' => $indice + 1,
+                'id' => $afectacion['ID'] ?? 'N/A',
+            ];
+        }
+
+        foreach ($referenciasPorSocio as $socioId => $referencias) {
+            $referenciasUnicas = array_values(array_unique($referencias));
+            if (empty($referenciasUnicas)) {
+                continue;
+            }
+
+            // Normalizar referencias existentes en BD para evitar falsos negativos por formato.
+            $referenciasBdNormalizadas = Operacion::where('socio_id', $socioId)
+                ->whereNotNull('referencia')
+                ->pluck('referencia')
+                ->map(function ($ref) {
+                    return $this->normalizarReferencia($ref);
+                })
+                ->filter(function ($ref) {
+                    return $ref !== '';
+                })
+                ->unique()
+                ->values()
+                ->all();
+
+            $referenciasExistentes = array_intersect($referenciasUnicas, $referenciasBdNormalizadas);
+
+            foreach ($referenciasExistentes as $referenciaExistente) {
+                $clave = $socioId . '|' . $referenciaExistente;
+                $filas = $filasPorClave[$clave] ?? [];
+
+                foreach ($filas as $fila) {
+                    $registrosConReferenciaDuplicada[] = [
+                        'indice' => $fila['indice'],
+                        'id' => $fila['id'],
+                        'socio_id' => $socioId,
+                        'referencia' => $referenciaExistente,
+                    ];
+                }
+            }
+        }
+
+        return $registrosConReferenciaDuplicada;
+    }
+
+    private function normalizarReferencia($referencia): string
+    {
+        $referenciaNormalizada = preg_replace('/[^A-Za-z0-9]/', '', (string) ($referencia ?? ''));
+        return mb_substr($referenciaNormalizada, 0, 20);
+    }
+
+    private function resolverSocioIdDesdeAfectacion(array $afectacion): int
+    {
+        $socioId = 1;
+        if (!empty($afectacion['id_socio'])) {
+            $socioExiste = Socio::find((int) $afectacion['id_socio']);
+            if ($socioExiste) {
+                $socioId = (int) $afectacion['id_socio'];
+            }
+        }
+
+        return $socioId;
     }
 }

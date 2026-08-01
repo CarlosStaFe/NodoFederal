@@ -28,8 +28,13 @@ class ObtainApiTokensOnLogin
         Log::info("Usuario autenticado: {$user->email}, obteniendo tokens API en memoria...");
         
         try {
-            // Obtener tokens automáticamente al login y almacenar solo en cache
-            $success = $this->apiTokenService->obtainTokensOnLogin($user);
+            // Garantizar conexión API activa al inicio de sesión
+            $success = !empty($this->apiTokenService->getValidToken($user));
+
+            if (request()->hasSession()) {
+                request()->session()->put('api_connection_active', $success);
+                request()->session()->put('api_connection_started_at', now()->toDateTimeString());
+            }
             
             if ($success) {
                 Log::info("Tokens API obtenidos y almacenados en memoria para {$user->email}");
