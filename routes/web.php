@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LocalidadController;
@@ -13,9 +14,17 @@ use App\Http\Controllers\OperacionController;
 use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\DatabaseController;
 
-Route::get('/', function () {
+/* Route::get('/', function () {
     return redirect()->route('admin.index');
-});
+}); */
+
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
+
+Route::post('/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 // Ruta de prueba temporal
 Route::get('/test-adminlte', function() {
