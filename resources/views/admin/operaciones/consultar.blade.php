@@ -96,7 +96,9 @@
                 <br>
                 <p>><small class="text-info">* Puede consultar por DNI (completando documento y sexo, se calculará el CUIL automáticamente) o por CUIL ( deberá completar el valor). Al consultar será redirigido automáticamente al informe.</small></p>
                 <br>
-                <div>                    
+                
+                <div>
+                    <a href="https://servicioswww.anses.gob.ar/C2-ConstaCUIL" class="btn btn-warning me-5" target="_blank" rel="noopener noreferrer">Buscar CUIL en ANSES</a>
                     <button type="button" id="limpiar" class="btn btn-primary me-5">Limpiar</button>
                     <button type="submit" class="btn btn-success me-5" id="btnConsultar">
                         <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>

@@ -59,6 +59,7 @@
             </nav>
 
             <a class="btn-getstarted" href="{{ route('login') }}">Ingresar</a>
+{{--             <a class="btn-getstarted" href="{{ route('login') }}" target="_blank" rel="noopener noreferrer">Ingresar</a> --}}
 
         </div>
     </header>
